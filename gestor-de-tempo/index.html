@@ -1,0 +1,1239 @@
+<title>Tempo — Trilha</title>
+<style>
+  :root {
+    --bg: oklch(97% 0.006 145);
+    --surface: oklch(99.5% 0.003 145);
+    --surface-muted: oklch(95.5% 0.006 145);
+    --border: oklch(88% 0.008 145);
+    --ink: oklch(20% 0.01 145);
+    --body-ink: oklch(42% 0.012 145);
+    --muted: oklch(58% 0.012 145);
+    --accent: #88AC67;
+    --accent-deep: #6f9450;
+    --accent-tint: oklch(94% 0.03 145);
+    --track: oklch(92% 0.008 145);
+    --danger: #b3593f;
+    --danger-tint: oklch(94% 0.03 40);
+    --warn: #b0852c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: oklch(18% 0.012 145);
+      --surface: oklch(22% 0.012 145);
+      --surface-muted: oklch(25% 0.012 145);
+      --border: oklch(30% 0.014 145);
+      --ink: oklch(94% 0.006 145);
+      --body-ink: oklch(78% 0.01 145);
+      --muted: oklch(62% 0.012 145);
+      --accent: #9dc17f;
+      --accent-deep: #88AC67;
+      --accent-tint: oklch(30% 0.03 145);
+      --track: oklch(28% 0.012 145);
+      --danger: #d98668;
+      --danger-tint: oklch(30% 0.03 40);
+      --warn: #d6ad5a;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: oklch(18% 0.012 145);
+    --surface: oklch(22% 0.012 145);
+    --surface-muted: oklch(25% 0.012 145);
+    --border: oklch(30% 0.014 145);
+    --ink: oklch(94% 0.006 145);
+    --body-ink: oklch(78% 0.01 145);
+    --muted: oklch(62% 0.012 145);
+    --accent: #9dc17f;
+    --accent-deep: #88AC67;
+    --accent-tint: oklch(30% 0.03 145);
+    --track: oklch(28% 0.012 145);
+    --danger: #d98668;
+    --danger-tint: oklch(30% 0.03 40);
+    --warn: #d6ad5a;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body {
+    background: var(--bg); color: var(--body-ink);
+    font-family: 'Work Sans', system-ui, sans-serif; font-size: 14px;
+    padding: 40px 20px 90px;
+  }
+  .page { width: 100%; max-width: 960px; margin: 0 auto; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  header { margin-bottom: 24px; }
+  .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+  .header-titles { min-width: 0; }
+  .header-logo { height: 32px; width: auto; flex: none; margin-top: 6px; display: block; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .header-logo { filter: invert(1) brightness(1.6); }
+  }
+  :root[data-theme="dark"] .header-logo { filter: invert(1) brightness(1.6); }
+  .eyebrow {
+    font-family: 'Comfortaa', sans-serif; font-weight: 600; font-size: 13px;
+    letter-spacing: 3px; color: var(--accent-deep); text-transform: uppercase;
+  }
+  h1 {
+    font-family: 'Comfortaa', sans-serif; font-weight: 600; font-size: 36px; line-height: 1.2;
+    color: var(--ink); margin: 10px 0 0; text-wrap: balance;
+  }
+
+  .bar {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    background: var(--bg); padding-block: 12px; margin-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+  }
+  .tabs, .people, .segmented { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tab {
+    font-family: 'Comfortaa', sans-serif; font-weight: 600; font-size: 12px; letter-spacing: 1px;
+    text-transform: uppercase; padding: 8px 14px; border-radius: 100px; border: 1px solid transparent;
+    background: transparent; color: var(--muted); cursor: pointer;
+  }
+  .tab:hover { color: var(--ink); }
+  .tab.is-selected { color: var(--accent-deep); border-color: var(--accent-deep); background: var(--accent-tint); }
+  .people-label { font-size: 12px; color: var(--muted); margin-right: 4px; align-self: center; }
+  .seg-pill {
+    font-family: 'Comfortaa', sans-serif; font-weight: 600; font-size: 12px; letter-spacing: .5px;
+    padding: 7px 13px; border-radius: 100px; border: 1px solid var(--border);
+    background: transparent; color: var(--body-ink); cursor: pointer;
+  }
+  .seg-pill:hover { border-color: var(--accent-deep); }
+  .seg-pill.is-selected { background: var(--accent-tint); border-color: var(--accent-deep); color: var(--accent-deep); }
+  .tab:focus-visible, .seg-pill:focus-visible, .btn:focus-visible, .chip:focus-visible, .day:focus-visible, .link:focus-visible {
+    outline: 2px solid var(--accent-deep); outline-offset: 2px;
+  }
+
+  .btn {
+    font-family: 'Work Sans', sans-serif; font-weight: 500; font-size: 14px; border-radius: 8px;
+    padding: 10px 16px; border: 1px solid var(--border); background: var(--surface); color: var(--ink);
+    cursor: pointer; transition: border-color .15s ease, background .15s ease;
+  }
+  .btn:hover { border-color: var(--accent-deep); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-primary { background: var(--accent-deep); border-color: var(--accent-deep); color: #fff; }
+  .btn-primary:hover { background: var(--accent); border-color: var(--accent); }
+  .btn-stop { background: var(--danger); border-color: var(--danger); color: #fff; }
+  .btn-stop:hover { opacity: .9; border-color: var(--danger); }
+  .btn-small { padding: 6px 11px; font-size: 13px; }
+  .link {
+    background: none; border: none; padding: 4px 6px; cursor: pointer; font: inherit; font-size: 13px;
+    color: var(--muted); border-radius: 6px;
+  }
+  .link:hover { color: var(--accent-deep); }
+  .link.danger:hover { color: var(--danger); }
+
+  section.view { display: flex; flex-direction: column; gap: 28px; }
+  .section-head {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 14px;
+  }
+  .section-title {
+    font-family: 'Comfortaa', sans-serif; font-weight: 600; font-size: 14px;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--ink); margin: 0;
+  }
+  .section-meta { font-size: 13px; color: var(--muted); }
+  .section-meta b { color: var(--ink); font-weight: 500; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .timer-card { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+  .timer-card.is-running { border-color: var(--accent-deep); }
+  .timer-running { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; justify-content: space-between; }
+  .elapsed {
+    font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: 44px; color: var(--ink);
+    font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .running-what { flex: 1; min-width: 200px; }
+  .running-where { font-family: 'Comfortaa', sans-serif; font-weight: 600; color: var(--ink); font-size: 16px; }
+  .running-desc { color: var(--body-ink); margin-top: 4px; }
+  .running-since { color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+  .dot-live { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-right: 6px; animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .35; } }
+  @media (prefers-reduced-motion: reduce) { .dot-live { animation: none; } }
+
+  .grid-form { display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px 14px; align-items: end; }
+  .col-12 { grid-column: span 12; } .col-6 { grid-column: span 6; } .col-4 { grid-column: span 4; }
+  .col-3 { grid-column: span 3; } .col-8 { grid-column: span 8; }
+  @media (max-width: 640px) { .col-6, .col-4, .col-3, .col-8 { grid-column: span 12; } .col-3.keep { grid-column: span 6; } }
+  .field label, .field .label {
+    display: block; font-size: 11.5px; letter-spacing: .6px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 6px;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%; font-family: 'Work Sans', sans-serif; font-size: 14.5px; color: var(--ink);
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--accent-deep); outline-offset: 1px; border-color: var(--accent-deep); }
+  .hint { font-size: 12.5px; color: var(--muted); }
+  .hint.warn { color: var(--danger); }
+  .form-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px; max-width: 100%;
+    font-size: 13px; padding: 6px 12px; border-radius: 100px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--body-ink); cursor: pointer; text-align: left;
+  }
+  .chip:hover { border-color: var(--accent-deep); color: var(--ink); }
+  .chip b { color: var(--ink); font-weight: 500; }
+  .chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .others { font-size: 13px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+  .others b { color: var(--body-ink); font-weight: 500; }
+
+  .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  .day {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 8px;
+    cursor: pointer; display: flex; flex-direction: column; gap: 6px; align-items: stretch; text-align: left;
+    font: inherit; color: inherit;
+  }
+  .day:hover { border-color: var(--accent-deep); }
+  .day.is-selected { border-color: var(--accent-deep); background: var(--accent-tint); }
+  .day-name { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+  .day-date { font-family: 'Comfortaa', sans-serif; font-weight: 600; color: var(--ink); font-size: 13px; }
+  .day-hours { font-size: 13px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .day-bar { height: 6px; border-radius: 3px; background: var(--track); overflow: hidden; }
+  .day-bar i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+  @media (max-width: 560px) { .day { padding: 8px 5px; } .day-date { font-size: 12px; } .day-hours { font-size: 11.5px; } }
+
+  .entries { display: flex; flex-direction: column; gap: 8px; }
+  .entry {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;
+    display: grid; grid-template-columns: 110px 1fr auto; gap: 12px; align-items: center;
+  }
+  .entry-time { font-variant-numeric: tabular-nums; color: var(--ink); font-size: 13.5px; }
+  .entry-time small { display: block; color: var(--muted); font-size: 12px; }
+  .entry-main { min-width: 0; }
+  .entry-where { font-family: 'Comfortaa', sans-serif; font-weight: 600; color: var(--ink); font-size: 14px; }
+  .entry-desc { color: var(--body-ink); font-size: 13.5px; margin-top: 2px; word-break: break-word; }
+  .entry-flags { margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .entry-actions { display: flex; gap: 2px; }
+  @media (max-width: 560px) { .entry { grid-template-columns: 1fr auto; } .entry-time { grid-column: 1 / -1; } }
+  .pill {
+    display: inline-block; font-size: 11.5px; padding: 2px 9px; border-radius: 100px;
+    border: 1px solid var(--border); color: var(--muted); background: var(--surface-muted); white-space: nowrap;
+  }
+  .pill.accent { color: var(--accent-deep); border-color: var(--accent-deep); background: var(--accent-tint); }
+  .pill.danger { color: var(--danger); border-color: var(--danger); background: var(--danger-tint); }
+  .empty { font-size: 13.5px; color: var(--muted); font-style: italic; padding: 8px 2px; }
+
+  .panel { background: var(--surface); border: 1px solid var(--accent-deep); border-radius: 12px; padding: 18px; }
+  .panel-title { font-family: 'Comfortaa', sans-serif; font-weight: 600; color: var(--ink); font-size: 15px; margin: 0 0 14px; }
+
+  .projects { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
+  .project { display: flex; flex-direction: column; gap: 10px; }
+  .project-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+  .project-name { font-family: 'Comfortaa', sans-serif; font-weight: 600; font-size: 15.5px; color: var(--ink); }
+  .project-sub { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+  .kv { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .kv div { display: flex; flex-direction: column; gap: 2px; }
+  .kv small { font-size: 11px; letter-spacing: .5px; text-transform: uppercase; color: var(--muted); }
+  .kv b { font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; font-size: 14px; }
+  .meters { display: flex; flex-direction: column; gap: 7px; }
+  .meter-row { display: grid; grid-template-columns: 118px 1fr 92px; gap: 8px; align-items: center; font-size: 12.5px; }
+  .meter-row .m-label { color: var(--body-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .meter-row .m-val { text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .meter { height: 8px; border-radius: 4px; background: var(--track); overflow: hidden; position: relative; }
+  .meter i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
+  .meter.over i { background: var(--danger); }
+  .meter.near i { background: var(--warn); }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+  .tile small { display: block; font-size: 11px; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); }
+  .tile b { display: block; font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: 26px; color: var(--ink); margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .tile span { font-size: 12.5px; color: var(--muted); }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  th { font-size: 11px; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); font-weight: 500; background: var(--surface-muted); }
+  td { color: var(--body-ink); }
+  td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
+  td.name { color: var(--ink); white-space: normal; min-width: 160px; }
+  tr:last-child td { border-bottom: none; }
+  tr.total td { font-weight: 600; color: var(--ink); background: var(--surface-muted); }
+  td.barcell { width: 32%; min-width: 120px; }
+  .hbar { height: 8px; border-radius: 4px; background: var(--track); overflow: hidden; }
+  .hbar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
+
+  .list-edit { display: flex; flex-direction: column; gap: 8px; }
+  .list-edit-row { display: flex; gap: 8px; align-items: center; }
+  .list-edit-row input { flex: 1; }
+  .person-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr auto; gap: 10px; align-items: end; }
+  @media (max-width: 640px) { .person-row { grid-template-columns: 1fr 1fr; } }
+
+  .notice { font-size: 13px; color: var(--body-ink); background: var(--accent-tint); border: 1px solid var(--accent-deep); border-radius: 10px; padding: 10px 14px; }
+  .notice.danger { background: var(--danger-tint); border-color: var(--danger); }
+  .toast {
+    position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+    background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 8px; font-size: 13.5px; z-index: 20;
+    max-width: calc(100% - 32px);
+  }
+
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+
+  @media (max-width: 480px) {
+    body { padding: 28px 16px 72px; }
+    h1 { font-size: 28px; }
+    .header-logo { height: 22px; margin-top: 2px; }
+    .elapsed { font-size: 36px; }
+  }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Work+Sans:wght@300;400;500;600&display=swap">
+
+<div class="page">
+  <header>
+    <div class="header-top">
+      <div class="header-titles">
+        <div class="eyebrow">Trilha · Gestão</div>
+        <h1>Tempo</h1>
+      </div>
+      <img class="header-logo" src="logo.png" alt="Trilha Arquitetura Brasileira">
+    </div>
+  </header>
+
+  <div class="bar">
+    <nav class="tabs" id="tabs" aria-label="Seções">
+      <button class="tab is-selected" data-tab="agora">Agora</button>
+      <button class="tab" data-tab="projetos">Projetos</button>
+      <button class="tab" data-tab="relatorios">Relatórios</button>
+      <button class="tab" data-tab="config">Configurações</button>
+    </nav>
+    <div class="people" id="people"><span class="people-label">Lançando como</span></div>
+  </div>
+
+  <div id="status" class="notice" hidden></div>
+
+  <!-- AGORA -->
+  <section class="view" id="view-agora">
+    <div>
+      <div class="card timer-card" id="timer-card">
+        <div id="timer-running" class="timer-running" hidden>
+          <div class="running-what">
+            <div class="running-where" id="run-where"></div>
+            <div class="running-desc" id="run-desc"></div>
+            <div class="running-since" id="run-since"></div>
+          </div>
+          <div class="elapsed" id="run-elapsed">0:00:00</div>
+          <button class="btn btn-stop" id="btn-stop">Parar e salvar</button>
+        </div>
+        <form id="timer-form" class="grid-form" autocomplete="off">
+          <div class="field col-4">
+            <label for="t-alvo">Onde</label>
+            <select id="t-alvo"></select>
+          </div>
+          <div class="field col-4" id="t-etapa-wrap">
+            <label for="t-etapa">Etapa</label>
+            <select id="t-etapa"></select>
+          </div>
+          <div class="field col-4">
+            <label for="t-desc">O que está fazendo</label>
+            <input id="t-desc" list="desc-list" placeholder="Ex.: Detalhamento banheiro Paula e Bruno">
+          </div>
+          <div class="col-12 form-actions">
+            <button class="btn btn-primary" id="btn-start" type="submit">Iniciar cronômetro</button>
+            <span class="hint" id="t-hint"></span>
+          </div>
+        </form>
+        <div>
+          <div class="hint" style="margin-bottom:8px">Continuar de onde parou</div>
+          <div class="chips" id="recent"></div>
+        </div>
+        <div class="others" id="others" hidden></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-head">
+        <h2 class="section-title">Semana</h2>
+        <div class="section-meta" id="week-meta"></div>
+      </div>
+      <div class="week" id="week"></div>
+    </div>
+
+    <div>
+      <div class="section-head">
+        <h2 class="section-title" id="day-title">Hoje</h2>
+        <div class="form-actions">
+          <span class="section-meta" id="day-meta"></span>
+          <button class="btn btn-small" id="btn-manual">+ Lançamento manual</button>
+        </div>
+      </div>
+      <div class="panel" id="entry-panel" hidden>
+        <h3 class="panel-title" id="entry-panel-title">Lançamento manual</h3>
+        <form id="entry-form" class="grid-form" autocomplete="off">
+          <div class="field col-4"><label for="e-data">Data</label><input type="date" id="e-data" required></div>
+          <div class="field col-4 col-3 keep"><label for="e-ini">Início</label><input type="time" id="e-ini" required></div>
+          <div class="field col-4 col-3 keep"><label for="e-fim">Fim</label><input type="time" id="e-fim" required></div>
+          <div class="field col-4"><label for="e-alvo">Onde</label><select id="e-alvo"></select></div>
+          <div class="field col-4" id="e-etapa-wrap"><label for="e-etapa">Etapa</label><select id="e-etapa"></select></div>
+          <div class="field col-4"><label for="e-desc">O que foi feito</label><input id="e-desc" list="desc-list"></div>
+          <div class="field col-12" id="e-just-wrap" hidden>
+            <label for="e-just">Justificativa (semana já fechada)</label>
+            <input id="e-just" placeholder="Por que este ajuste está sendo feito?">
+          </div>
+          <div class="col-12 form-actions">
+            <button class="btn btn-primary" type="submit" id="e-save">Salvar</button>
+            <button class="btn" type="button" id="e-cancel">Cancelar</button>
+            <span class="hint" id="e-hint"></span>
+          </div>
+        </form>
+      </div>
+      <div class="panel" id="del-panel" hidden>
+        <h3 class="panel-title">Excluir lançamento</h3>
+        <div class="grid-form">
+          <div class="col-12 hint" id="del-info"></div>
+          <div class="field col-12" id="del-just-wrap"><label for="del-just">Justificativa (semana já fechada)</label><input id="del-just"></div>
+          <div class="col-12 form-actions">
+            <button class="btn btn-stop" id="del-confirm">Excluir</button>
+            <button class="btn" id="del-cancel">Cancelar</button>
+            <span class="hint warn" id="del-hint"></span>
+          </div>
+        </div>
+      </div>
+      <div class="entries" id="entries" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <!-- PROJETOS -->
+  <section class="view" id="view-projetos" hidden>
+    <div>
+      <div class="section-head">
+        <h2 class="section-title">Projetos</h2>
+        <div class="form-actions">
+          <div class="segmented" id="proj-filter">
+            <button class="seg-pill is-selected" data-f="ativo">Ativos</button>
+            <button class="seg-pill" data-f="pausado">Pausados</button>
+            <button class="seg-pill" data-f="concluido">Concluídos</button>
+          </div>
+          <button class="btn btn-small btn-primary" id="btn-new-proj">+ Novo projeto</button>
+        </div>
+      </div>
+      <div class="panel" id="proj-panel" hidden style="margin-bottom:14px">
+        <h3 class="panel-title" id="proj-panel-title">Novo projeto</h3>
+        <form id="proj-form" class="grid-form" autocomplete="off">
+          <div class="field col-6"><label for="p-nome">Nome do projeto</label><input id="p-nome" required placeholder="Ex.: Residência Gustavo"></div>
+          <div class="field col-6"><label for="p-cliente">Cliente</label><input id="p-cliente"></div>
+          <div class="field col-3 keep"><label for="p-tipo">Tipo</label><select id="p-tipo"></select></div>
+          <div class="field col-3 keep"><label for="p-area">Área (m²)</label><input id="p-area" type="number" min="0" step="0.01" inputmode="decimal"></div>
+          <div class="field col-3 keep"><label for="p-hon">Honorário (R$)</label><input id="p-hon" type="number" min="0" step="0.01" inputmode="decimal"></div>
+          <div class="field col-3 keep"><label for="p-status">Situação</label>
+            <select id="p-status"><option value="ativo">Ativo</option><option value="pausado">Pausado</option><option value="concluido">Concluído</option></select>
+          </div>
+          <div class="col-12"><div class="label hint" style="text-transform:uppercase;letter-spacing:.6px;font-size:11.5px">Horas previstas por etapa (opcional)</div></div>
+          <div class="col-12 grid-form" id="p-prev" style="gap:10px"></div>
+          <div class="col-12 form-actions">
+            <button class="btn btn-primary" type="submit">Salvar projeto</button>
+            <button class="btn" type="button" id="p-cancel">Cancelar</button>
+          </div>
+        </form>
+      </div>
+      <div class="projects" id="projects"></div>
+    </div>
+  </section>
+
+  <!-- RELATÓRIOS -->
+  <section class="view" id="view-relatorios" hidden>
+    <div class="card grid-form">
+      <div class="field col-4"><label for="r-periodo">Período</label>
+        <select id="r-periodo">
+          <option value="semana">Esta semana</option>
+          <option value="mes" selected>Este mês</option>
+          <option value="mesant">Mês anterior</option>
+          <option value="ano">Este ano</option>
+          <option value="custom">Personalizado</option>
+        </select>
+      </div>
+      <div class="field col-4 col-3 keep" id="r-de-wrap" hidden><label for="r-de">De</label><input type="date" id="r-de"></div>
+      <div class="field col-4 col-3 keep" id="r-ate-wrap" hidden><label for="r-ate">Até</label><input type="date" id="r-ate"></div>
+      <div class="field col-4"><label for="r-pessoa">Pessoa</label><select id="r-pessoa"></select></div>
+      <div class="col-12 form-actions">
+        <span class="hint" id="r-range"></span>
+        <button class="btn btn-small" id="btn-csv">Exportar lançamentos (CSV)</button>
+      </div>
+    </div>
+    <div class="tiles" id="r-tiles"></div>
+    <div><div class="section-head"><h2 class="section-title">Por pessoa</h2></div><div id="r-pessoas"></div></div>
+    <div><div class="section-head"><h2 class="section-title">Por projeto</h2></div><div id="r-projetos"></div></div>
+    <div><div class="section-head"><h2 class="section-title">Por etapa</h2><span class="section-meta">Soma de todos os projetos no período</span></div><div id="r-etapas"></div></div>
+    <div><div class="section-head"><h2 class="section-title">Áreas internas</h2><span class="section-meta">Tempo não faturável</span></div><div id="r-areas"></div></div>
+    <div><div class="section-head"><h2 class="section-title">Por atividade</h2><span class="section-meta">Descrições mais frequentes</span></div><div id="r-ativ"></div></div>
+    <div>
+      <div class="section-head">
+        <h2 class="section-title">Fechamento mensal</h2>
+        <div class="form-actions">
+          <select id="f-pessoa" class="btn btn-small" aria-label="Pessoa do fechamento"></select>
+          <input type="month" id="f-mes" class="btn btn-small" aria-label="Mês do fechamento">
+          <button class="btn btn-small" id="btn-fech-csv">Exportar (CSV)</button>
+        </div>
+      </div>
+      <div id="r-fech"></div>
+    </div>
+  </section>
+
+  <!-- CONFIGURAÇÕES -->
+  <section class="view" id="view-config" hidden>
+    <div>
+      <div class="section-head"><h2 class="section-title">Pessoas</h2><span class="section-meta">Valores usados nos custos e no fechamento</span></div>
+      <div class="card" style="display:flex;flex-direction:column;gap:14px">
+        <div id="cfg-people" style="display:flex;flex-direction:column;gap:14px"></div>
+        <div class="form-actions"><button class="btn btn-small" id="btn-add-person">+ Adicionar pessoa</button></div>
+        <div class="hint">Custo-hora: quanto a hora da pessoa custa ao escritório (salário, pró-labore, encargos). Valor-hora de pagamento: usado no fechamento mensal. Os dois podem ficar vazios por enquanto.</div>
+      </div>
+    </div>
+    <div>
+      <div class="section-head"><h2 class="section-title">Escritório</h2><span class="section-meta" id="cfg-office-meta"></span></div>
+      <div class="card grid-form">
+        <div class="field col-4"><label for="c-fixos">Custos fixos mensais (R$)</label><input type="number" id="c-fixos" min="0" step="0.01" inputmode="decimal" placeholder="Aluguel, softwares, contador…"></div>
+        <div class="field col-4"><label for="c-horas">Horas produtivas por pessoa / mês</label><input type="number" id="c-horas" min="1" step="1" placeholder="112"></div>
+        <div class="col-4 form-actions"><button class="btn btn-primary" id="btn-save-office">Salvar</button></div>
+        <div class="col-12 hint">Referência de mercado: de 160 h disponíveis, cerca de 70% (112 h) são produtivas. O custo fixo é dividido pelas horas produtivas e somado ao custo-hora de cada pessoa.</div>
+      </div>
+    </div>
+    <div class="grid-form" style="gap:28px">
+      <div class="col-6">
+        <div class="section-head"><h2 class="section-title">Etapas de projeto</h2></div>
+        <div class="card"><div class="list-edit" id="cfg-etapas"></div>
+          <div class="form-actions" style="margin-top:10px"><button class="btn btn-small" data-add="etapas">+ Etapa</button><button class="btn btn-small btn-primary" data-save="etapas">Salvar</button></div></div>
+      </div>
+      <div class="col-6">
+        <div class="section-head"><h2 class="section-title">Áreas internas</h2></div>
+        <div class="card"><div class="list-edit" id="cfg-areas"></div>
+          <div class="form-actions" style="margin-top:10px"><button class="btn btn-small" data-add="areas">+ Área</button><button class="btn btn-small btn-primary" data-save="areas">Salvar</button></div></div>
+      </div>
+      <div class="col-6">
+        <div class="section-head"><h2 class="section-title">Tipos de projeto</h2></div>
+        <div class="card"><div class="list-edit" id="cfg-tipos"></div>
+          <div class="form-actions" style="margin-top:10px"><button class="btn btn-small" data-add="tipos">+ Tipo</button><button class="btn btn-small btn-primary" data-save="tipos">Salvar</button></div></div>
+      </div>
+    </div>
+  </section>
+
+  <datalist id="desc-list"></datalist>
+
+  <footer>
+    Semana de segunda a domingo. Lançamentos de semanas anteriores só podem ser incluídos, alterados ou excluídos com justificativa, que fica registrada.
+  </footer>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function () {
+  "use strict";
+  var db = null, downloads = null;
+  var state = {
+    pessoas: [], projetos: [], lanc: [], lancDocs: {}, timers: {},
+    config: null, tab: "agora", pessoaId: null, dia: null,
+    projFiltro: "ativo", editEntryId: null, delEntryId: null, editProjId: null
+  };
+  var DEFAULT_CONFIG = {
+    etapas: [
+      { id: "ep", nome: "Estudo Preliminar" }, { id: "ap", nome: "Anteprojeto" },
+      { id: "pl", nome: "Projeto Legal" }, { id: "comp", nome: "Compatibilização" },
+      { id: "ex", nome: "Projeto Executivo" }, { id: "obra", nome: "Obra" }
+    ],
+    areas: [
+      { id: "adm", nome: "Administrativo" }, { id: "mkt", nome: "Marketing" },
+      { id: "com", nome: "Comercial e captação" }, { id: "cap", nome: "Capacitação" }
+    ],
+    tipos: [
+      { id: "res", nome: "Residencial" }, { id: "comr", nome: "Comercial" },
+      { id: "int", nome: "Interiores" }, { id: "ref", nome: "Reforma" }, { id: "out", nome: "Outro" }
+    ],
+    custosFixosMensais: null, horasProdutivasMes: 112
+  };
+
+  // ---------- utilidades ----------
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function ymd(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+  function parseYmd(s) { var p = s.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function hm(d) { return pad(d.getHours()) + ":" + pad(d.getMinutes()); }
+  function fmtH(min) { min = Math.round(min || 0); var h = Math.floor(min / 60), m = min % 60; return h + "h" + pad(m); }
+  function fmtClock(ms) { var s = Math.max(0, Math.floor(ms / 1000)); return Math.floor(s / 3600) + ":" + pad(Math.floor(s / 60) % 60) + ":" + pad(s % 60); }
+  function fmtBRL(v) { return v == null || isNaN(v) ? "—" : v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }); }
+  function fmtNum(v, d) { return v == null || isNaN(v) ? "—" : v.toLocaleString("pt-BR", { maximumFractionDigits: d == null ? 1 : d }); }
+  function fmtDia(d) { return d.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" }); }
+  function numOrNull(v) { if (v === "" || v == null) return null; var n = parseFloat(String(v).replace(",", ".")); return isNaN(n) ? null : n; }
+  function weekStart(d) { var x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); var wd = (x.getDay() + 6) % 7; x.setDate(x.getDate() - wd); return x; }
+  function addDays(d, n) { var x = new Date(d); x.setDate(x.getDate() + n); return x; }
+  function isLocked(iniIso) { return new Date(iniIso) < weekStart(new Date()); }
+  function slug(s) { return String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || ("x" + Date.now()); }
+  function toast(msg) { var t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(function () { t.hidden = true; }, 2600); }
+  function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+
+  function cfg() { return state.config || DEFAULT_CONFIG; }
+  function byId(list, id) { for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]; return null; }
+  function pessoa(id) { return byId(state.pessoas, id); }
+  function projeto(id) { return byId(state.projetos, id); }
+  function etapaNome(id) { var e = byId(cfg().etapas, id); return e ? e.nome : (id ? "Etapa removida" : ""); }
+  function areaNome(id) { var a = byId(cfg().areas, id); return a ? a.nome : "Área removida"; }
+  function tipoNome(id) { var t = byId(cfg().tipos, id); return t ? t.nome : ""; }
+  function alvoNome(l) { if (l.tipo === "area") return areaNome(l.alvoId); var p = projeto(l.alvoId); return p ? p.nome : "Projeto removido"; }
+  function alvoKey(tipo, id) { return tipo + ":" + id; }
+  function lancAtivos() { return state.lanc.filter(function (l) { return !l.excluido; }); }
+
+  // Lançamentos ficam agrupados: um documento por pessoa por mês (lancamentos/<pessoa>_<AAAA-MM>),
+  // com a lista em "itens". Isso mantém o banco bem abaixo do limite de documentos.
+  function mesDoc(pid, iniIso) { return pid + "_" + ymd(new Date(iniIso)).slice(0, 7); }
+  function itensDoc(docId) { return (state.lancDocs[docId] || []).map(function (x) { return Object.assign({}, x); }); }
+  async function gravarDoc(docId, pid, itens) {
+    state.lancDocs[docId] = itens; flattenLanc();
+    await db.doc("lancamentos/" + docId).set({ pessoaId: pid, mes: docId.slice(-7), itens: itens });
+  }
+  function novoId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  async function addLanc(l) {
+    l.id = novoId(); var docId = mesDoc(l.pessoaId, l.inicio), itens = itensDoc(docId);
+    itens.push(l); await gravarDoc(docId, l.pessoaId, itens);
+  }
+  async function updateLanc(id, patch) {
+    var old = byId(state.lanc, id); if (!old) return;
+    var novo = Object.assign({}, old, patch); delete novo._doc;
+    var docOld = old._doc, docNew = mesDoc(novo.pessoaId, novo.inicio);
+    var itensOld = itensDoc(docOld).filter(function (x) { return x.id !== id; });
+    if (docOld === docNew) { itensOld.push(novo); await gravarDoc(docOld, novo.pessoaId, itensOld); }
+    else {
+      var itensNew = itensDoc(docNew); itensNew.push(novo);
+      await gravarDoc(docNew, novo.pessoaId, itensNew);
+      await gravarDoc(docOld, old.pessoaId, itensOld);
+    }
+  }
+  async function removeLanc(id) {
+    var old = byId(state.lanc, id); if (!old) return;
+    await gravarDoc(old._doc, old.pessoaId, itensDoc(old._doc).filter(function (x) { return x.id !== id; }));
+  }
+  function flattenLanc() {
+    var out = [];
+    Object.keys(state.lancDocs).forEach(function (docId) {
+      state.lancDocs[docId].forEach(function (x) { var o = Object.assign({}, x); o._doc = docId; out.push(o); });
+    });
+    state.lanc = out;
+  }
+
+  // custo-hora total da pessoa = custo-hora próprio + rateio dos custos fixos
+  function rateioHora() {
+    var c = cfg(), ativos = state.pessoas.filter(function (p) { return p.ativo !== false; }).length || 1;
+    if (c.custosFixosMensais == null || !c.horasProdutivasMes) return null;
+    return c.custosFixosMensais / (c.horasProdutivasMes * ativos);
+  }
+  function custoHoraTotal(pid) {
+    var p = pessoa(pid); var r = rateioHora();
+    if (!p || p.custoHora == null) return null;
+    return p.custoHora + (r || 0);
+  }
+  function custoLanc(l) { var ch = custoHoraTotal(l.pessoaId); return ch == null ? null : ch * l.min / 60; }
+
+  // ---------- abas e pessoas ----------
+  function setTab(t) {
+    state.tab = t; ls("tempo.tab", t);
+    Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (b) { b.classList.toggle("is-selected", b.dataset.tab === t); });
+    ["agora", "projetos", "relatorios", "config"].forEach(function (v) { $("view-" + v).hidden = v !== t; });
+    render();
+  }
+  $("tabs").addEventListener("click", function (e) { var b = e.target.closest(".tab"); if (b) setTab(b.dataset.tab); });
+
+  function renderPeople() {
+    var wrap = $("people");
+    var html = '<span class="people-label">Lançando como</span>';
+    state.pessoas.filter(function (p) { return p.ativo !== false; }).forEach(function (p) {
+      html += '<button class="seg-pill' + (p.id === state.pessoaId ? " is-selected" : "") + '" data-p="' + esc(p.id) + '">' + esc(p.nome) + (state.timers[p.id] ? ' <span class="dot-live" aria-label="cronômetro ligado"></span>' : "") + "</button>";
+    });
+    wrap.innerHTML = html;
+  }
+  $("people").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-p]"); if (!b) return;
+    state.pessoaId = b.dataset.p; ls("tempo.pessoa", state.pessoaId); render();
+  });
+
+  // ---------- selects de onde/etapa ----------
+  function fillAlvo(sel, current) {
+    var ativos = state.projetos.filter(function (p) { return p.status !== "concluido"; }).sort(function (a, b) { return a.nome.localeCompare(b.nome); });
+    var html = '<option value="">Escolha…</option>';
+    if (ativos.length) {
+      html += '<optgroup label="Projetos">';
+      ativos.forEach(function (p) { html += '<option value="projeto:' + esc(p.id) + '">' + esc(p.nome) + "</option>"; });
+      html += "</optgroup>";
+    }
+    html += '<optgroup label="Áreas internas">';
+    cfg().areas.forEach(function (a) { html += '<option value="area:' + esc(a.id) + '">' + esc(a.nome) + "</option>"; });
+    html += "</optgroup>";
+    // projeto concluído em edição continua disponível
+    if (current && current.indexOf("projeto:") === 0 && !ativos.some(function (p) { return "projeto:" + p.id === current; })) {
+      var p = projeto(current.slice(8)); if (p) html += '<option value="' + esc(current) + '">' + esc(p.nome) + " (concluído)</option>";
+    }
+    sel.innerHTML = html;
+    sel.value = current || "";
+  }
+  function fillEtapa(sel, current) {
+    var html = '<option value="">Escolha…</option>';
+    cfg().etapas.forEach(function (e) { html += '<option value="' + esc(e.id) + '">' + esc(e.nome) + "</option>"; });
+    sel.innerHTML = html; sel.value = current || "";
+  }
+  function syncEtapaVisibility(alvoSel, wrap) { wrap.hidden = !(alvoSel.value.indexOf("projeto:") === 0); }
+  $("t-alvo").addEventListener("change", function () { syncEtapaVisibility($("t-alvo"), $("t-etapa-wrap")); });
+  $("e-alvo").addEventListener("change", function () { syncEtapaVisibility($("e-alvo"), $("e-etapa-wrap")); });
+
+  function readCombo(alvoSel, etapaSel, descInp) {
+    var v = alvoSel.value; if (!v) return { erro: "Escolha onde você está trabalhando." };
+    var i = v.indexOf(":"), tipo = v.slice(0, i), alvoId = v.slice(i + 1);
+    var etapaId = tipo === "projeto" ? (etapaSel.value || null) : null;
+    if (tipo === "projeto" && !etapaId) return { erro: "Escolha a etapa do projeto." };
+    return { tipo: tipo, alvoId: alvoId, etapaId: etapaId, descricao: descInp.value.trim() };
+  }
+
+  // ---------- cronômetro ----------
+  function myTimer() { return state.pessoaId ? state.timers[state.pessoaId] : null; }
+
+  async function startTimer(combo) {
+    if (!db || !state.pessoaId) return;
+    var atual = myTimer();
+    if (atual) await stopTimer(true);
+    var t = { pessoaId: state.pessoaId, tipo: combo.tipo, alvoId: combo.alvoId, etapaId: combo.etapaId, descricao: combo.descricao || "", inicio: new Date().toISOString() };
+    state.timers[state.pessoaId] = t; render();
+    try { await db.doc("timers/" + state.pessoaId).set(t); }
+    catch (e) { showError(e); }
+  }
+
+  async function stopTimer(silent) {
+    var t = myTimer(); if (!t || !db) return;
+    var fim = new Date(), ini = new Date(t.inicio);
+    var min = (fim - ini) / 60000;
+    delete state.timers[state.pessoaId]; render();
+    try {
+      if (min >= 1) {
+        await addLanc({
+          pessoaId: t.pessoaId, tipo: t.tipo, alvoId: t.alvoId, etapaId: t.etapaId || null,
+          descricao: t.descricao || "", inicio: t.inicio, fim: fim.toISOString(), min: Math.round(min * 10) / 10,
+          origem: "cronometro", criadoEm: fim.toISOString(), excluido: false, ajustes: []
+        });
+        if (!silent) toast("Salvo: " + fmtH(min));
+      } else if (!silent) toast("Menos de 1 minuto: não foi salvo.");
+      await db.doc("timers/" + t.pessoaId).delete();
+    } catch (e) { showError(e); }
+  }
+
+  $("timer-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var c = readCombo($("t-alvo"), $("t-etapa"), $("t-desc"));
+    if (c.erro) { $("t-hint").textContent = c.erro; return; }
+    $("t-hint").textContent = "";
+    startTimer(c); $("t-desc").value = "";
+  });
+  $("btn-stop").addEventListener("click", function () { stopTimer(false); });
+
+  function recentCombos() {
+    var seen = {}, out = [];
+    var mine = lancAtivos().filter(function (l) { return l.pessoaId === state.pessoaId; }).sort(function (a, b) { return b.inicio < a.inicio ? -1 : 1; });
+    for (var i = 0; i < mine.length && out.length < 6; i++) {
+      var l = mine[i]; if (l.tipo === "projeto" && !projeto(l.alvoId)) continue;
+      if (l.tipo === "projeto" && projeto(l.alvoId).status === "concluido") continue;
+      var k = [l.tipo, l.alvoId, l.etapaId, l.descricao].join("|"); if (seen[k]) continue; seen[k] = 1;
+      out.push({ tipo: l.tipo, alvoId: l.alvoId, etapaId: l.etapaId, descricao: l.descricao || "" });
+    }
+    return out;
+  }
+  $("recent").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-i]"); if (!b) return;
+    var c = recentCombos()[+b.dataset.i]; if (c) startTimer(c);
+  });
+
+  function renderTimer() {
+    var t = myTimer();
+    $("timer-card").classList.toggle("is-running", !!t);
+    $("timer-running").hidden = !t;
+    $("btn-start").textContent = t ? "Trocar para esta atividade" : "Iniciar cronômetro";
+    if (t) {
+      $("run-where").innerHTML = '<span class="dot-live"></span>' + esc(alvoNome(t)) + (t.etapaId ? " · " + esc(etapaNome(t.etapaId)) : "");
+      $("run-desc").textContent = t.descricao || "Sem descrição";
+      $("run-since").textContent = "Desde " + hm(new Date(t.inicio));
+      tick();
+    }
+    var tv = $("t-alvo").value, te = $("t-etapa").value;
+    fillAlvo($("t-alvo"), tv); fillEtapa($("t-etapa"), te);
+    syncEtapaVisibility($("t-alvo"), $("t-etapa-wrap"));
+    var rc = recentCombos();
+    $("recent").innerHTML = rc.length ? rc.map(function (c, i) {
+      return '<button class="chip" data-i="' + i + '" title="Iniciar cronômetro com esta atividade"><b>' + esc(alvoNome(c)) + "</b><span>" +
+        esc([c.etapaId ? etapaNome(c.etapaId) : "", c.descricao].filter(Boolean).join(" · ")) + "</span></button>";
+    }).join("") : '<span class="empty">Suas últimas atividades aparecem aqui para retomar com um clique.</span>';
+    var outros = Object.keys(state.timers).filter(function (pid) { return pid !== state.pessoaId; });
+    $("others").hidden = !outros.length;
+    $("others").innerHTML = outros.map(function (pid) {
+      var o = state.timers[pid], p = pessoa(pid);
+      return '<div><span class="dot-live"></span><b>' + esc(p ? p.nome : pid) + "</b> está em " + esc(alvoNome(o)) + (o.etapaId ? " · " + esc(etapaNome(o.etapaId)) : "") + (o.descricao ? " — " + esc(o.descricao) : "") + " desde " + hm(new Date(o.inicio)) + "</div>";
+    }).join("");
+  }
+  function tick() { var t = myTimer(); if (t) $("run-elapsed").textContent = fmtClock(Date.now() - new Date(t.inicio)); }
+  setInterval(tick, 1000);
+
+  // ---------- semana e dia ----------
+  function renderWeek() {
+    var ws = weekStart(new Date()), mine = lancAtivos().filter(function (l) { return l.pessoaId === state.pessoaId; });
+    var totals = [], total = 0, max = 0;
+    for (var i = 0; i < 7; i++) {
+      var d = addDays(ws, i), key = ymd(d), m = 0;
+      mine.forEach(function (l) { if (ymd(new Date(l.inicio)) === key) m += l.min; });
+      totals.push({ d: d, key: key, m: m }); total += m; if (m > max) max = m;
+    }
+    var scale = Math.max(max, 480), nomes = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+    $("week").innerHTML = totals.map(function (t, i) {
+      return '<button class="day' + (t.key === state.dia ? " is-selected" : "") + '" data-d="' + t.key + '" title="' + fmtH(t.m) + ' em ' + t.d.toLocaleDateString("pt-BR") + '">' +
+        '<span class="day-name">' + nomes[i] + '</span><span class="day-date">' + pad(t.d.getDate()) + "/" + pad(t.d.getMonth() + 1) + "</span>" +
+        '<span class="day-hours">' + (t.m ? fmtH(t.m) : "—") + '</span><span class="day-bar"><i style="width:' + Math.min(100, t.m / scale * 100) + '%"></i></span></button>';
+    }).join("");
+    var dias = totals.filter(function (t) { return t.m > 0; }).length;
+    $("week-meta").innerHTML = "Total <b class=\"num\">" + fmtH(total) + "</b>" + (dias ? " · média <b class=\"num\">" + fmtH(total / dias) + "</b> por dia trabalhado" : "");
+  }
+  $("week").addEventListener("click", function (e) { var b = e.target.closest("[data-d]"); if (!b) return; state.dia = b.dataset.d; renderWeek(); renderDay(); });
+
+  function renderDay() {
+    var d = parseYmd(state.dia), hoje = ymd(new Date()) === state.dia;
+    $("day-title").textContent = hoje ? "Hoje" : fmtDia(d);
+    var list = lancAtivos().filter(function (l) { return l.pessoaId === state.pessoaId && ymd(new Date(l.inicio)) === state.dia; })
+      .sort(function (a, b) { return a.inicio < b.inicio ? -1 : 1; });
+    var tot = list.reduce(function (s, l) { return s + l.min; }, 0);
+    $("day-meta").innerHTML = list.length ? "<b class=\"num\">" + fmtH(tot) + "</b> em " + list.length + (list.length === 1 ? " lançamento" : " lançamentos") : "";
+    $("entries").innerHTML = list.length ? list.map(function (l) {
+      var ini = new Date(l.inicio), fim = new Date(l.fim), locked = isLocked(l.inicio);
+      var flags = [];
+      if (l.tipo === "area") flags.push('<span class="pill">Interno</span>');
+      if (l.origem === "manual") flags.push('<span class="pill">Manual</span>');
+      if (l.ajustes && l.ajustes.length) flags.push('<span class="pill danger" title="' + esc(l.ajustes.map(function (a) { return new Date(a.em).toLocaleDateString("pt-BR") + ": " + a.motivo; }).join("\n")) + '">Ajustado</span>');
+      if (locked) flags.push('<span class="pill">Semana fechada</span>');
+      return '<div class="entry"><div class="entry-time">' + hm(ini) + "–" + hm(fim) + "<small>" + fmtH(l.min) + "</small></div>" +
+        '<div class="entry-main"><div class="entry-where">' + esc(alvoNome(l)) + (l.etapaId ? " · " + esc(etapaNome(l.etapaId)) : "") + "</div>" +
+        (l.descricao ? '<div class="entry-desc">' + esc(l.descricao) + "</div>" : "") +
+        (flags.length ? '<div class="entry-flags">' + flags.join("") + "</div>" : "") + "</div>" +
+        '<div class="entry-actions"><button class="link" data-edit="' + l.id + '">Editar</button><button class="link danger" data-del="' + l.id + '">Excluir</button></div></div>';
+    }).join("") : '<div class="empty">Nenhum lançamento neste dia.</div>';
+  }
+
+  // ---------- lançamento manual / edição ----------
+  function openEntry(l) {
+    state.editEntryId = l ? l.id : null;
+    $("entry-panel-title").textContent = l ? "Editar lançamento" : "Lançamento manual";
+    var ini = l ? new Date(l.inicio) : null, fim = l ? new Date(l.fim) : null;
+    $("e-data").value = l ? ymd(ini) : state.dia;
+    $("e-ini").value = l ? hm(ini) : "";
+    $("e-fim").value = l ? hm(fim) : "";
+    fillAlvo($("e-alvo"), l ? alvoKey(l.tipo, l.alvoId) : "");
+    fillEtapa($("e-etapa"), l ? l.etapaId : "");
+    syncEtapaVisibility($("e-alvo"), $("e-etapa-wrap"));
+    $("e-desc").value = l ? l.descricao || "" : "";
+    $("e-just").value = ""; $("e-hint").textContent = "";
+    syncJust();
+    $("del-panel").hidden = true;
+    $("entry-panel").hidden = false; $("e-data").focus();
+  }
+  function syncJust() {
+    var need = false, d = $("e-data").value;
+    if (d && parseYmd(d) < weekStart(new Date())) need = true;
+    if (state.editEntryId) { var l = byId(state.lanc, state.editEntryId); if (l && isLocked(l.inicio)) need = true; }
+    $("e-just-wrap").hidden = !need;
+    return need;
+  }
+  $("e-data").addEventListener("change", syncJust);
+  $("btn-manual").addEventListener("click", function () { openEntry(null); });
+  $("e-cancel").addEventListener("click", function () { $("entry-panel").hidden = true; });
+  $("entry-form").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var c = readCombo($("e-alvo"), $("e-etapa"), $("e-desc"));
+    if (c.erro) { $("e-hint").textContent = c.erro; return; }
+    var d = $("e-data").value, a = $("e-ini").value, b = $("e-fim").value;
+    if (!d || !a || !b) { $("e-hint").textContent = "Preencha data, início e fim."; return; }
+    var ini = new Date(d + "T" + a), fim = new Date(d + "T" + b);
+    if (fim <= ini) fim = addDays(fim, 1); // atravessou a meia-noite
+    var min = Math.round((fim - ini) / 6000) / 10;
+    if (min > 16 * 60) { $("e-hint").textContent = "Confira os horários: mais de 16 horas num lançamento."; return; }
+    var need = syncJust(), just = $("e-just").value.trim();
+    if (need && just.length < 5) { $("e-hint").textContent = "Escreva a justificativa para ajustar uma semana fechada."; return; }
+    var agora = new Date().toISOString();
+    var body = { pessoaId: state.pessoaId, tipo: c.tipo, alvoId: c.alvoId, etapaId: c.etapaId, descricao: c.descricao, inicio: ini.toISOString(), fim: fim.toISOString(), min: min };
+    try {
+      if (state.editEntryId) {
+        var old = byId(state.lanc, state.editEntryId);
+        var ajustes = (old.ajustes || []).slice();
+        if (need) ajustes.push({ em: agora, por: state.pessoaId, acao: "edicao", motivo: just, antes: { inicio: old.inicio, fim: old.fim, alvoId: old.alvoId, etapaId: old.etapaId, descricao: old.descricao } });
+        body.pessoaId = old.pessoaId; body.ajustes = ajustes; body.editadoEm = agora;
+        await updateLanc(state.editEntryId, body);
+        toast("Lançamento atualizado");
+      } else {
+        body.origem = "manual"; body.criadoEm = agora; body.excluido = false;
+        body.ajustes = need ? [{ em: agora, por: state.pessoaId, acao: "inclusao", motivo: just }] : [];
+        await addLanc(body);
+        toast("Lançamento salvo: " + fmtH(min));
+      }
+      $("entry-panel").hidden = true; state.dia = ymd(ini); render();
+    } catch (err) { showError(err); }
+  });
+
+  $("entries").addEventListener("click", function (e) {
+    var ed = e.target.closest("[data-edit]"), dl = e.target.closest("[data-del]");
+    if (ed) openEntry(byId(state.lanc, ed.dataset.edit));
+    if (dl) {
+      var l = byId(state.lanc, dl.dataset.del); state.delEntryId = l.id;
+      $("del-info").textContent = hm(new Date(l.inicio)) + "–" + hm(new Date(l.fim)) + " · " + alvoNome(l) + (l.descricao ? " · " + l.descricao : "");
+      $("del-just-wrap").hidden = !isLocked(l.inicio); $("del-just").value = ""; $("del-hint").textContent = "";
+      $("entry-panel").hidden = true; $("del-panel").hidden = false;
+    }
+  });
+  $("del-cancel").addEventListener("click", function () { $("del-panel").hidden = true; });
+  $("del-confirm").addEventListener("click", async function () {
+    var l = byId(state.lanc, state.delEntryId); if (!l) return;
+    var locked = isLocked(l.inicio), just = $("del-just").value.trim();
+    if (locked && just.length < 5) { $("del-hint").textContent = "Escreva a justificativa."; return; }
+    try {
+      if (locked) {
+        var aj = (l.ajustes || []).slice(); aj.push({ em: new Date().toISOString(), por: state.pessoaId, acao: "exclusao", motivo: just });
+        await updateLanc(l.id, { excluido: true, ajustes: aj });
+      } else {
+        await removeLanc(l.id);
+      }
+      $("del-panel").hidden = true; toast("Lançamento excluído");
+    } catch (err) { showError(err); }
+  });
+
+  // ---------- projetos ----------
+  function projStats(pid) {
+    var ls_ = lancAtivos().filter(function (l) { return l.tipo === "projeto" && l.alvoId === pid; });
+    var s = { min: 0, custo: 0, custoOk: true, porEtapa: {} };
+    ls_.forEach(function (l) {
+      s.min += l.min; var c = custoLanc(l); if (c == null) s.custoOk = false; else s.custo += c;
+      s.porEtapa[l.etapaId] = (s.porEtapa[l.etapaId] || 0) + l.min;
+    });
+    return s;
+  }
+  function renderProjects() {
+    var list = state.projetos.filter(function (p) { return (p.status || "ativo") === state.projFiltro; }).sort(function (a, b) { return a.nome.localeCompare(b.nome); });
+    $("projects").innerHTML = list.length ? list.map(function (p) {
+      var s = projStats(p.id), h = s.min / 60;
+      var custo = s.min ? (s.custoOk ? fmtBRL(s.custo) : "—") : fmtBRL(0);
+      var margem = p.honorario != null && s.custoOk ? fmtBRL(p.honorario - s.custo) : "—";
+      var prev = p.horasPrevistas || {};
+      var meters = cfg().etapas.map(function (e) {
+        var real = (s.porEtapa[e.id] || 0) / 60, pv = prev[e.id];
+        if (!real && !pv) return "";
+        var pct = pv ? real / pv * 100 : 100, cls = pv ? (pct > 100 ? " over" : pct >= 80 ? " near" : "") : "";
+        return '<div class="meter-row" title="' + esc(e.nome) + ": " + fmtNum(real) + " h" + (pv ? " de " + fmtNum(pv) + " h previstas" : "") + '"><span class="m-label">' + esc(e.nome) + '</span><span class="meter' + cls + '"><i style="width:' + Math.min(100, pct) + '%"></i></span><span class="m-val">' + fmtNum(real) + (pv ? " / " + fmtNum(pv) : "") + " h</span></div>";
+      }).join("");
+      var sub = [p.cliente, tipoNome(p.tipo), p.area ? fmtNum(p.area) + " m²" : ""].filter(Boolean).join(" · ");
+      return '<div class="card project"><div class="project-top"><div><div class="project-name">' + esc(p.nome) + '</div><div class="project-sub">' + esc(sub || "Sem detalhes") + '</div></div><button class="link" data-editp="' + p.id + '">Editar</button></div>' +
+        '<div class="kv"><div><small>Horas</small><b>' + fmtH(s.min) + '</b></div><div><small>Custo</small><b>' + custo + '</b></div><div><small>' + (p.area ? "Horas/m²" : "Margem") + "</small><b>" + (p.area ? fmtNum(h / p.area, 2) : margem) + "</b></div></div>" +
+        (p.area && p.honorario != null ? '<div class="kv"><div><small>Honorário</small><b>' + fmtBRL(p.honorario) + '</b></div><div><small>Margem</small><b>' + margem + '</b></div><div><small>Custo/m²</small><b>' + (s.custoOk && s.min ? fmtBRL(s.custo / p.area) : "—") + "</b></div></div>" : "") +
+        (meters ? '<div class="meters">' + meters + "</div>" : '<div class="empty">Sem horas lançadas ainda.</div>') + "</div>";
+    }).join("") : '<div class="empty">Nenhum projeto nesta situação. Use “+ Novo projeto” para cadastrar.</div>';
+  }
+  $("proj-filter").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-f]"); if (!b) return; state.projFiltro = b.dataset.f;
+    Array.prototype.forEach.call(this.children, function (c) { c.classList.toggle("is-selected", c === b); });
+    renderProjects();
+  });
+  function openProj(p) {
+    state.editProjId = p ? p.id : null;
+    $("proj-panel-title").textContent = p ? "Editar projeto" : "Novo projeto";
+    $("p-nome").value = p ? p.nome : ""; $("p-cliente").value = p ? p.cliente || "" : "";
+    $("p-tipo").innerHTML = cfg().tipos.map(function (t) { return '<option value="' + esc(t.id) + '">' + esc(t.nome) + "</option>"; }).join("");
+    $("p-tipo").value = p && p.tipo ? p.tipo : cfg().tipos[0].id;
+    $("p-area").value = p && p.area != null ? p.area : ""; $("p-hon").value = p && p.honorario != null ? p.honorario : "";
+    $("p-status").value = p ? p.status || "ativo" : "ativo";
+    var prev = p && p.horasPrevistas || {};
+    $("p-prev").innerHTML = cfg().etapas.map(function (e) {
+      return '<div class="field col-4"><label for="pv-' + esc(e.id) + '">' + esc(e.nome) + ' (h)</label><input type="number" min="0" step="0.5" id="pv-' + esc(e.id) + '" data-etapa="' + esc(e.id) + '" value="' + (prev[e.id] != null ? prev[e.id] : "") + '"></div>';
+    }).join("");
+    $("proj-panel").hidden = false; $("p-nome").focus();
+  }
+  $("btn-new-proj").addEventListener("click", function () { openProj(null); });
+  $("p-cancel").addEventListener("click", function () { $("proj-panel").hidden = true; });
+  $("projects").addEventListener("click", function (e) { var b = e.target.closest("[data-editp]"); if (b) openProj(projeto(b.dataset.editp)); });
+  $("proj-form").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var prev = {};
+    Array.prototype.forEach.call($("p-prev").querySelectorAll("input"), function (i) { var v = numOrNull(i.value); if (v != null) prev[i.dataset.etapa] = v; });
+    var body = { nome: $("p-nome").value.trim(), cliente: $("p-cliente").value.trim(), tipo: $("p-tipo").value, area: numOrNull($("p-area").value), honorario: numOrNull($("p-hon").value), status: $("p-status").value, horasPrevistas: prev };
+    if (!body.nome) return;
+    try {
+      if (state.editProjId) await db.doc("projetos/" + state.editProjId).update(body);
+      else { body.criadoEm = new Date().toISOString(); await db.collection("projetos").add(body); }
+      $("proj-panel").hidden = true; toast("Projeto salvo");
+    } catch (err) { showError(err); }
+  });
+
+  // ---------- relatórios ----------
+  function periodo() {
+    var v = $("r-periodo").value, hoje = new Date(), de, ate;
+    if (v === "semana") { de = weekStart(hoje); ate = addDays(de, 6); }
+    else if (v === "mes") { de = new Date(hoje.getFullYear(), hoje.getMonth(), 1); ate = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0); }
+    else if (v === "mesant") { de = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1); ate = new Date(hoje.getFullYear(), hoje.getMonth(), 0); }
+    else if (v === "ano") { de = new Date(hoje.getFullYear(), 0, 1); ate = new Date(hoje.getFullYear(), 11, 31); }
+    else { de = $("r-de").value ? parseYmd($("r-de").value) : new Date(hoje.getFullYear(), hoje.getMonth(), 1); ate = $("r-ate").value ? parseYmd($("r-ate").value) : hoje; }
+    return { de: ymd(de), ate: ymd(ate) };
+  }
+  function filtrados() {
+    var p = periodo(), pid = $("r-pessoa").value;
+    return lancAtivos().filter(function (l) { var d = ymd(new Date(l.inicio)); return d >= p.de && d <= p.ate && (!pid || l.pessoaId === pid); });
+  }
+  function group(list, keyFn) {
+    var m = {}; list.forEach(function (l) { var k = keyFn(l); if (k == null) return; var g = m[k] || (m[k] = { key: k, min: 0, custo: 0, custoOk: true, n: 0, dias: {} }); g.min += l.min; g.n++; g.dias[ymd(new Date(l.inicio))] = 1; var c = custoLanc(l); if (c == null) g.custoOk = false; else g.custo += c; });
+    return Object.keys(m).map(function (k) { return m[k]; }).sort(function (a, b) { return b.min - a.min; });
+  }
+  function barTable(rows, cols, total) {
+    if (!rows.length) return '<div class="empty">Sem lançamentos no período.</div>';
+    var max = rows[0].min || 1;
+    var h = '<div class="table-wrap"><table><thead><tr>' + cols.map(function (c) { return "<th" + (c.r ? ' class="r"' : "") + ">" + c.t + "</th>"; }).join("") + "</tr></thead><tbody>";
+    rows.forEach(function (r) {
+      h += "<tr>" + cols.map(function (c) {
+        if (c.bar) return '<td class="barcell"><div class="hbar" title="' + fmtH(r.min) + '"><i style="width:' + (r.min / max * 100) + '%"></i></div></td>';
+        return "<td" + (c.r ? ' class="r"' : c.name ? ' class="name"' : "") + ">" + c.f(r) + "</td>";
+      }).join("") + "</tr>";
+    });
+    if (total) h += '<tr class="total">' + cols.map(function (c) { return "<td" + (c.r ? ' class="r"' : "") + ">" + (c.tot ? c.tot() : "") + "</td>"; }).join("") + "</tr>";
+    return h + "</tbody></table></div>";
+  }
+  function renderReports() {
+    var sel = $("r-pessoa"), cur = sel.value;
+    sel.innerHTML = '<option value="">Todas</option>' + state.pessoas.map(function (p) { return '<option value="' + esc(p.id) + '">' + esc(p.nome) + "</option>"; }).join("");
+    sel.value = cur;
+    var p = periodo(); $("r-range").textContent = parseYmd(p.de).toLocaleDateString("pt-BR") + " a " + parseYmd(p.ate).toLocaleDateString("pt-BR");
+    var L = filtrados(), totMin = L.reduce(function (s, l) { return s + l.min; }, 0);
+    var projMin = L.filter(function (l) { return l.tipo === "projeto"; }).reduce(function (s, l) { return s + l.min; }, 0);
+    var custoOk = L.every(function (l) { return custoLanc(l) != null; }), custo = L.reduce(function (s, l) { return s + (custoLanc(l) || 0); }, 0);
+    var nProj = {}; L.forEach(function (l) { if (l.tipo === "projeto") nProj[l.alvoId] = 1; });
+    $("r-tiles").innerHTML =
+      '<div class="card tile"><small>Horas no período</small><b>' + fmtH(totMin) + '</b><span>' + L.length + ' lançamentos</span></div>' +
+      '<div class="card tile"><small>Em projetos</small><b>' + (totMin ? Math.round(projMin / totMin * 100) : 0) + '%</b><span>' + fmtH(projMin) + ' faturáveis</span></div>' +
+      '<div class="card tile"><small>Projetos com horas</small><b>' + Object.keys(nProj).length + '</b><span>no período</span></div>' +
+      '<div class="card tile"><small>Custo das horas</small><b>' + (L.length && !custoOk ? "—" : fmtBRL(custo)) + '</b><span>' + (L.length && !custoOk ? "Preencha o custo-hora em Configurações" : "com rateio dos custos fixos") + "</span></div>";
+
+    var porPessoa = group(L, function (l) { return l.pessoaId; });
+    $("r-pessoas").innerHTML = barTable(porPessoa, [
+      { t: "Pessoa", name: 1, f: function (r) { var x = pessoa(r.key); return esc(x ? x.nome : r.key); } },
+      { t: "Horas", r: 1, f: function (r) { return fmtH(r.min); } },
+      { t: "Dias", r: 1, f: function (r) { return Object.keys(r.dias).length; } },
+      { t: "Média/dia", r: 1, f: function (r) { return fmtH(r.min / Object.keys(r.dias).length); } },
+      { t: "Em projetos", r: 1, f: function (r) { var pm = L.filter(function (l) { return l.pessoaId === r.key && l.tipo === "projeto"; }).reduce(function (s, l) { return s + l.min; }, 0); return Math.round(pm / r.min * 100) + "%"; } },
+      { t: "A pagar", r: 1, f: function (r) { var x = pessoa(r.key); return x && x.valorHora != null ? fmtBRL(x.valorHora * r.min / 60) : "—"; } },
+      { t: "", bar: 1 }
+    ]);
+
+    var porProj = group(L, function (l) { return l.tipo === "projeto" ? l.alvoId : null; });
+    $("r-projetos").innerHTML = barTable(porProj, [
+      { t: "Projeto", name: 1, f: function (r) { var x = projeto(r.key); return esc(x ? x.nome : "Projeto removido"); } },
+      { t: "Horas", r: 1, f: function (r) { return fmtH(r.min); }, tot: function () { return fmtH(projMin); } },
+      { t: "Custo", r: 1, f: function (r) { return r.custoOk ? fmtBRL(r.custo) : "—"; } },
+      { t: "Horas/m²", r: 1, f: function (r) { var x = projeto(r.key); return x && x.area ? fmtNum(r.min / 60 / x.area, 2) : "—"; } },
+      { t: "", bar: 1 }
+    ], true);
+
+    var porEtapa = group(L, function (l) { return l.tipo === "projeto" ? l.etapaId : null; });
+    $("r-etapas").innerHTML = barTable(porEtapa, [
+      { t: "Etapa", name: 1, f: function (r) { return esc(etapaNome(r.key)); } },
+      { t: "Horas", r: 1, f: function (r) { return fmtH(r.min); } },
+      { t: "% do tempo em projetos", r: 1, f: function (r) { return projMin ? Math.round(r.min / projMin * 100) + "%" : "—"; } },
+      { t: "Custo", r: 1, f: function (r) { return r.custoOk ? fmtBRL(r.custo) : "—"; } },
+      { t: "", bar: 1 }
+    ]);
+
+    var porArea = group(L, function (l) { return l.tipo === "area" ? l.alvoId : null; });
+    $("r-areas").innerHTML = barTable(porArea, [
+      { t: "Área", name: 1, f: function (r) { return esc(areaNome(r.key)); } },
+      { t: "Horas", r: 1, f: function (r) { return fmtH(r.min); } },
+      { t: "% do total", r: 1, f: function (r) { return totMin ? Math.round(r.min / totMin * 100) + "%" : "—"; } },
+      { t: "", bar: 1 }
+    ]);
+
+    var porAtiv = group(L, function (l) { return l.descricao ? l.descricao.trim().toLowerCase() : null; }).slice(0, 15);
+    var nomeAtiv = {}; L.forEach(function (l) { if (l.descricao) nomeAtiv[l.descricao.trim().toLowerCase()] = l.descricao.trim(); });
+    $("r-ativ").innerHTML = barTable(porAtiv, [
+      { t: "Atividade", name: 1, f: function (r) { return esc(nomeAtiv[r.key]); } },
+      { t: "Horas", r: 1, f: function (r) { return fmtH(r.min); } },
+      { t: "Vezes", r: 1, f: function (r) { return r.n; } },
+      { t: "", bar: 1 }
+    ]);
+    renderFechamento();
+  }
+  ["r-periodo", "r-de", "r-ate", "r-pessoa"].forEach(function (id) {
+    $(id).addEventListener("change", function () {
+      var c = $("r-periodo").value === "custom"; $("r-de-wrap").hidden = !c; $("r-ate-wrap").hidden = !c; renderReports();
+    });
+  });
+
+  function fechamentoDados() {
+    var pid = $("f-pessoa").value, mes = $("f-mes").value; if (!pid || !mes) return null;
+    var y = +mes.slice(0, 4), m = +mes.slice(5, 7) - 1, fimMes = new Date(y, m + 1, 0).getDate(), rows = [], tot = 0;
+    var L = lancAtivos().filter(function (l) { return l.pessoaId === pid; });
+    for (var d = 1; d <= fimMes; d++) {
+      var dt = new Date(y, m, d), key = ymd(dt);
+      var dl = L.filter(function (l) { return ymd(new Date(l.inicio)) === key; }).sort(function (a, b) { return a.inicio < b.inicio ? -1 : 1; });
+      if (!dl.length) continue;
+      var min = dl.reduce(function (s, l) { return s + l.min; }, 0); tot += min;
+      var ultimo = dl.reduce(function (mx, l) { return l.fim > mx ? l.fim : mx; }, dl[0].fim);
+      rows.push({ dt: dt, entrada: hm(new Date(dl[0].inicio)), saida: hm(new Date(ultimo)), min: min, n: dl.length, ajustado: dl.some(function (l) { return l.ajustes && l.ajustes.length; }) });
+    }
+    return { pessoa: pessoa(pid), rows: rows, tot: tot, mes: mes };
+  }
+  function renderFechamento() {
+    var fp = $("f-pessoa"), cur = fp.value || state.pessoaId;
+    fp.innerHTML = state.pessoas.map(function (p) { return '<option value="' + esc(p.id) + '">' + esc(p.nome) + "</option>"; }).join("");
+    fp.value = cur;
+    if (!$("f-mes").value) $("f-mes").value = ymd(new Date()).slice(0, 7);
+    var F = fechamentoDados(); if (!F) { $("r-fech").innerHTML = ""; return; }
+    var vh = F.pessoa && F.pessoa.valorHora;
+    var h = '<div class="table-wrap"><table><thead><tr><th>Data</th><th>Dia</th><th class="r">Entrada</th><th class="r">Saída</th><th class="r">Lançamentos</th><th class="r">Horas</th><th></th></tr></thead><tbody>';
+    F.rows.forEach(function (r) {
+      h += "<tr><td>" + r.dt.toLocaleDateString("pt-BR") + "</td><td>" + r.dt.toLocaleDateString("pt-BR", { weekday: "short" }) + '</td><td class="r">' + r.entrada + '</td><td class="r">' + r.saida + '</td><td class="r">' + r.n + '</td><td class="r">' + fmtH(r.min) + "</td><td>" + (r.ajustado ? '<span class="pill danger">Ajustado</span>' : "") + "</td></tr>";
+    });
+    h += '<tr class="total"><td colspan="5">Total do mês · ' + F.rows.length + (F.rows.length === 1 ? " dia" : " dias") + (vh != null ? " · valor-hora " + fmtBRL(vh) : "") + '</td><td class="r">' + fmtH(F.tot) + "</td><td>" + (vh != null ? fmtBRL(vh * F.tot / 60) : "") + "</td></tr>";
+    $("r-fech").innerHTML = F.rows.length ? h + "</tbody></table></div>" + (vh == null ? '<div class="hint" style="margin-top:8px">Preencha o valor-hora de pagamento em Configurações para calcular o valor a pagar.</div>' : "") : '<div class="empty">Sem lançamentos neste mês.</div>';
+  }
+  $("f-pessoa").addEventListener("change", renderFechamento);
+  $("f-mes").addEventListener("change", renderFechamento);
+
+  function csvCell(v) { v = v == null ? "" : String(v); return /[";\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  async function saveCsv(name, rows) {
+    if (!downloads) { toast("Exportação indisponível nesta visualização."); return; }
+    var text = "﻿" + rows.map(function (r) { return r.map(csvCell).join(";"); }).join("\n");
+    try { await downloads.save({ filename: name, data: text }); }
+    catch (e) { if (e && e.code !== "declined") toast("Não foi possível exportar."); }
+  }
+  $("btn-csv").addEventListener("click", function () {
+    var p = periodo(), rows = [["Data", "Início", "Fim", "Horas", "Pessoa", "Tipo", "Projeto/Área", "Etapa", "Descrição", "Origem", "Custo (R$)", "Ajustes"]];
+    filtrados().sort(function (a, b) { return a.inicio < b.inicio ? -1 : 1; }).forEach(function (l) {
+      var ini = new Date(l.inicio), c = custoLanc(l), x = pessoa(l.pessoaId);
+      rows.push([ini.toLocaleDateString("pt-BR"), hm(ini), hm(new Date(l.fim)), (l.min / 60).toFixed(2).replace(".", ","), x ? x.nome : l.pessoaId, l.tipo === "projeto" ? "Projeto" : "Interno", alvoNome(l), etapaNome(l.etapaId), l.descricao, l.origem, c == null ? "" : c.toFixed(2).replace(".", ","), (l.ajustes || []).map(function (a) { return a.motivo; }).join(" | ")]);
+    });
+    saveCsv("lancamentos_" + p.de + "_a_" + p.ate + ".csv", rows);
+  });
+  $("btn-fech-csv").addEventListener("click", function () {
+    var F = fechamentoDados(); if (!F) return;
+    var vh = F.pessoa && F.pessoa.valorHora, rows = [["Data", "Dia", "Entrada", "Saída", "Lançamentos", "Horas"]];
+    F.rows.forEach(function (r) { rows.push([r.dt.toLocaleDateString("pt-BR"), r.dt.toLocaleDateString("pt-BR", { weekday: "short" }), r.entrada, r.saida, r.n, (r.min / 60).toFixed(2).replace(".", ",")]); });
+    rows.push(["Total", "", "", "", "", (F.tot / 60).toFixed(2).replace(".", ",")]);
+    if (vh != null) rows.push(["Valor a pagar (R$)", "", "", "", "", (vh * F.tot / 60).toFixed(2).replace(".", ",")]);
+    saveCsv("fechamento_" + slug(F.pessoa ? F.pessoa.nome : "pessoa") + "_" + F.mes + ".csv", rows);
+  });
+
+  // ---------- configurações ----------
+  function renderConfig() {
+    if (!$("cfg-people").contains(document.activeElement)) $("cfg-people").innerHTML = state.pessoas.map(function (p) {
+      var ct = custoHoraTotal(p.id);
+      return '<div class="person-row" data-pid="' + esc(p.id) + '">' +
+        '<div class="field"><label for="pn-' + esc(p.id) + '">Nome</label><input id="pn-' + esc(p.id) + '" data-k="nome" value="' + esc(p.nome) + '"></div>' +
+        '<div class="field"><label for="pp-' + esc(p.id) + '">Perfil</label><select id="pp-' + esc(p.id) + '" data-k="perfil"><option value="socio"' + (p.perfil !== "colaborador" ? " selected" : "") + '>Sócio(a)</option><option value="colaborador"' + (p.perfil === "colaborador" ? " selected" : "") + '>Colaborador(a)</option></select></div>' +
+        '<div class="field"><label for="pc-' + esc(p.id) + '">Custo-hora (R$)</label><input id="pc-' + esc(p.id) + '" data-k="custoHora" type="number" min="0" step="0.01" value="' + (p.custoHora != null ? p.custoHora : "") + '"></div>' +
+        '<div class="field"><label for="pv-p-' + esc(p.id) + '">Valor-hora pagamento (R$)</label><input id="pv-p-' + esc(p.id) + '" data-k="valorHora" type="number" min="0" step="0.01" value="' + (p.valorHora != null ? p.valorHora : "") + '"></div>' +
+        '<div class="form-actions"><button class="btn btn-small btn-primary" data-savep="' + esc(p.id) + '">Salvar</button></div>' +
+        '<div class="hint" style="grid-column:1/-1">' + (ct != null ? "Custo-hora total com rateio: <b>" + fmtBRL(ct) + "</b>" : "Sem custo-hora definido") + "</div></div>";
+    }).join("");
+    var c = cfg(), r = rateioHora();
+    if (document.activeElement !== $("c-fixos")) $("c-fixos").value = c.custosFixosMensais != null ? c.custosFixosMensais : "";
+    if (document.activeElement !== $("c-horas")) $("c-horas").value = c.horasProdutivasMes || "";
+    $("cfg-office-meta").innerHTML = r != null ? "Rateio dos custos fixos: <b>" + fmtBRL(r) + "</b> por hora" : "Preencha para calcular o custo fixo por hora";
+    ["etapas", "areas", "tipos"].forEach(function (k) {
+      if ($("cfg-" + k).dataset.dirty === "1") return;
+      $("cfg-" + k).innerHTML = c[k].map(function (it) { return listRow(k, it); }).join("");
+    });
+  }
+  function listRow(k, it) {
+    return '<div class="list-edit-row field" data-id="' + esc(it.id || "") + '"><input aria-label="Nome" value="' + esc(it.nome) + '"><button class="link danger" data-rm="1" title="Remover">Remover</button></div>';
+  }
+  $("view-config").addEventListener("input", function (e) { var le = e.target.closest(".list-edit"); if (le) le.dataset.dirty = "1"; });
+  $("view-config").addEventListener("click", async function (e) {
+    var t = e.target;
+    if (t.dataset.rm) { var le = t.closest(".list-edit"); le.dataset.dirty = "1"; t.closest(".list-edit-row").remove(); return; }
+    if (t.dataset.add) { var box = $("cfg-" + t.dataset.add); box.dataset.dirty = "1"; box.insertAdjacentHTML("beforeend", listRow(t.dataset.add, { id: "", nome: "" })); box.lastElementChild.querySelector("input").focus(); return; }
+    if (t.dataset.save) {
+      var k = t.dataset.save, box2 = $("cfg-" + k), used = {};
+      var items = Array.prototype.map.call(box2.querySelectorAll(".list-edit-row"), function (row) {
+        var nome = row.querySelector("input").value.trim(); if (!nome) return null;
+        var id = row.dataset.id || slug(nome); while (used[id]) id += "-2"; used[id] = 1; return { id: id, nome: nome };
+      }).filter(Boolean);
+      if (!items.length) { toast("Mantenha ao menos um item."); return; }
+      try { var patch = {}; patch[k] = items; await saveConfig(patch); box2.dataset.dirty = ""; toast("Salvo"); } catch (err) { showError(err); }
+      return;
+    }
+    if (t.dataset.savep) {
+      var row2 = t.closest("[data-pid]"), body = {};
+      Array.prototype.forEach.call(row2.querySelectorAll("[data-k]"), function (i) { body[i.dataset.k] = i.dataset.k === "nome" || i.dataset.k === "perfil" ? i.value.trim() : numOrNull(i.value); });
+      if (!body.nome) return;
+      try { await db.doc("pessoas/" + t.dataset.savep).update(body); toast("Salvo"); } catch (err) { showError(err); }
+      return;
+    }
+    if (t.id === "btn-add-person") {
+      var n = state.pessoas.length + 1, id = "pessoa-" + Date.now().toString(36);
+      try { await db.doc("pessoas/" + id).set({ nome: "Nova pessoa", perfil: "colaborador", custoHora: null, valorHora: null, ativo: true, ordem: n }); } catch (err) { showError(err); }
+      return;
+    }
+    if (t.id === "btn-save-office") {
+      try { await saveConfig({ custosFixosMensais: numOrNull($("c-fixos").value), horasProdutivasMes: numOrNull($("c-horas").value) || 112 }); toast("Salvo"); } catch (err) { showError(err); }
+    }
+  });
+  async function saveConfig(patch) {
+    var ref = db.doc("config/escritorio");
+    if (state.config) await ref.update(patch);
+    else { var full = JSON.parse(JSON.stringify(DEFAULT_CONFIG)); Object.keys(patch).forEach(function (k) { full[k] = patch[k]; }); await ref.set(full); }
+  }
+
+  // ---------- render geral ----------
+  function renderDatalist() {
+    var seen = {}, opts = [];
+    lancAtivos().slice().sort(function (a, b) { return b.inicio < a.inicio ? -1 : 1; }).forEach(function (l) {
+      var d = (l.descricao || "").trim(); if (d && !seen[d.toLowerCase()] && opts.length < 60) { seen[d.toLowerCase()] = 1; opts.push(d); }
+    });
+    $("desc-list").innerHTML = opts.map(function (d) { return '<option value="' + esc(d) + '">'; }).join("");
+  }
+  function render() {
+    if (!state.pessoaId && state.pessoas.length) state.pessoaId = state.pessoas[0].id;
+    renderPeople();
+    if (state.tab === "agora") { renderTimer(); renderWeek(); renderDay(); renderDatalist(); }
+    else if (state.tab === "projetos") renderProjects();
+    else if (state.tab === "relatorios") renderReports();
+    else if (state.tab === "config") renderConfig();
+  }
+  var renderQueued = false;
+  function scheduleRender() { if (renderQueued) return; renderQueued = true; requestAnimationFrame(function () { renderQueued = false; render(); }); }
+
+  function showError(e) {
+    var code = e && e.code;
+    var msg = code === "quota_exceeded" ? "O banco de dados atingiu o limite de registros." :
+      code === "revoked" || code === "not_granted" ? "Este acesso não permite salvar dados." :
+      "Não foi possível salvar. Tente de novo em instantes.";
+    toast(msg);
+  }
+  function setStatus(msg, danger) { var s = $("status"); s.hidden = !msg; s.textContent = msg || ""; s.classList.toggle("danger", !!danger); }
+
+  // ---------- inicialização ----------
+  state.dia = ymd(new Date());
+  state.pessoaId = ls("tempo.pessoa");
+  var savedTab = ls("tempo.tab"); if (savedTab && $("view-" + savedTab)) setTab(savedTab); else render();
+  setStatus("Conectando ao banco de dados…");
+
+  function snapList(snap) { return snap.docs.map(function (d) { var o = Object.assign({}, d.data()); o.id = d.id; return o; }); }
+
+  (async function init() {
+    var use = window.claude && window.claude.use ? window.claude.use.bind(window.claude) : null;
+    try { downloads = use ? await use("downloads") : null; } catch (e) { downloads = null; }
+    try { db = use ? await use("db") : null; } catch (e) { db = null; }
+    if (!db) { setStatus("O banco de dados não está disponível nesta visualização. Abra o app pelo claude.ai para lançar horas.", true); $("btn-csv").hidden = !downloads; return; }
+    setStatus("");
+    if (!downloads) { $("btn-csv").hidden = true; $("btn-fech-csv").hidden = true; }
+    var onErr = function (e) { if (e && (e.code === "revoked" || e.code === "not_granted")) setStatus("O acesso a este app foi alterado. Recarregue a página.", true); };
+    db.collection("pessoas").onSnapshot(function (s) {
+      state.pessoas = snapList(s).sort(function (a, b) { return (a.ordem || 0) - (b.ordem || 0); });
+      if (state.pessoaId && !pessoa(state.pessoaId)) state.pessoaId = null;
+      scheduleRender();
+    }, onErr);
+    db.collection("projetos").onSnapshot(function (s) { state.projetos = snapList(s); scheduleRender(); }, onErr);
+    db.collection("lancamentos").onSnapshot(function (s) {
+      var docs = {}; s.docs.forEach(function (d) { var b = d.data(); docs[d.id] = Array.isArray(b.itens) ? b.itens : []; });
+      state.lancDocs = docs; flattenLanc(); scheduleRender();
+    }, onErr);
+    db.collection("timers").onSnapshot(function (s) {
+      var t = {}; snapList(s).forEach(function (x) { t[x.id] = x; }); state.timers = t; scheduleRender();
+    }, onErr);
+    db.doc("config/escritorio").onSnapshot(function (d) { state.config = d.exists ? d.data() : null; scheduleRender(); }, onErr);
+  })();
+})();
+</script>
