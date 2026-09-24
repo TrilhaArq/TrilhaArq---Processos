@@ -1,8 +1,9 @@
-# Gestor de Tempo — Trilha (artefato)
+# Gestão Trilha — tempo e tarefas (artefato)
 
 Artefato: https://claude.ai/artifact/N5fGJZBumZy7dyN57w7e8o
 Código-fonte: `gestor-de-tempo/index.html` + `gestor-de-tempo/logo.png` (publicado junto como arquivo `logo.png`).
-Capacidades declaradas: `db` (banco de dados do artefato) e `downloads` (exportar CSV).
+Capacidades declaradas: `db` (banco de dados do artefato), `downloads` (exportar CSV) e `mcp` com o conector
+"Google Calendar" (só `create_event` e `update_event`, mesma integração do antigo gestor de tarefas).
 
 Para continuar o desenvolvimento em outra conversa: anexe este arquivo e o `index.html`, e peça para
 republicar no **mesmo** artefato passando a URL acima como `url` (assim os dados são mantidos).
@@ -12,7 +13,15 @@ republicar no **mesmo** artefato passando a URL acima como `url` (assim os dados
 Mapear tempo e custo de cada projeto para precificar com base em dados, não em estimativa.
 É a base do futuro controle financeiro do escritório.
 
-## Regras de negócio (v1)
+## Navegação (v3)
+
+- **Capa (página inicial):** avisos (fechamentos mensais a conferir), botões das pessoas (Luan, Elisa) com
+  horas do mês, tarefas a fazer e atrasadas, e botões administrativos: Projetos, Relatórios, Configurações.
+- **Área da pessoa:** abas **Tempo** e **Tarefas**, mais "← Início". Cabeçalho padrão com o nome da pessoa.
+- **Área administrativa:** abas Projetos, Relatórios e Configurações.
+- O app sempre abre na capa.
+
+## Regras de negócio
 
 1. **Um único app para todos.** Cada pessoa lança as próprias horas; os relatórios consolidam tudo.
 2. **Pessoas:** hoje Luan e Elisa, os dois como sócios, usando a mesma conta Claude. A pessoa é escolhida
@@ -23,10 +32,29 @@ Mapear tempo e custo de cada projeto para precificar com base em dados, não em 
    Compatibilização, Projeto Executivo, Obra. Editáveis em Configurações.
 5. **Áreas internas (não faturáveis):** Administrativo, Marketing, Comercial e captação, Capacitação. Editáveis.
 6. **Tipos de projeto:** Residencial, Comercial, Interiores, Reforma, Outro. Editáveis.
+3a. **Tipo de trabalho no cronômetro:** botões Projeto | Gestão | Obra. Projeto → escolhe projeto e etapa
+   (a lista de etapas não mostra "Obra"); Gestão → escolhe a área interna; Obra → escolhe o projeto e a etapa
+   fica "obra" automaticamente (subtópicos de obra ainda serão definidos). No banco: gestão = `tipo: "area"`,
+   obra = `tipo: "projeto"` com `etapaId: "obra"`.
 7. **Cronômetro é a forma principal.** Um cronômetro por pessoa, salvo no banco (sobrevive a recarregar a
    página e aparece para os outros como "está em…"). Iniciar outra atividade com o cronômetro ligado para
    a atual e começa a nova. Menos de 1 minuto não é salvo.
-8. **"Continuar de onde parou":** as 6 últimas combinações distintas da pessoa, um clique reinicia.
+8. **Atividades (pausar × concluir):** cada combinação onde + etapa + descrição é uma atividade. O cronômetro
+   tem **Pausar** (salva o tempo; a atividade vai para "Continuar de onde parou") e **Concluir** (salva o tempo;
+   a atividade vai para a lista "Concluídas" no fim da página, com opção **Reabrir**). Iniciar outra atividade
+   com o cronômetro ligado pausa a atual. Uma atividade pausada pode ser concluída sem retomar (botão ✓).
+   Concluídas somem da lista após 60 dias (as horas continuam nos lançamentos).
+8a. **Quadros do mês (Tempo):** horas no mês (com média por dia trabalhado), atividades em andamento e
+   atividades concluídas no mês. Mês = do dia 1º ao último dia (vale também para os relatórios).
+8b. **Tarefas (agenda de alto nível, independente do tempo):** mesmas regras do antigo gestor de tarefas —
+   grupos Compromisso (topo), A fazer (Prioridade → Demanda → Tarefa) e Concluídas; marcar conclui e move;
+   "Limpar concluídas" com confirmação; Prioridade com título vermelho; Prazo/Data editável no card e em
+   vermelho "· atrasado"; criada em / concluída em / quanto levou; checklist. Compromisso tem Data, Horário,
+   Duração, Lembrete e Repetir (só na criação) e é enviado à Agenda Google (calendário
+   trilha@trilhaarq.com.br) com o nome da pessoa no título. Excluir a tarefa não apaga o evento da agenda.
+8c. **Fechamento mensal automático:** no primeiro acesso de cada mês o app grava em `fechamentos` o resumo do
+   mês anterior de cada pessoa (horas, dias, média por dia, valor-hora, valor a pagar) e mostra um aviso na
+   capa até alguém clicar em "Conferido". Se houver ajustes depois, Relatórios avisa e permite atualizar.
 9. **Lançamento manual:** data, início, fim, onde, etapa, descrição. Fim menor que início = passou da meia-noite.
    Limite de 16 h por lançamento.
 10. **Semana fechada:** a semana vai de segunda a domingo. Incluir, editar ou excluir lançamento de semana
@@ -57,10 +85,18 @@ Mapear tempo e custo de cada projeto para precificar com base em dados, não em 
   `custosFixosMensais`, `horasProdutivasMes`.
 - `projetos/{id}`: `nome`, `cliente`, `tipo`, `area`, `honorario`, `status`, `horasPrevistas{etapaId: h}`, `criadoEm`.
 - `timers/{pessoaId}`: `pessoaId`, `tipo`, `alvoId`, `etapaId`, `descricao`, `inicio`.
+- `atividades/{pessoaId}`: `itens[]` com `id`, `tipo`, `alvoId`, `etapaId`, `descricao`, `status`
+  ("andamento" | "pausada" | "concluida"), `criadoEm`, `ultimoUso`, `concluidoEm`.
+- `tarefas/{pessoaId}`: `itens[]` com os campos do antigo gestor (`title`, `description`, `subdivision`,
+  `status`, `checklist`, `dueDate`, `dueTime`, `durationMinutes`, `reminderMinutes`, `recurrence`,
+  `calendarEventId`, `calendarId`, `createdAt`, `completedAt`) + `id`. Para registrar uma tarefa pelo chat,
+  ler o documento, acrescentar o item e gravar com `if_version`.
+- `fechamentos/{pessoaId}_{AAAA-MM}`: `min`, `dias`, `mediaMin`, `valorHora`, `valor`, `geradoEm`,
+  `conferido`, `conferidoEm`.
 - `lancamentos/{pessoaId}_{AAAA-MM}`: `pessoaId`, `mes`, `itens[]` — **um documento por pessoa por mês**
   (o banco do artefato tem limite de 5.000 documentos; assim são ~12 por pessoa por ano). Cada item:
   `id`, `pessoaId`, `tipo` ("projeto" | "area"), `alvoId`, `etapaId`, `descricao`, `inicio`, `fim` (ISO),
-  `min`, `origem` ("cronometro" | "manual"), `criadoEm`, `editadoEm`, `excluido`, `ajustes[]`.
+  `min`, `atividadeId`, `origem` ("cronometro" | "manual"), `criadoEm`, `editadoEm`, `excluido`, `ajustes[]`.
 
 ## Próximos passos previstos
 
