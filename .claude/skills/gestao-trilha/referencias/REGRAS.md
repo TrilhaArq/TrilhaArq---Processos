@@ -91,7 +91,7 @@ Mapear tempo e custo de cada projeto para precificar com base em dados, não em 
     esverdeados, Comfortaa em títulos e rótulos, Work Sans no texto, cards com borda de 1px e raio de 10px,
     pills, logo preta no canto superior direito invertida no tema escuro.
 
-## Financeiro (v1 — em teste)
+## Financeiro (v1 — em uso desde setembro de 2026)
 
 Objetivo: controle simples do dinheiro do escritório, mesmo sem CNPJ e com conta misturada ("caixa do escritório"):
 tudo que os clientes pagam é receita do escritório; tudo que é gasto do trabalho é despesa; gasto pessoal não entra.
@@ -135,10 +135,16 @@ tudo que os clientes pagam é receita do escritório; tudo que é gasto do traba
     equipe, conta e forma padrão, % de reserva de imposto (opcional), contas e categorias.
 11. **Cálculos:** caixa para entradas e despesas (data do pagamento); listas de abertos pela data de vencimento;
     atrasado = aberto com vencimento antes de hoje.
+12. **Mês de início** (`fin_config/geral.inicio`, oficial = 2026-09): meses anteriores ficam zerados no painel e no
+    gráfico, e remunerações de fechamentos anteriores não aparecem a pagar (evita prejuízo fictício de meses sem
+    registro). Se o documento não existir, vale o mês atual e ele é gravado na primeira configuração salva.
+13. **Receitas e Despesas** abrem com um quadro de resumo único (mesmo estilo do Painel): Receitas = recebido no
+    mês, ainda a receber no mês, atrasado, recebido no ano; Despesas = despesas pagas, equipe no mês, ainda a pagar,
+    custo fixo mapeado.
 
 ### Modelo de dados do Financeiro
 
-- `fin_config/geral`: `contas[]`, `categorias[{id,nome,tipo,grupo?,fixa?}]`, `impostoPct`, `diaPagamentoEquipe`,
+- `fin_config/geral`: `inicio` (AAAA-MM), `contas[]`, `categorias[{id,nome,tipo,grupo?,fixa?}]`, `impostoPct`, `diaPagamentoEquipe`,
   `contaPadrao`, `formaPadrao`, `recibo{nome,doc,cidade,contato}`, `proximoRecibo`, `teste` (só na cópia de teste).
 - `fin_contratos/{id}`: `projetoId`, `cliente`, `clienteDoc`, `servico`, `valorTotal`, `status` ("ativo" | "encerrado"),
   `criadoEm`, `parcelas[]` com `id`, `descricao`, `vencimento`, `valor`, `recebidoEm`, `valorRecebido`, `forma`,
@@ -155,7 +161,6 @@ tudo que os clientes pagam é receita do escritório; tudo que é gasto do traba
 - Rentabilidade por projeto (contrato recebido × horas × custo-hora × despesas do projeto).
 - Calculadora de proposta (perfil do projeto → horas parecidas → preço), previsto × realizado.
 - Termômetro de formalização (autônomo × Simples Nacional, validar com contador).
-- Ao levar para o app oficial: republicar no link oficial com `modulos/financeiro.js` e cadastrar os contratos reais.
 
 ## Modelo de dados
 

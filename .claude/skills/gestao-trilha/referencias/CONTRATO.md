@@ -18,7 +18,8 @@ modulos/<id>.js     um arquivo por módulo
 
 **Cópia de teste:** https://claude.ai/artifact/V9bUhPfLyowX83XUz5Zeaw — mesmos arquivos, `<title>` "Gestão Trilha Teste",
 capacidades só `db` e `downloads` (sem Google Agenda) e banco próprio com dados fictícios (`fin_config/geral.teste = true`
-mostra o aviso na capa). Módulos novos são testados lá antes de ir para o link oficial.
+mostra o aviso na capa). Módulos novos são testados lá antes de ir para o link oficial. Ao levar uma mudança ao oficial, publicar os
+mesmos arquivos nos dois links (na cópia de teste só muda o `<title>`).
 
 Publicar sempre com `url` = link acima, `file_path` = `index.html`, `root` = esta pasta e `files` listando
 **todos** os arquivos (estilo.css, nucleo.js, logo.png e cada `modulos/*.js`). Não mudar `capabilities` sem
@@ -110,6 +111,6 @@ ele expõe (ex.: `Trilha.tempo.lancAtivos()`, `Trilha.tempo.custoLanc(l)`, `Tril
 | Projetos (cadastro) | `modulos/projetos.js` | admin | em uso — será ampliado pelo Gestor de Projetos |
 | Relatórios | `modulos/relatorios.js` | admin | em uso |
 | Configurações | `modulos/config.js` | admin | em uso |
-| Financeiro | `modulos/financeiro.js` | admin | v1 em teste na cópia https://claude.ai/artifact/V9bUhPfLyowX83XUz5Zeaw (dados fictícios); ainda não publicado no app oficial |
+| Financeiro | `modulos/financeiro.js` | admin | em uso (v1 no app oficial desde set/2026; a cópia de teste segue com dados fictícios) |
 | Gestor de projetos | — | admin | "Em breve" na capa |
 | Gestor de obras (orçamento de obras) | — | admin | "Em breve" na capa — portar o app de orçamento (skill orcamento-obra-trilha), itens agrupados por obra |

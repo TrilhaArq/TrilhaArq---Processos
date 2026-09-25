@@ -30,7 +30,7 @@
       { id: "reserva", nome: "Guardado na reserva", tipo: "saida", grupo: "reserva", fixa: true },
       { id: "reserva-e", nome: "Resgate da reserva", tipo: "entrada", grupo: "reserva", fixa: true }
     ],
-    impostoPct: null, diaPagamentoEquipe: 5, contaPadrao: "luan", formaPadrao: "Pix",
+    inicio: null, impostoPct: null, diaPagamentoEquipe: 5, contaPadrao: "luan", formaPadrao: "Pix",
     recibo: { nome: "", doc: "", cidade: "", contato: "" }, proximoRecibo: 1
   };
   var FORMAS = ["Pix", "Dinheiro", "Transferência", "Boleto", "Cartão"];
@@ -54,7 +54,7 @@
   };
 
   // ---------- utilidades ----------
-  function cfg() { var c = S.cfgDoc || {}, o = {}; Object.keys(DEF).forEach(function (k) { o[k] = c[k] != null ? c[k] : DEF[k]; }); o.recibo = Object.assign({}, DEF.recibo, c.recibo || {}); o.teste = !!c.teste; return o; }
+  function cfg() { var c = S.cfgDoc || {}, o = {}; Object.keys(DEF).forEach(function (k) { o[k] = c[k] != null ? c[k] : DEF[k]; }); o.recibo = Object.assign({}, DEF.recibo, c.recibo || {}); o.teste = !!c.teste; o.inicio = c.inicio || T.mesAtual(); return o; }
   function hoje() { return ymd(new Date()); }
   function mesDe(s) { return s ? String(s).slice(0, 7) : ""; }
   function addMes(mes, n) { var d = new Date(+mes.slice(0, 4), +mes.slice(5, 7) - 1 + n, 1); return ymd(d).slice(0, 7); }
@@ -120,7 +120,7 @@
   function virtEquipe(M) {
     if (!T.relatorios) return [];
     var F = T.relatorios.fechamentos();
-    return Object.keys(F).map(function (k) { return F[k]; }).filter(function (f) { return f.valor != null && f.valor > 0 && !M.fech[f.id]; }).map(function (f) {
+    return Object.keys(F).map(function (k) { return F[k]; }).filter(function (f) { return f.valor != null && f.valor > 0 && !M.fech[f.id] && f.mes >= cfg().inicio; }).map(function (f) {
       var p = T.pessoa(f.pessoaId);
       return reg({
         key: "f:" + f.id, kind: "fech", tipo: "saida", fechId: f.id, refMes: f.mes, titulo: "Remuneração · " + (p ? p.nome : f.pessoaId),
@@ -152,7 +152,9 @@
     });
     return { valor: r2(tot), ok: ok };
   }
+  // Meses antes do início do Financeiro (fin_config.inicio) não entram nos números: não há registro deles.
   function resumoMes(D, mes) {
+    if (mes < cfg().inicio) return { mes: mes, entrou: 0, desp: 0, equipe: 0, equipeOk: true, saiu: 0, resultado: 0, antes: true };
     var entrou = soma(D.ent.filter(function (e) { return pagoNoMes(e, mes) && grupo(e.categoriaId) !== "reserva"; }));
     var desp = soma(D.sai.filter(function (e) { return pagoNoMes(e, mes) && grupo(e.categoriaId) === "normal"; }));
     var eq = equipeMes(mes);
@@ -163,7 +165,7 @@
   async function saveCfg(patch) {
     var ref = T.db.doc("fin_config/geral");
     if (S.cfgDoc) await ref.update(patch);
-    else { var full = T.clone(DEF); Object.keys(patch).forEach(function (k) { full[k] = patch[k]; }); await ref.set(full); }
+    else { var full = T.clone(DEF); full.inicio = T.mesAtual(); Object.keys(patch).forEach(function (k) { full[k] = patch[k]; }); await ref.set(full); }
   }
   async function gravarMes(mes, itens) { S.movDocs[mes] = itens; await T.db.doc("fin_mov/" + mes).set({ mes: mes, itens: itens }); }
   async function addMov(m) {
@@ -297,7 +299,7 @@
         '<div class="hero-op" aria-hidden="true">=</div>' +
         '<div class="hero-cell ' + gb(R.resultado) + '"><small>Resultado do mês</small><b>' + BRL(R.resultado) + "</b><span>o que sobra para o escritório</span></div>" +
       "</div>" +
-      '<div class="hero-year ' + gb(acum) + '"><small>Resultado em ' + ano + "</small><b>" + BRL(r2(acum)) + "</b><span>acumulado de janeiro a " + mesCurto(S.mes) + "</span></div></div>" +
+      '<div class="hero-year ' + gb(acum) + '"><small>Resultado em ' + ano + "</small><b>" + BRL(r2(acum)) + "</b><span>acumulado de " + (cfg().inicio > ano + "-01" && cfg().inicio <= S.mes ? mesCurto(cfg().inicio) : "janeiro") + " a " + mesCurto(S.mes) + "</span></div></div>" +
       (!R.equipeOk ? '<div class="hint">* Falta o valor-hora de alguém em Configurações; a equipe está incompleta.</div>' : "");
     renderChart(serie);
     // próximos 90 dias
@@ -334,24 +336,29 @@
     var prev = D.ent.filter(function (e) { return e.status === "aberta" && e.venc >= ini && e.venc <= fim; }).sort(porVenc);
     var atras = D.ent.filter(function (e) { return e.status === "aberta" && e.venc < hoje(); });
     var noAno = soma(D.ent.filter(function (e) { return e.status === "paga" && mesDe(e.pagoEm).slice(0, 4) === ano && mesDe(e.pagoEm) <= S.mes && grupo(e.categoriaId) !== "reserva"; }));
-    $("fr-tiles").innerHTML =
-      '<div class="card tile"><small>Recebido em ' + mesCurto(S.mes) + "</small><b>" + BRL(soma(rec)) + "</b><span>" + rec.length + " recebimentos</span></div>" +
-      '<div class="card tile"><small>Ainda a receber no mês</small><b>' + BRL(soma(prev)) + "</b><span>" + prev.length + " parcelas</span></div>" +
-      '<div class="card tile' + (atras.length ? " bad" : "") + '"><small>Atrasado</small><b>' + BRL(soma(atras)) + "</b><span>" + atras.length + " parcelas vencidas</span></div>" +
-      '<div class="card tile"><small>Recebido em ' + ano + "</small><b>" + BRL(noAno) + "</b><span>até " + mesCurto(S.mes) + "</span></div>";
+    $("fr-tiles").innerHTML = quadro("Receitas de " + esc(T.mesNome(S.mes)), [
+      { l: "Recebido no mês", v: BRL(soma(rec)), s: rec.length + (rec.length === 1 ? " recebimento" : " recebimentos"), cls: "good" },
+      { l: "Ainda a receber no mês", v: BRL(soma(prev)), s: prev.length + (prev.length === 1 ? " parcela" : " parcelas") },
+      { l: "Atrasado", v: BRL(soma(atras)), s: atras.length + (atras.length === 1 ? " parcela vencida" : " parcelas vencidas"), cls: atras.length ? "bad" : "" },
+      { l: "Recebido em " + ano, v: BRL(noAno), s: "até " + mesCurto(S.mes) }]);
     $("fr-recebidas").innerHTML = lista(rec, "Nenhum recebimento em " + mesCurto(S.mes) + ".");
     $("fr-previstas").innerHTML = lista(prev, "Nada previsto para " + mesCurto(S.mes) + ".");
+  }
+  function quadro(titulo, cells) {
+    return '<div class="hero-head"><span class="hero-eyebrow">' + titulo + '</span></div><div class="next-grid">' + cells.map(function (c) {
+      return '<div class="next-cell' + (c.cls ? " " + c.cls : "") + '"><small>' + c.l + "</small><b>" + c.v + "</b><span>" + c.s + "</span></div>";
+    }).join("") + "</div>";
   }
   function custoFixoMapeado() { return r2(soma(S.rec.filter(function (r) { return recOcorre(r, T.mesAtual()) || (r.freq === "anual" && (!r.fim || r.fim >= T.mesAtual())); }), function (r) { return r.freq === "anual" ? valorRec(r) / 12 : valorRec(r); })); }
   function renderDespesas(D) {
     var fim = S.mes + "-31", ini = S.mes + "-01";
     var doMes = D.sai.filter(function (e) { return (e.status === "aberta" && e.venc >= ini && e.venc <= fim) || pagoNoMes(e, S.mes) || (e.status === "pulada" && mesDe(e.venc) === S.mes); });
     var R = resumoMes(D, S.mes), aberto = soma(doMes.filter(function (e) { return e.status === "aberta"; })), mapeado = custoFixoMapeado();
-    $("fd-tiles").innerHTML =
-      '<div class="card tile"><small>Despesas pagas</small><b>' + BRL(R.desp) + "</b><span>em " + mesCurto(S.mes) + "</span></div>" +
-      '<div class="card tile"><small>Equipe no mês</small><b>' + BRL(R.equipe) + "</b><span>horas × valor-hora" + (R.equipeOk ? "" : " · falta valor-hora") + "</span></div>" +
-      '<div class="card tile"><small>Ainda a pagar</small><b>' + BRL(aberto) + "</b><span>com vencimento no mês</span></div>" +
-      '<div class="card tile"><small>Custo fixo mapeado</small><b>' + BRL(mapeado) + "</b><span>por mês, das despesas fixas</span></div>";
+    $("fd-tiles").innerHTML = quadro("Despesas de " + esc(T.mesNome(S.mes)), [
+      { l: "Despesas pagas", v: BRL(R.desp), s: "no mês, sem a equipe" },
+      { l: "Equipe no mês", v: BRL(R.equipe), s: "horas × valor-hora" + (R.equipeOk ? "" : " · falta valor-hora") },
+      { l: "Ainda a pagar", v: BRL(aberto), s: "com vencimento no mês", cls: aberto ? "" : "good" },
+      { l: "Custo fixo mapeado", v: BRL(mapeado), s: "por mês, das despesas fixas" }]);
     var grupos = {};
     doMes.forEach(function (e) { (grupos[e.categoriaId] = grupos[e.categoriaId] || []).push(e); });
     var ordem = cfg().categorias.filter(function (c) { return c.tipo === "saida"; }).map(function (c) { return c.id; });
@@ -884,11 +891,11 @@
       sec("A pagar", '<span class="section-meta" id="fi-pagar-meta"></span>', '<div class="fin-list" id="fi-pagar"></div>') +
     "</div>" +
     // receitas
-    '<div class="fin-page" id="fp-receitas" hidden><div class="tiles" id="fr-tiles"></div>' +
+    '<div class="fin-page" id="fp-receitas" hidden><div class="fin-hero fin-sum" id="fr-tiles"></div>' +
       sec("Recebidas no mês", '<button class="btn btn-small" id="fr-nova">+ Receita avulsa</button>', '<div class="fin-list" id="fr-recebidas"></div>') +
       sec("A receber no mês", "", '<div class="fin-list" id="fr-previstas"></div>') + "</div>" +
     // despesas
-    '<div class="fin-page" id="fp-despesas" hidden><div class="tiles" id="fd-tiles"></div>' +
+    '<div class="fin-page" id="fp-despesas" hidden><div class="fin-hero fin-sum" id="fd-tiles"></div>' +
       '<div class="panel" id="fin-rec" hidden><h3 class="panel-title" id="fr-title">Nova despesa fixa</h3><div class="grid-form">' +
         fld("col-6", "frc-desc", "Descrição", '<input id="frc-desc" placeholder="Ex.: SketchUp, Internet">') + fld("col-6", "frc-cat", "Categoria", '<select id="frc-cat"></select>') +
         fld("col-3 keep", "frc-valor", "Valor cheio (R$)", '<input type="number" id="frc-valor" min="0" step="0.01" inputmode="decimal">') +
