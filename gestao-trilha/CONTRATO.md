@@ -99,3 +99,4 @@ ele expõe (ex.: `Trilha.tempo.lancAtivos()`, `Trilha.tempo.custoLanc(l)`).
 | Configurações | `modulos/config.js` | admin | em uso |
 | Financeiro | — | admin | "Em breve" na capa |
 | Gestor de projetos | — | admin | "Em breve" na capa |
+| Gestor de obras (orçamento de obras) | — | admin | "Em breve" na capa — portar o app de orçamento (skill orcamento-obra-trilha), itens agrupados por obra |

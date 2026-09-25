@@ -134,7 +134,8 @@
   // ---------- capa ----------
   var FUTUROS = [
     { t: "Financeiro", d: "Fluxo de caixa, contas e resultados", icon: '<path d="M3 7h18v12H3z"/><path d="M3 11h18"/><path d="M7 15h3"/>' },
-    { t: "Gestor de projetos", d: "Fases, entregas e prazos de cada projeto", icon: '<path d="M4 5h16"/><path d="M4 12h10"/><path d="M4 19h6"/><circle cx="18" cy="17" r="3"/>' }
+    { t: "Gestor de projetos", d: "Fases, entregas e prazos de cada projeto", icon: '<path d="M4 5h16"/><path d="M4 12h10"/><path d="M4 19h6"/><circle cx="18" cy="17" r="3"/>' },
+    { t: "Gestor de obras", d: "Orçamentos, execução e custo real das obras", icon: '<path d="M3 20h18"/><path d="M5 20v-6a7 7 0 0 1 14 0v6"/><path d="M12 7V4"/><path d="M9 14h6"/>' }
   ];
   function renderHome() {
     var s = T.state;
