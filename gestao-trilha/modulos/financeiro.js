@@ -286,21 +286,35 @@
     for (var m = ano + "-01"; m <= S.mes; m = addMes(m, 1)) acum += resumoMes(D, m).resultado;
     var R = serie[11], P = serie[10], delta = P.entrou > 0 ? Math.round((R.entrou - P.entrou) / P.entrou * 100) : null;
     var nRec = D.ent.filter(function (e) { return pagoNoMes(e, S.mes) && grupo(e.categoriaId) !== "reserva"; }).length;
-    $("fi-tiles").innerHTML =
-      '<div class="card tile"><small>Entrou</small><b>' + BRL(R.entrou) + "</b><span>" + nRec + (nRec === 1 ? " recebimento" : " recebimentos") + (delta != null ? " · " + (delta >= 0 ? "▲ " : "▼ ") + Math.abs(delta) + "% sobre " + mesCurto(P.mes) : "") + "</span></div>" +
-      '<div class="card tile"><small>Saiu</small><b>' + BRL(R.saiu) + "</b><span>Despesas " + BRL(R.desp) + " · Equipe " + (R.equipeOk ? BRL(R.equipe) : BRL(R.equipe) + "*") + "</span></div>" +
-      '<div class="card tile ' + (R.resultado >= 0 ? "good" : "bad") + '"><small>Resultado do mês</small><b>' + BRL(R.resultado) + "</b><span>o que sobra para o escritório</span></div>" +
-      '<div class="card tile ' + (acum >= 0 ? "good" : "bad") + '"><small>Resultado em ' + ano + "</small><b>" + BRL(r2(acum)) + "</b><span>acumulado de janeiro a " + mesCurto(S.mes) + "</span></div>";
+    var gb = function (v) { return v >= 0 ? "good" : "bad"; };
+    $("fi-hero").innerHTML =
+      '<div class="hero-head"><span class="hero-eyebrow">Resumo de ' + esc(T.mesNome(S.mes)) + "</span>" +
+        (delta != null ? '<span class="hero-delta">' + (delta >= 0 ? "▲ " : "▼ ") + Math.abs(delta) + "% de entradas sobre " + mesCurto(P.mes) + "</span>" : "") + "</div>" +
+      '<div class="hero-body"><div class="hero-flow">' +
+        '<div class="hero-cell"><small><i class="dot dot-a"></i>Entrou</small><b>' + BRL(R.entrou) + "</b><span>" + nRec + (nRec === 1 ? " recebimento" : " recebimentos") + "</span></div>" +
+        '<div class="hero-op" aria-hidden="true">−</div>' +
+        '<div class="hero-cell"><small><i class="dot dot-b"></i>Saiu</small><b>' + BRL(R.saiu) + "</b><span>Despesas " + BRL(R.desp) + " · Equipe " + BRL(R.equipe) + (R.equipeOk ? "" : "*") + "</span></div>" +
+        '<div class="hero-op" aria-hidden="true">=</div>' +
+        '<div class="hero-cell ' + gb(R.resultado) + '"><small>Resultado do mês</small><b>' + BRL(R.resultado) + "</b><span>o que sobra para o escritório</span></div>" +
+      "</div>" +
+      '<div class="hero-year ' + gb(acum) + '"><small>Resultado em ' + ano + "</small><b>" + BRL(r2(acum)) + "</b><span>acumulado de janeiro a " + mesCurto(S.mes) + "</span></div></div>" +
+      (!R.equipeOk ? '<div class="hint">* Falta o valor-hora de alguém em Configurações; a equipe está incompleta.</div>' : "");
     renderChart(serie);
     // próximos 90 dias
     var lim = ymd(T.addDays(new Date(), 90)), aRec = D.ent.filter(function (e) { return e.status === "aberta" && e.venc <= lim; });
     var aPag = D.sai.filter(function (e) { return e.status === "aberta" && e.venc <= lim && e.venc >= addMes(T.mesAtual(), -1) + "-01"; });
     var reserva = soma(D.sai.filter(function (e) { return e.status === "paga" && grupo(e.categoriaId) === "reserva"; })) - soma(D.ent.filter(function (e) { return e.status === "paga" && grupo(e.categoriaId) === "reserva"; }));
     var c = cfg(), recAno = soma(D.ent.filter(function (e) { return e.status === "paga" && mesDe(e.pagoEm).slice(0, 4) === ano && grupo(e.categoriaId) !== "reserva"; }));
-    $("fi-prev").innerHTML = '<span class="lbl">Próximos 90 dias</span><span>A receber <b>' + BRL(soma(aRec)) + "</b></span><span>A pagar <b>" + BRL(soma(aPag)) + "</b></span>" +
-      "<span>Reserva guardada <b>" + BRL(r2(reserva)) + "</b></span>" +
-      (c.impostoPct ? "<span>Imposto a separar em " + ano + " <b>" + BRL(r2(recAno * c.impostoPct / 100)) + "</b> (" + T.fmtNum(c.impostoPct) + "%)</span>" : "") +
-      (!R.equipeOk ? '<span class="hint">* Falta o valor-hora de alguém em Configurações</span>' : "");
+    var saldo = r2(soma(aRec) - soma(aPag)), nPag = aPag.length;
+    $("fi-prev").innerHTML =
+      '<div class="next-head"><span class="next-title">Próximos 90 dias</span><span class="hint">até ' + T.fmtYmd(lim) + "</span></div>" +
+      '<div class="next-grid">' +
+        '<div class="next-cell"><small>A receber</small><b>' + BRL(soma(aRec)) + "</b><span>" + aRec.length + (aRec.length === 1 ? " parcela" : " parcelas") + (aRec.some(function (e) { return e.venc < hoje(); }) ? ", com atrasadas" : "") + "</span></div>" +
+        '<div class="next-cell"><small>A pagar</small><b>' + BRL(soma(aPag)) + "</b><span>" + nPag + (nPag === 1 ? " conta" : " contas") + ", com a equipe</span></div>" +
+        '<div class="next-cell ' + gb(saldo) + '"><small>Saldo previsto</small><b>' + BRL(saldo) + "</b><span>a receber − a pagar</span></div>" +
+        '<div class="next-cell"><small>Reserva guardada</small><b>' + BRL(r2(reserva)) + "</b><span>" +
+          (c.impostoPct ? "imposto a separar em " + ano + ": " + BRL(r2(recAno * c.impostoPct / 100)) : "defina a reserva de imposto em Ajustes") + "</span></div>" +
+      "</div>";
     // a receber
     T.each("[data-f]", function (b) { b.classList.toggle("is-selected", b.dataset.f === S.recFiltro); }, $("fi-recf"));
     var fimMes = S.mes + "-31", abertas = D.ent.filter(function (e) { return e.status === "aberta" && (S.recFiltro === "todas" || e.venc <= fimMes); }).sort(porVenc);
@@ -862,10 +876,10 @@
     "</form></div>" +
     // painel
     '<div class="fin-page" id="fp-inicio">' +
-      '<div class="tiles" id="fi-tiles"></div>' +
+      '<div class="fin-hero" id="fi-hero"></div>' +
       '<div class="card chart-card"><div class="chart-head"><div class="chart-title">Últimos 12 meses</div><div class="legend"><span><i style="background:var(--serie-a)"></i>Entrou</span><span><i style="background:var(--serie-b)"></i>Saiu (despesas + equipe)</span></div></div>' +
         '<div class="chart" id="fi-chart"></div><div class="chart-tip" id="fi-tip" hidden></div></div>' +
-      '<div class="forecast" id="fi-prev"></div>' +
+      '<div class="card fin-next" id="fi-prev"></div>' +
       sec("A receber", '<div class="segmented" id="fi-recf"><button class="seg-pill" data-f="mes">Até este mês</button><button class="seg-pill" data-f="todas">Todas em aberto</button></div>', '<div class="fin-list" id="fi-receber"></div><div class="fin-list" id="fi-recebidas" style="margin-top:8px"></div>') +
       sec("A pagar", '<span class="section-meta" id="fi-pagar-meta"></span>', '<div class="fin-list" id="fi-pagar"></div>') +
     "</div>" +

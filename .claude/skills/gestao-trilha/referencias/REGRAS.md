@@ -97,9 +97,11 @@ Objetivo: controle simples do dinheiro do escritório, mesmo sem CNPJ e com cont
 tudo que os clientes pagam é receita do escritório; tudo que é gasto do trabalho é despesa; gasto pessoal não entra.
 
 1. **Páginas:** Painel (início), Receitas, Despesas, Contratos, Ajustes, com seletor de mês e botão "+ Lançar" sempre visível.
-2. **Painel:** Entrou (recebido no mês), Saiu (despesas pagas + equipe), Resultado do mês (entrou − despesas − equipe),
-   Resultado no ano (jan até o mês), gráfico de 12 meses (entrou × saiu, verde e azul), faixa "Próximos 90 dias"
-   (a receber, a pagar, reserva guardada, imposto a separar), lista **A receber** (atrasadas + mês; filtro "Todas em
+2. **Painel:** um **quadro de resumo do mês** (borda verde) lido como conta: Entrou − Saiu (despesas pagas + equipe)
+   = Resultado do mês, com o **Resultado no ano** (jan até o mês) em destaque à direita e a variação das entradas
+   sobre o mês anterior no cabeçalho; gráfico de 12 meses (entrou × saiu, verde e azul); quadro **Próximos 90 dias**
+   com A receber, A pagar (com a equipe), Saldo previsto (a receber − a pagar) e Reserva guardada (com o imposto a
+   separar no ano); lista **A receber** (atrasadas + mês; filtro "Todas em
    aberto") com "Recebido ✓", "Recebidas no mês" recolhível e **A pagar** recolhível ("x de y resolvidas · faltam R$").
    Na cópia de teste, uma faixa no topo do Financeiro avisa que os dados são fictícios.
 3. **Receber/pagar em dois cliques:** "Recebido ✓"/"Pago ✓" abre data (hoje), valor, forma e conta já preenchidos →
