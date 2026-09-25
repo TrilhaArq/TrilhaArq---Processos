@@ -132,6 +132,6 @@
   T.register({
     id: "projetos", label: "Projetos", area: "admin", html: html, init: init, render: render,
     icon: '<path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/>',
-    desc: function () { var n = T.state.projetos.filter(function (p) { return (p.status || "ativo") === "ativo"; }).length; return n + (n === 1 ? " projeto ativo" : " projetos ativos"); }
+    desc: function () { return "Cadastro, perfil e horas por projeto"; }
   });
 })();

@@ -386,6 +386,7 @@
     if (!T.db) return;
     var mudou = $("fin-nav").dataset.page !== S.page;
     $("fin-nav").dataset.page = S.page;
+    $("fin-teste").hidden = !cfg().teste;
     T.each("[data-page]", function (b) { b.classList.toggle("is-selected", b.dataset.page === S.page); }, $("fin-nav"));
     PAGES.forEach(function (p) { $("fp-" + p[0]).hidden = p[0] !== S.page; });
     $("fin-mes").textContent = cap(T.mesNome(S.mes));
@@ -834,6 +835,7 @@
   function fld(cls, id, label, input) { return '<div class="field ' + cls + '"><label for="' + id + '">' + label + "</label>" + input + "</div>"; }
   function sec(t, meta, body) { return '<div><div class="section-head"><h2 class="section-title">' + t + "</h2>" + (meta || "") + "</div>" + body + "</div>"; }
   var html =
+    '<div class="notice" id="fin-teste" hidden>Cópia de teste: os projetos, as horas e os valores são fictícios. Nada daqui chega ao app oficial.</div>' +
     '<div class="fin-bar"><nav class="fin-nav" id="fin-nav" aria-label="Áreas do Financeiro">' + PAGES.map(function (p) { return '<button class="seg-pill" data-page="' + p[0] + '">' + p[1] + "</button>"; }).join("") + "</nav>" +
       '<div class="fin-tools"><div class="month-switch" id="fin-mes-wrap"><button id="fin-prev" aria-label="Mês anterior">‹</button><span id="fin-mes" title="Voltar ao mês atual" role="button" tabindex="0"></span><button id="fin-next" aria-label="Próximo mês">›</button></div>' +
       '<button class="btn btn-primary" id="fin-add">+ Lançar</button></div></div>' +
@@ -929,40 +931,15 @@
     '<div class="form-actions"><button class="btn btn-primary" id="fin-pdf">Baixar PDF</button><button class="btn" data-close="1">Fechar</button><span class="save-state" id="fin-pdf-st"></span></div></div></div>';
 
   // ---------- registro ----------
-  function abertasAte(lim) { S.idx = S.idx || {}; return parcelas().concat(movs().filter(function (m) { return m.tipo === "entrada"; }).map(entMov)).filter(function (e) { return e.status === "aberta" && e.venc <= lim; }).sort(porVenc); }
   T.register({
     id: "financeiro", label: "Financeiro", area: "admin", html: html, init: init, render: render,
     icon: '<path d="M3 7h18v12H3z"/><path d="M3 11h18"/><path d="M7 15h3"/>',
-    desc: function () {
-      var fim = T.mesAtual() + "-31", L = abertasAte(fim);
-      return L.length ? "A receber até o fim do mês: " + BRL(soma(L)) : "Recebimentos, despesas e resultado";
-    },
+    desc: function () { return "Recebimentos, despesas e resultado"; },
     connect: function (db) {
       db.doc("fin_config/geral").onSnapshot(function (d) { S.cfgDoc = d.exists ? d.data() : null; T.scheduleRender(); }, T.onErr);
       db.collection("fin_contratos").onSnapshot(function (s) { S.contratos = T.snapList(s); T.scheduleRender(); }, T.onErr);
       db.collection("fin_mov").onSnapshot(function (s) { S.movDocs = T.arrDocs(s); T.scheduleRender(); }, T.onErr);
       db.doc("fin_recorrentes/lista").onSnapshot(function (d) { S.rec = d.exists && Array.isArray(d.data().itens) ? d.data().itens : []; T.scheduleRender(); }, T.onErr);
-    },
-    notes: function () {
-      var out = [];
-      if (cfg().teste) out.push('<div class="note"><div><div class="note-title">Cópia de teste</div><div class="note-body">Os projetos, as horas e os valores deste app são fictícios. Teste à vontade: nada aqui chega ao app oficial.</div></div></div>');
-      var lim = ymd(T.addDays(new Date(), 7)), L = abertasAte(lim);
-      if (L.length) {
-        out.push('<div class="note"><div style="flex:1;min-width:0"><div class="note-title">A receber até ' + fmtDM(lim) + " · " + BRL(soma(L)) + '</div><div class="note-lines">' + L.slice(0, 4).map(function (e) {
-          return '<div class="note-line"><span>' + fmtDM(e.venc) + (e.venc < hoje() ? ' <span class="pill danger">atrasada</span>' : "") + " · " + esc(e.titulo) + " · <b>" + BRL(e.valor) + '</b></span><button class="btn btn-small btn-ok" data-finrec="' + esc(e.key) + '">Recebido ✓</button></div>';
-        }).join("") + (L.length > 4 ? '<div class="note-body">e mais ' + (L.length - 4) + "</div>" : "") + '</div></div><div class="form-actions"><button class="btn btn-small" data-finopen="1">Abrir Financeiro</button></div></div>');
-      }
-      return out;
-    },
-    onHomeClick: async function (e) {
-      if (e.target.closest("[data-finopen]")) { S.page = "inicio"; T.go("admin", "financeiro"); return; }
-      var b = e.target.closest("[data-finrec]"); if (!b || S.busy) return;
-      var x = S.idx[b.dataset.finrec]; if (!x) return;
-      var c = cfg(), d = { data: hoje(), valor: x.valor, forma: c.formaPadrao, conta: c.contaPadrao };
-      S.busy = true; b.disabled = true;
-      try { await confirmar(x, d, null); T.toast("Recebido: " + x.titulo + " · " + BRL(x.valor), { label: "Desfazer", fn: function () { desfazer(x); } }); }
-      catch (err) { T.showError(err); b.disabled = false; }
-      S.busy = false;
     }
   });
 })();

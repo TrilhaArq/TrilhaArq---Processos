@@ -42,11 +42,15 @@ Cada `modulos/<id>.js` é uma função autoexecutável que chama `Trilha.registe
 | `render()` | sim | redesenha a view com o estado atual |
 | `connect(db)` | não | assina as coleções do módulo (`onSnapshot`) |
 | `icon`, `desc()` | admin | SVG (paths, 24×24, só traço) e descrição curta do botão na capa |
-| `homeStats(pid)` | não | números no cartão da pessoa na capa: `[{label, value, alert}]` |
-| `homeState(pid)` | não | linha de estado no cartão da pessoa (HTML curto) |
-| `notes()` | não | avisos no topo da capa (HTML de `.note`) |
-| `onHomeClick(e)` | não | cliques nos botões dos próprios avisos |
+| `homeStats(pid)` | não | só módulos da área "pessoa" (Tempo, Tarefas): números no cartão da pessoa `[{label, value, alert}]` |
+| `homeState(pid)` | não | só módulos da área "pessoa": linha de estado no cartão da pessoa (HTML curto) |
 | `onLoaded(key)` | não | chamado quando uma coleção chega do servidor |
+
+**Regra da capa (decidida pelo Luan):** a capa é só o lugar de entrar. Tem os cartões das pessoas (com o
+resumo de Tempo e Tarefas) e um botão por app do escritório, com descrição **fixa**. Nenhum app do escritório
+manda dados, números ou avisos para a capa: cada um é "um app dentro do app", com a própria página inicial,
+onde ficam os avisos dele (ex.: fechamentos a conferir no topo de Relatórios; parcelas a receber no Painel do
+Financeiro). Não existem mais `notes()` nem `onHomeClick()`.
 
 Adicionar um módulo = criar o arquivo + uma linha `<script src="modulos/<id>.js">` no `index.html` antes de
 `Trilha.start()`. Ao ficar pronto, remover o botão "Em breve" correspondente (`FUTUROS` em `nucleo.js`).

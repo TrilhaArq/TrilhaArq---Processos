@@ -15,8 +15,9 @@ Mapear tempo e custo de cada projeto para precificar com base em dados, não em 
 
 ## Navegação (v3)
 
-- **Capa (página inicial):** avisos (fechamentos mensais a conferir), botões das pessoas (Luan, Elisa) com
-  horas do mês, tarefas a fazer e atrasadas, e botões administrativos: Projetos, Relatórios, Configurações.
+- **Capa (página inicial):** só botões. Botões das pessoas (Luan, Elisa) com horas do mês, tarefas a fazer e
+  atrasadas, e um botão por app do escritório (Financeiro, Projetos, Relatórios, Configurações e os "Em breve"),
+  com descrição fixa. Nenhum app do escritório mostra dados ou avisos na capa; cada um tem a própria página inicial.
 - **Área da pessoa:** abas **Tempo** e **Tarefas**, mais "← Início". Cabeçalho padrão com o nome da pessoa.
 - **Área administrativa:** abas Projetos, Relatórios e Configurações.
 - O app sempre abre na capa.
@@ -61,8 +62,8 @@ Mapear tempo e custo de cada projeto para precificar com base em dados, não em 
    Duração, Lembrete e Repetir (só na criação) e é enviado à Agenda Google (calendário
    trilha@trilhaarq.com.br) com o nome da pessoa no título. Excluir a tarefa não apaga o evento da agenda.
 8c. **Fechamento mensal automático:** no primeiro acesso de cada mês o app grava em `fechamentos` o resumo do
-   mês anterior de cada pessoa (horas, dias, média por dia, valor-hora, valor a pagar) e mostra um aviso na
-   capa até alguém clicar em "Conferido". Se houver ajustes depois, Relatórios avisa e permite atualizar.
+   mês anterior de cada pessoa (horas, dias, média por dia, valor-hora, valor a pagar) e mostra um aviso no
+   topo de Relatórios até alguém clicar em "Conferido". Se houver ajustes depois, Relatórios avisa e permite atualizar.
 9. **Lançamento manual:** data, início, fim, onde, etapa, descrição. Fim menor que início = passou da meia-noite.
    Limite de 16 h por lançamento.
 10. **Semana fechada:** a semana vai de segunda a domingo. Incluir, editar ou excluir lançamento de semana
@@ -99,9 +100,9 @@ tudo que os clientes pagam é receita do escritório; tudo que é gasto do traba
    Resultado no ano (jan até o mês), gráfico de 12 meses (entrou × saiu, verde e azul), faixa "Próximos 90 dias"
    (a receber, a pagar, reserva guardada, imposto a separar), lista **A receber** (atrasadas + mês; filtro "Todas em
    aberto") com "Recebido ✓", "Recebidas no mês" recolhível e **A pagar** recolhível ("x de y resolvidas · faltam R$").
+   Na cópia de teste, uma faixa no topo do Financeiro avisa que os dados são fictícios.
 3. **Receber/pagar em dois cliques:** "Recebido ✓"/"Pago ✓" abre data (hoje), valor, forma e conta já preenchidos →
-   Confirmar. Toast com "Desfazer". Parcela recebida mostra "Recibo" e "Desfazer". Na capa, aviso das parcelas até
-   7 dias (e atrasadas) com "Recebido ✓" direto (hoje, valor cheio, forma e conta padrão).
+   Confirmar. Toast com "Desfazer". Parcela recebida mostra "Recibo" e "Desfazer". Nada do Financeiro aparece na capa.
 4. **Equipe = todos que trabalham** (sócios ou colaboradores, Luan incluído): remuneração = horas do mês × valor-hora
    (fechamento mensal do Relatórios). No painel entra por competência (horas do mês; mês em andamento calculado ao vivo).
    Cada fechamento gravado vira "Remuneração · Pessoa" a pagar no dia configurado do mês seguinte (padrão 5);

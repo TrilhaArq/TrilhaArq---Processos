@@ -109,7 +109,8 @@
 
   // ---------- módulos ----------
   // register({ id, label, area: "pessoa"|"admin", icon, desc(), html, init(T), connect(db), render(),
-  //            homeStats(pid), homeState(pid), notes(), onHomeClick(e) })
+  //            homeStats(pid), homeState(pid) })
+  // A capa só tem botões: pessoas (com o resumo de Tempo/Tarefas) e os apps do escritório. Nenhum app manda avisos ou dados para ela.
   T.register = function (m) { T.modules.push(m); };
   T.mod = function (id) { return T.byId(T.modules, id); };
   function modsDaArea(area) { return T.modules.filter(function (m) { return m.area === area; }); }
@@ -150,13 +151,11 @@
     }).join("") + FUTUROS.map(function (f) {
       return '<div class="tile-btn admin-tile soon" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true">' + f.icon + '</svg><span><span class="t">' + f.t + '<span class="soon-pill">Em breve</span></span><span class="d">' + f.d + "</span></span></div>";
     }).join("");
-    $("notes").innerHTML = call("notes").join("");
   }
   $("home") && document.addEventListener("click", function (e) {
     if (T.state.view === "home" && e.target.closest("#home")) {
       var u = e.target.closest("[data-user]"); if (u) { T.go("pessoa", null, u.dataset.user); return; }
       var a = e.target.closest("[data-go]"); if (a) { T.go("admin", a.dataset.go); return; }
-      call("onHomeClick", [e]);
       return;
     }
     if (e.target.closest("[data-home]")) { T.go("home"); return; }
