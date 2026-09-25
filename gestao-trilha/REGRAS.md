@@ -1,11 +1,11 @@
-# Gestão Trilha — tempo e tarefas (artefato)
+# Gestão Trilha — regras dos módulos Tempo, Tarefas, Projetos, Relatórios e Configurações
 
 Artefato: https://claude.ai/artifact/N5fGJZBumZy7dyN57w7e8o
-Código-fonte: `gestor-de-tempo/index.html` + `gestor-de-tempo/logo.png` (publicado junto como arquivo `logo.png`).
+Código-fonte: pasta `gestao-trilha/` (estrutura em módulos — ver `CONTRATO.md`).
 Capacidades declaradas: `db` (banco de dados do artefato), `downloads` (exportar CSV) e `mcp` com o conector
 "Google Calendar" (só `create_event` e `update_event`, mesma integração do antigo gestor de tarefas).
 
-Para continuar o desenvolvimento em outra conversa: anexe este arquivo e o `index.html`, e peça para
+Para continuar em outra conversa: anexe `CONTRATO.md` e este arquivo (ou dê acesso ao repositório) e peça para
 republicar no **mesmo** artefato passando a URL acima como `url` (assim os dados são mantidos).
 
 ## Objetivo
@@ -32,10 +32,18 @@ Mapear tempo e custo de cada projeto para precificar com base em dados, não em 
    Compatibilização, Projeto Executivo, Obra. Editáveis em Configurações.
 5. **Áreas internas (não faturáveis):** Administrativo, Marketing, Comercial e captação, Capacitação. Editáveis.
 6. **Tipos de projeto:** Residencial, Comercial, Interiores, Reforma, Outro. Editáveis.
-3a. **Tipo de trabalho no cronômetro:** botões Projeto | Gestão | Obra. Projeto → escolhe projeto e etapa
-   (a lista de etapas não mostra "Obra"); Gestão → escolhe a área interna; Obra → escolhe o projeto e a etapa
-   fica "obra" automaticamente (subtópicos de obra ainda serão definidos). No banco: gestão = `tipo: "area"`,
-   obra = `tipo: "projeto"` com `etapaId: "obra"`.
+3a. **Tipo de trabalho no cronômetro:** botões Projeto | Gestão | Obra. Projeto → projeto + etapa
+   (a lista de etapas não mostra "Obra"); Gestão → área interna; Obra → projeto + **tópico de obra**
+   (Orçamento preliminar, Orçamento executivo, Planejamento de obra, Cronograma de obra, Controle financeiro,
+   Controle de gestão, Execução de obra — editáveis em Configurações). No banco: gestão = `tipo: "area"`,
+   obra = `tipo: "projeto"` com `etapaId: "obra"` e `topicoId`. Relatórios têm a tabela "Obra" por tópico.
+3b. **Proteções do cronômetro:** cada navegador tem um id e um nome ("Windows · Chrome"). O cronômetro guarda
+   onde foi iniciado; pausar/concluir de outro aparelho pede confirmação. Cada lançamento do cronômetro guarda
+   `motivo` (pausar/concluir/trocar) e `paradoEm` (aparelho e horário), visível como etiqueta. Depois de pausar ou
+   concluir aparece "Desfazer" por 10 s (apaga o lançamento e o cronômetro volta a correr do horário original).
+   Os botões perdem o foco após o clique, para um Enter/espaço posterior não pausar sem querer.
+3c. **Configurações:** todo Salvar mostra "Salvando…" → "Salvo ✓" (ou o erro) ao lado do botão; listas editadas
+   mostram "Alterações não salvas" até salvar.
 7. **Cronômetro é a forma principal.** Um cronômetro por pessoa, salvo no banco (sobrevive a recarregar a
    página e aparece para os outros como "está em…"). Iniciar outra atividade com o cronômetro ligado para
    a atual e começa a nova. Menos de 1 minuto não é salvo.
@@ -81,10 +89,10 @@ Mapear tempo e custo de cada projeto para precificar com base em dados, não em 
 ## Modelo de dados
 
 - `pessoas/{id}`: `nome`, `perfil` ("socio" | "colaborador"), `custoHora`, `valorHora`, `ativo`, `ordem`.
-- `config/escritorio`: `etapas[{id,nome}]`, `areas[{id,nome}]`, `tipos[{id,nome}]`,
+- `config/escritorio`: `etapas[{id,nome}]`, `areas[{id,nome}]`, `obraTopicos[{id,nome}]`, `tipos[{id,nome}]`,
   `custosFixosMensais`, `horasProdutivasMes`.
 - `projetos/{id}`: `nome`, `cliente`, `tipo`, `area`, `honorario`, `status`, `horasPrevistas{etapaId: h}`, `criadoEm`.
-- `timers/{pessoaId}`: `pessoaId`, `tipo`, `alvoId`, `etapaId`, `descricao`, `inicio`.
+- `timers/{pessoaId}`: `pessoaId`, `atividadeId`, `tipo`, `alvoId`, `etapaId`, `topicoId`, `descricao`, `inicio`, `dispositivo{id,nome}`.
 - `atividades/{pessoaId}`: `itens[]` com `id`, `tipo`, `alvoId`, `etapaId`, `descricao`, `status`
   ("andamento" | "pausada" | "concluida"), `criadoEm`, `ultimoUso`, `concluidoEm`.
 - `tarefas/{pessoaId}`: `itens[]` com os campos do antigo gestor (`title`, `description`, `subdivision`,
@@ -96,7 +104,7 @@ Mapear tempo e custo de cada projeto para precificar com base em dados, não em 
 - `lancamentos/{pessoaId}_{AAAA-MM}`: `pessoaId`, `mes`, `itens[]` — **um documento por pessoa por mês**
   (o banco do artefato tem limite de 5.000 documentos; assim são ~12 por pessoa por ano). Cada item:
   `id`, `pessoaId`, `tipo` ("projeto" | "area"), `alvoId`, `etapaId`, `descricao`, `inicio`, `fim` (ISO),
-  `min`, `atividadeId`, `origem` ("cronometro" | "manual"), `criadoEm`, `editadoEm`, `excluido`, `ajustes[]`.
+  `min`, `atividadeId`, `topicoId`, `motivo`, `paradoEm{id,nome,em}`, `origem` ("cronometro" | "manual"), `criadoEm`, `editadoEm`, `excluido`, `ajustes[]`.
 
 ## Próximos passos previstos
 

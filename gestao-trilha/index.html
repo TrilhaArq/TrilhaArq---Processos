@@ -1,0 +1,57 @@
+<title>Gestão Trilha</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Work+Sans:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="estilo.css">
+
+<div class="page">
+  <div id="status" class="notice" hidden style="margin-bottom:16px"></div>
+
+  <!-- Capa: organiza os módulos. Pessoas no alto, escritório abaixo. -->
+  <div id="home" class="cover">
+    <div class="cover-head">
+      <div>
+        <div class="eyebrow">Trilha · Gestão</div>
+        <h1>Gestão</h1>
+        <div class="cover-date" id="cover-date"></div>
+      </div>
+      <img class="cover-logo" src="logo.png" alt="Trilha Arquitetura Brasileira">
+    </div>
+    <div class="notes" id="notes"></div>
+    <div>
+      <h2 class="cover-label">Pessoas</h2>
+      <div class="user-tiles" id="user-tiles"></div>
+    </div>
+    <div>
+      <h2 class="cover-label">Escritório</h2>
+      <div class="admin-tiles" id="admin-tiles"></div>
+    </div>
+  </div>
+
+  <!-- Área interna: cabeçalho padrão + abas do módulo aberto -->
+  <div id="app" hidden>
+    <header>
+      <div class="header-top">
+        <div class="header-titles">
+          <div class="eyebrow">Trilha · Gestão</div>
+          <h1 id="app-title"></h1>
+        </div>
+        <img class="header-logo" src="logo.png" alt="Trilha Arquitetura Brasileira">
+      </div>
+    </header>
+    <div class="bar">
+      <nav class="tabs" id="tabs" aria-label="Seções"></nav>
+    </div>
+    <div id="views"></div>
+    <footer>
+      Mês de 1º ao último dia. Semana de segunda a domingo; lançamentos de semanas anteriores só podem ser incluídos, alterados ou excluídos com justificativa, que fica registrada.
+    </footer>
+  </div>
+</div>
+<div class="toast" id="toast" hidden><span id="toast-msg"></span><button id="toast-btn" hidden></button></div>
+
+<script src="nucleo.js"></script>
+<script src="modulos/tempo.js"></script>
+<script src="modulos/tarefas.js"></script>
+<script src="modulos/projetos.js"></script>
+<script src="modulos/relatorios.js"></script>
+<script src="modulos/config.js"></script>
+<script>Trilha.start();</script>
