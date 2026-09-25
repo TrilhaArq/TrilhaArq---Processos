@@ -44,7 +44,7 @@ cronômetro do Tempo. Telas: painel de todos os projetos (colunas por etapa), pa
 
 | # | Bloco | Situação |
 |---|---|---|
-| 0 | Visão geral do funcionamento de projetos (áudios do Luan) | aguardando material |
+| 0 | Visão geral do funcionamento de projetos (áudios explicativos) | aguardando material |
 | 1 | Entrada do projeto | pendente |
 | 2 | Fluxo de etapas | pendente |
 | 3 | Entregáveis por etapa | pendente |
