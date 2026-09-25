@@ -16,6 +16,10 @@ logo.png            logo preta (invertida no tema escuro)
 modulos/<id>.js     um arquivo por módulo
 ```
 
+**Cópia de teste:** https://claude.ai/artifact/V9bUhPfLyowX83XUz5Zeaw — mesmos arquivos, `<title>` "Gestão Trilha Teste",
+capacidades só `db` e `downloads` (sem Google Agenda) e banco próprio com dados fictícios (`fin_config/geral.teste = true`
+mostra o aviso na capa). Módulos novos são testados lá antes de ir para o link oficial.
+
 Publicar sempre com `url` = link acima, `file_path` = `index.html`, `root` = esta pasta e `files` listando
 **todos** os arquivos (estilo.css, nucleo.js, logo.png e cada `modulos/*.js`). Não mudar `capabilities` sem
 necessidade (hoje: `db`, `downloads`, `mcp` Google Calendar com `create_event`/`update_event`); para declarar
@@ -48,7 +52,8 @@ Adicionar um módulo = criar o arquivo + uma linha `<script src="modulos/<id>.js
 `Trilha.start()`. Ao ficar pronto, remover o botão "Em breve" correspondente (`FUTUROS` em `nucleo.js`).
 
 Um módulo **não** mexe no HTML nem no estado de outro módulo. Para ler dados de outro módulo, use o objeto que
-ele expõe (ex.: `Trilha.tempo.lancAtivos()`, `Trilha.tempo.custoLanc(l)`).
+ele expõe (ex.: `Trilha.tempo.lancAtivos()`, `Trilha.tempo.custoLanc(l)`, `Trilha.relatorios.fechamentos()`,
+`Trilha.relatorios.calcFechamento(pid, mes)`).
 
 ## 3. O que o núcleo oferece (`window.Trilha`, abreviado `T`)
 
@@ -71,8 +76,9 @@ ele expõe (ex.: `Trilha.tempo.lancAtivos()`, `Trilha.tempo.custoLanc(l)`).
   movimentações financeiras) ficam **agrupados** num documento por pessoa/mês ou por mês, com a lista em
   `itens[]` (ver `lancamentos/<pessoa>_<AAAA-MM>`). Nunca um documento por lançamento.
 - Coleções comuns (núcleo): `pessoas/<id>`, `projetos/<id>`, `config/escritorio`. Módulos podem acrescentar
-  campos a `projetos` (ex.: o Financeiro guarda parcelas do honorário), mas nunca renomear ou apagar os existentes.
+  campos a `projetos` (ex.: `perfil`, usado na precificação), mas nunca renomear ou apagar os existentes.
 - Coleções de módulos em uso: `lancamentos`, `atividades`, `timers` (Tempo); `tarefas` (Tarefas);
+  `fin_config`, `fin_contratos`, `fin_mov`, `fin_recorrentes` (Financeiro);
   `fechamentos` (Relatórios). Um módulo novo usa coleções com o próprio prefixo/nome e as documenta aqui.
 - Toda gravação feita pelo Claude no chat (ArtifactData) usa `if_version` do documento lido.
 - Datas: ISO (`toISOString`) para instantes; `AAAA-MM-DD` para dias; `AAAA-MM` para meses. Valores em reais
@@ -97,6 +103,6 @@ ele expõe (ex.: `Trilha.tempo.lancAtivos()`, `Trilha.tempo.custoLanc(l)`).
 | Projetos (cadastro) | `modulos/projetos.js` | admin | em uso — será ampliado pelo Gestor de Projetos |
 | Relatórios | `modulos/relatorios.js` | admin | em uso |
 | Configurações | `modulos/config.js` | admin | em uso |
-| Financeiro | — | admin | "Em breve" na capa |
+| Financeiro | `modulos/financeiro.js` | admin | v1 em teste na cópia https://claude.ai/artifact/V9bUhPfLyowX83XUz5Zeaw (dados fictícios); ainda não publicado no app oficial |
 | Gestor de projetos | — | admin | "Em breve" na capa |
 | Gestor de obras (orçamento de obras) | — | admin | "Em breve" na capa — portar o app de orçamento (skill orcamento-obra-trilha), itens agrupados por obra |

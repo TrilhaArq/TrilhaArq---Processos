@@ -206,6 +206,9 @@
     if (!T.downloads) { /* verificado de novo depois da conexão */ }
   }
 
+  // Leitura para outros módulos (Financeiro): fechamentos gravados e cálculo do mês.
+  T.relatorios = { fechamentos: function () { return S.fech; }, calcFechamento: calcFechamento };
+
   T.register({
     id: "relatorios", label: "Relatórios", area: "admin", html: html, init: init, render: render,
     icon: '<path d="M4 20h16"/><path d="M7 16V10"/><path d="M12 16V5"/><path d="M17 16v-3"/>',

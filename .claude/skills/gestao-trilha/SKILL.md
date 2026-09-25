@@ -9,6 +9,8 @@ App de gestão do escritório **Trilha Arquitetura Brasileira** (usuários: Luan
 Um único Artifact, organizado em **módulos**, com um único banco de dados compartilhado.
 
 - **Link (sempre o mesmo):** https://claude.ai/artifact/N5fGJZBumZy7dyN57w7e8o
+- **Cópia de teste (dados fictícios, sem Google Agenda):** https://claude.ai/artifact/V9bUhPfLyowX83XUz5Zeaw —
+  módulos novos (hoje o Financeiro v1) são testados lá antes de ir para o link oficial.
 - **Código:** repositório GitHub `TrilhaArq/TrilhaArq---Processos`, pasta `gestao-trilha/`
 - **Regras comuns:** `referencias/CONTRATO.md` (ler antes de qualquer alteração)
 - **Regras de negócio dos módulos atuais:** `referencias/REGRAS.md`
