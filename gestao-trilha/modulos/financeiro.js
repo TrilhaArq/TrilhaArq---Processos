@@ -242,16 +242,22 @@
   function porPago(a, b) { return (b.pagoEm || "") < (a.pagoEm || "") ? -1 : 1; }
 
   // ---------- gráfico ----------
-  function niceMax(v) { if (v <= 0) return 1000; var e = Math.pow(10, Math.floor(Math.log10(v))), f = v / e; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * e; }
+  // Passo "redondo" do eixo (1, 2, 2,5 ou 5 × 10ⁿ) para ~4 marcações; o topo é um múltiplo do passo.
+  function niceStep(v) {
+    if (v <= 0) return 250;
+    var e = Math.pow(10, Math.floor(Math.log10(v))), c = [1, 2, 2.5, 5, 10, 20];
+    for (var i = 0; i < c.length; i++) if (Math.ceil(v * 4 / (c[i] * e)) <= 5) return c[i] * e;
+    return 20 * e;
+  }
   function fmtK(v) { return v >= 1000 ? T.fmtNum(v / 1000, 1) + " mil" : T.fmtNum(v, 0); }
   function barPath(x, y, w, h) { if (h <= 0) return ""; var r = Math.min(4, h, w / 2); return "M" + x + "," + (y + h) + "V" + (y + r) + "Q" + x + "," + y + " " + (x + r) + "," + y + "H" + (x + w - r) + "Q" + (x + w) + "," + y + " " + (x + w) + "," + (y + r) + "V" + (y + h) + "Z"; }
   function renderChart(serie) {
     var box = $("fi-chart"), W = Math.max(300, box.clientWidth || 600), H = 210, pl = 52, pr = 6, pt = 10, pb = 26;
-    var max = niceMax(Math.max.apply(null, serie.map(function (m) { return Math.max(m.entrou, m.saiu); }))), n = serie.length;
+    var topo = Math.max.apply(null, serie.map(function (m) { return Math.max(m.entrou, m.saiu); })), step = niceStep(topo / 4), nt = Math.max(1, Math.ceil(topo / step)), max = step * nt, n = serie.length;
     var bw = (W - pl - pr) / n, bar = Math.max(4, Math.min(20, (bw - 12) / 2)), ih = H - pt - pb;
     var y = function (v) { return pt + ih - v / max * ih; };
     var s = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Entradas e saídas dos últimos 12 meses">';
-    for (var t = 0; t <= 4; t++) { var v = max * t / 4, yy = Math.round(y(v)) + 0.5; s += '<line class="grid" x1="' + pl + '" x2="' + (W - pr) + '" y1="' + yy + '" y2="' + yy + '"/><text class="ax" x="' + (pl - 8) + '" y="' + (yy + 4) + '" text-anchor="end">' + fmtK(v) + "</text>"; }
+    for (var t = 0; t <= nt; t++) { var v = step * t, yy = Math.round(y(v)) + 0.5; s += '<line class="grid" x1="' + pl + '" x2="' + (W - pr) + '" y1="' + yy + '" y2="' + yy + '"/><text class="ax" x="' + (pl - 8) + '" y="' + (yy + 4) + '" text-anchor="end">' + fmtK(v) + "</text>"; }
     serie.forEach(function (m, i) {
       var x0 = pl + i * bw, cx = x0 + bw / 2, ha = m.entrou / max * ih, hb = m.saiu / max * ih;
       s += '<rect class="band" data-i="' + i + '" x="' + x0 + '" y="' + pt + '" width="' + bw + '" height="' + (ih + pb) + '"/>';
@@ -764,7 +770,6 @@
       if (t.id === "fd-mapa") { abrirMapa(); return; }
       if (t.id === "fd-avulsa") { abrirLanc("saida"); return; }
       if (t.id === "fd-usar") { await T.saveWith(t, function () { return T.saveConfig({ custosFixosMensais: custoFixoMapeado() }); }); return; }
-      if (t.id === "fa-config") { T.go("admin", "config"); return; }
     });
     // contrato
     $("fc-proj").addEventListener("change", function () {
@@ -910,7 +915,7 @@
     "</div>" +
     // ajustes
     '<div class="fin-page" id="fp-ajustes" hidden>' +
-      sec("Pessoas e valor-hora", '<button class="btn btn-small" id="fa-config">Editar em Configurações</button>', '<div id="fa-pessoas"></div><div class="hint" style="margin-top:8px">A remuneração de cada pessoa é o fechamento mensal (horas × valor-hora). No início de cada mês ela aparece em “A pagar”.</div>') +
+      sec("Pessoas e valor-hora", '<span class="section-meta">Para alterar, use Configurações na página inicial</span>', '<div id="fa-pessoas"></div><div class="hint" style="margin-top:8px">A remuneração de cada pessoa é o fechamento mensal (horas × valor-hora). No início de cada mês ela aparece em “A pagar”.</div>') +
       sec("Recibo e pagamentos", "", '<div class="card grid-form" id="fa-form">' +
         fld("col-6", "fa-nome", "Nome no recibo (quem recebe)", '<input id="fa-nome" placeholder="Ex.: Luan …">') + fld("col-3 keep", "fa-doc", "CPF/CNPJ", '<input id="fa-doc">') +
         fld("col-3 keep", "fa-cidade", "Cidade", '<input id="fa-cidade" placeholder="Ex.: Belo Horizonte/MG">') + fld("col-6", "fa-contato", "Contato no rodapé", '<input id="fa-contato" placeholder="Telefone, e-mail ou Instagram">') +

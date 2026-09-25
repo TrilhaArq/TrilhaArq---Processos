@@ -19,7 +19,8 @@ Mapear tempo e custo de cada projeto para precificar com base em dados, não em 
   atrasadas, e um botão por app do escritório (Financeiro, Projetos, Relatórios, Configurações e os "Em breve"),
   com descrição fixa. Nenhum app do escritório mostra dados ou avisos na capa; cada um tem a própria página inicial.
 - **Área da pessoa:** abas **Tempo** e **Tarefas**, mais "← Início". Cabeçalho padrão com o nome da pessoa.
-- **Área administrativa:** abas Projetos, Relatórios e Configurações.
+- **Apps do escritório** (Financeiro, Projetos, Relatórios, Configurações): cada um abre como um app próprio, com o
+  título e só o botão "← Início" no topo; para ir a outro app, volta-se à capa.
 - O app sempre abre na capa.
 
 ## Regras de negócio

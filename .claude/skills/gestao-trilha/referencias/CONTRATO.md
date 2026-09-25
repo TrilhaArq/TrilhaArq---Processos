@@ -51,6 +51,9 @@ resumo de Tempo e Tarefas) e um botão por app do escritório, com descrição *
 manda dados, números ou avisos para a capa: cada um é "um app dentro do app", com a própria página inicial,
 onde ficam os avisos dele (ex.: fechamentos a conferir no topo de Relatórios; parcelas a receber no Painel do
 Financeiro). Não existem mais `notes()` nem `onHomeClick()`.
+Dentro de um app do escritório, a barra do topo tem **só "← Início"**: não há abas nem atalhos para outros apps
+(a navegação entre apps é sempre pela capa). As abas internas de cada app ficam dentro da própria view
+(ex.: Painel, Receitas, Despesas, Contratos, Ajustes no Financeiro). Na área da pessoa continuam as abas Tempo e Tarefas.
 
 Adicionar um módulo = criar o arquivo + uma linha `<script src="modulos/<id>.js">` no `index.html` antes de
 `Trilha.start()`. Ao ficar pronto, remover o botão "Em breve" correspondente (`FUTUROS` em `nucleo.js`).

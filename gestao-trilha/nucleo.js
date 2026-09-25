@@ -122,8 +122,10 @@
     if (view !== "home") { var mods = modsDaArea(view); if (!sub || !T.mod(sub) || T.mod(sub).area !== view) sub = mods[0].id; s.sub = sub; }
     $("home").hidden = view !== "home"; $("app").hidden = view === "home";
     if (view !== "home") {
+      // Área da pessoa: abas Tempo e Tarefas. Apps do escritório: cada um é "um app dentro do app" — só o botão de voltar;
+      // os outros apps se abrem pela capa.
       $("tabs").innerHTML = '<button class="tab back" data-home="1" aria-label="Voltar ao início">← Início</button>' +
-        modsDaArea(view).map(function (m) { return '<button class="tab' + (m.id === s.sub ? " is-selected" : "") + '" data-sub="' + m.id + '">' + T.esc(m.label) + "</button>"; }).join("");
+        (view === "pessoa" ? modsDaArea(view).map(function (m) { return '<button class="tab' + (m.id === s.sub ? " is-selected" : "") + '" data-sub="' + m.id + '">' + T.esc(m.label) + "</button>"; }).join("") : "");
       var p = T.pessoa(s.pessoaId);
       $("app-title").textContent = view === "pessoa" ? (p ? p.nome : "") : T.mod(s.sub).label;
     }
