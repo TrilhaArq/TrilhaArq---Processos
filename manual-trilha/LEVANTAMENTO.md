@@ -10,6 +10,13 @@ Registro vivo da conversa de levantamento. Serve para qualquer chat retomar exat
 
 ## Decisões já tomadas
 
+- (M5) Etapas: Briefing, Estudo Preliminar, Anteprojeto (3 fases), Projeto Executivo (2 fases), Projeto Legal em
+  paralelo ao Anteprojeto. Compatibilização é atividade da fase 2 do Anteprojeto, não etapa.
+- (M5) Cada etapa fecha com reunião, aceite e termo, exceto o Projeto Legal, que fecha com a aprovação.
+- (M5) Hierarquia provisória: etapa > fase > entregável > tarefa.
+- (M5) Três modelos de processo: do zero, reforma, interiores e marcenaria. Só o do zero está mapeado.
+- Mapeamento consolidado com fontes: `MAPEAMENTO.md`.
+
 - O Gestor de Projetos é focado no processo de projeto: painel por projeto, gerenciador dinâmico de etapas
   (da entrada no fluxo ao projeto executivo), acompanhamento do desenvolvimento e responsável por tarefa.
   Prazos, horas e honorários entram como consequência, integrados aos módulos existentes.
@@ -34,6 +41,9 @@ cronômetro do Tempo. Telas: painel de todos os projetos (colunas por etapa), pa
 
 ## Dúvidas em aberto
 
+> Rodada 1 (abaixo) em parte respondida pelo M5. Estado atual e perguntas da rodada 2: ver `MAPEAMENTO.md` e a seção "Perguntas — rodada 2" no fim deste arquivo.
+
+
 1. A lista de etapas representa o processo da Trilha? Apresentação como portão (e não etapa própria)?
    Projeto Legal no fluxo ou em paralelo?
 2. Entregável por grupo de desenhos/documento (com checklist interno opcional) em vez de prancha a prancha?
@@ -44,16 +54,16 @@ cronômetro do Tempo. Telas: painel de todos os projetos (colunas por etapa), pa
 
 | # | Bloco | Situação |
 |---|---|---|
-| 0 | Visão geral do funcionamento de projetos (áudios explicativos) | aguardando material |
+| 0 | Visão geral | parcial — 3 modelos de processo; identidade vem da proposta |
 | — | Análise de briefing, proposta, contrato e exportação do PE (M1–M4) | síntese feita, a validar |
-| 1 | Entrada do projeto | pendente |
-| 2 | Fluxo de etapas | pendente |
-| 3 | Entregáveis por etapa | pendente |
-| 4 | Padrões Trilha | pendente |
-| 5 | Complementares e terceiros | pendente |
-| 6 | Pessoas e papéis | pendente |
-| 7 | Variações por tipo de projeto | pendente |
-| 8 | Dores atuais | pendente |
+| 1 | Entrada do projeto | coberto (residencial do zero) |
+| 2 | Fluxo de etapas | coberto (do zero) |
+| 3 | Entregáveis por etapa | parcial |
+| 4 | Padrões Trilha | parcial |
+| 5 | Complementares e terceiros | bem coberto |
+| 6 | Pessoas e papéis | parcial |
+| 7 | Variações por tipo de projeto | só a divisão em 3 modelos |
+| 8 | Dores atuais | não aberto |
 
 ## Material recebido
 
@@ -64,6 +74,8 @@ cronômetro do Tempo. Telas: painel de todos os projetos (colunas por etapa), pa
 | M3 | Contrato de prestação de serviço + Anexo 01 (Plano de Projeto) | ago/2025 | Mesmo projeto |
 | M4 | Print da lista de PDFs exportados de um Projeto Executivo | — | Projeto "Lodges Cipó" |
 | — | Apresentação do Estudo Preliminar | — | **não chegou** (anunciada, sem anexo) |
+| M5 | Levantamento por voz (resumo do chat de levantamento) | 25–26/09/2026 | Blocos 0–2 e 5 cobertos; 3, 4, 6, 7 parciais; 8 não aberto |
+| — | Template ArchiCAD, cronogramas, lista completa de IDs, termos de etapa | — | citados no M5, **não recebidos** |
 
 Os arquivos não ficam no repositório (dados pessoais e cláusula de sigilo). Aqui só a síntese do processo.
 
@@ -165,3 +177,68 @@ Nome do arquivo exportado: `NNN_TR_<PROJETO>_<DISCIPLINA>_<ETAPA> - <TÍTULO DA 
   com prazo; vencido o prazo, a Trilha define (cláusula 2.2.7).
 - **Complementares** por disciplina: contratado? por quem? recebido? compatibilizado? Estrutural obrigatório.
 - A ficha do projeto aproveita o briefing e o programa de necessidades (áreas por setor).
+
+## Perguntas — rodada 2
+
+### A. Divergências entre a voz e os documentos (confirmar qual vale)
+1. Marco zero: contrato + topográfico + **documentos** (voz) ou contrato + topográfico + **1ª parcela paga** (contrato)? Ou os quatro?
+2. "Briefing": é etapa do projeto (proposta: etapa 01) ou fase comercial até o contrato (voz)? Como chamar cada parte?
+3. Lançamento de estrutura e de pontos: fase 1 (proposta e contrato) ou fase 2 (voz) do Anteprojeto?
+4. Nome do termo: "finalização de etapa" (voz) ou "encerramento de etapa" (contrato)?
+5. A proposta promete "quantitativos gerais" no Executivo; pela voz, não há quantitativo total. Qual é o compromisso?
+6. A exceção do cliente ansioso no Projeto Legal deve entrar no contrato, com ciência do risco?
+7. Papel da Elisa: a proposta já a apresenta como diretora de projetos e responsável técnica. Como descrever hoje?
+
+### B. Bloco 1 — Entrada
+8. A visita ao terreno gera algum registro (fotos, medidas, checklist)?
+9. Quanto tempo dura, em média, do primeiro contato até o contrato?
+10. Qual é o prazo que o cliente tem para entregar topográfico e documentos depois do contrato? O que acontece se atrasar?
+11. Quem monta a proposta e quem apresenta?
+12. O que acontece quando o cliente não fecha? Fica algum registro?
+
+### C. Bloco 2 — Fluxo (pontos em aberto)
+13. Aceites pontuais no Anteprojeto: como são dados hoje (WhatsApp, e-mail, reunião)? Ficam registrados?
+14. Ajustes pontuais do EP: deveria haver um limite? Qual?
+15. Revisão interna antes de apresentar: só o Luan ou também a Elisa? Em quais momentos?
+16. Na reunião final do Executivo, se o cliente pedir alteração: aplica-se o aditivo da cláusula 9?
+17. O Executivo tem algum marco intermediário com o cliente, ou só a entrega final?
+18. Existe um cronograma padrão por etapa que vocês usam (vocês citaram cronogramas)?
+
+### D. Bloco 3 — Entregáveis
+19. O Plano de Projeto é montado do zero em cada proposta ou parte de um modelo?
+20. No app, cada entregável é uma **prancha** (como no Plano) ou um **grupo** (ex.: "Mapeamentos")?
+21. Há entregáveis que não são pranchas (estudos, renders, animação, BIMx, listas, caderno)? Quais são sempre obrigatórios?
+22. O que compõe a apresentação do EP (ordem, conteúdo)? Enviar um exemplo.
+23. O que compõe o caderno de obra e o índice de projeto?
+
+### E. Bloco 4 — Padrões
+24. Enviar a lista completa de IDs de pranchas (séries 100 a 600 e outras).
+25. Como é o código do projeto no nome do arquivo? Quem define? Pode ficar sem acentos?
+26. Revisões: vocês usam R00, R01…? Onde a revisão aparece (carimbo, nome do arquivo)?
+27. Estrutura da pasta padrão: enviar print ou lista das subpastas.
+28. Template ArchiCAD: o que já vem pronto (aba de informações, legislação, layouts, carimbo)?
+29. Os seis pontos de padronização encontrados nos documentos (ver `MAPEAMENTO.md` §5): corrigir?
+
+### F. Bloco 5 — Complementares
+30. Quantas rodadas de compatibilização costumam acontecer? Como as interferências são registradas hoje?
+31. Vocês pedem prazo aos engenheiros? O que fazem quando atrasam?
+32. Quem fala com os engenheiros: Luan, Elisa ou os dois?
+
+### G. Bloco 6 — Pessoas e papéis
+33. Em cada etapa, quem faz, quem revisa e quem aprova?
+34. Quem fala com o cliente em cada momento?
+35. Quem emite o RRT de projeto?
+36. Quando entrar um colaborador, o que ele faria primeiro? O que continua só com os sócios?
+
+### H. Bloco 7 — Variações (depois do "do zero")
+37. Reforma: o que muda na entrada (levantamento cadastral, as built)? Quais etapas existem?
+38. Interiores e marcenaria: quais etapas e entregáveis? Como se conecta a um projeto de arquitetura da Trilha?
+39. Restaurante, pousada e institucional seguem o mesmo fluxo do residencial? O que muda?
+
+### I. Bloco 8 — Dores
+40. Em que momento do processo vocês mais perdem tempo?
+41. O que já foi esquecido ou refeito em algum projeto?
+42. Qual informação vocês procuram com frequência e demoram para achar?
+43. Quais esperas mais atrasam: cliente, engenheiros, condomínio ou prefeitura?
+44. O que você gostaria de ver num relance sobre todos os projetos?
+45. Onde a comunicação com o cliente mais gera retrabalho?
