@@ -165,3 +165,11 @@ Pedido do Luan:
 - Na **página do projeto**: botões **Suspender** e **Arquivar**.
 - **Alerta de confirmação** para todas essas ações (excluir, suspender, arquivar).
 - Ao **criar um projeto**, permitir **editar a área dos ambientes** no programa de necessidades (passo 3 do assistente).
+
+## 11. Botões de etapa na lista do Gestor (recebido, não processado)
+
+Pedido do Luan (por voz):
+- Na tela inicial do Gestor de Projetos, **botões com as etapas** (Briefing, Abertura, EP, AP, PL, PE…).
+- Ao clicar numa etapa, os projetos dessa etapa **sobem para o início da tela**; os demais continuam abaixo.
+- Objetivo: entrar direto, por exemplo, num Projeto Executivo sem rolar por todos os outros projetos.
+- Mesmo jeito dos botões que já existem para mudar a ordem da lista.
