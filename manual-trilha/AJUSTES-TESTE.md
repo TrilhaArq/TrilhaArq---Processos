@@ -199,3 +199,35 @@ não tem a etapa Briefing, então reunião de briefing não tem onde ser lançad
 Recomendação feita: registrar a reunião **uma vez só, no projeto** (botão "+ Reunião": data, etapa, participantes,
 duração, pauta e decisões), e o app lança a duração **automaticamente no Tempo** de cada participante. Acrescentar
 a etapa **Briefing** no Tempo. Aguardando o ok do Luan.
+- **Decidido (Luan, 28/09):** seguir a recomendação. A reunião também aparece no **registro do projeto**, com o tempo gasto.
+
+## 15. Horas por etapa nos quadros de etapa (recebido, não processado)
+
+- Na Visão geral do projeto, cada quadro de etapa mostra as **horas gastas** (etapa concluída) ou **gastas até agora**
+  (etapa em andamento). O total do projeto continua como já está.
+
+## 16. Histórico completo do projeto (proposta — aguardando ok)
+
+Pergunta do Luan: onde ver tudo o que aconteceu no projeto (desenhos concluídos, tempo de cada um), para análise e gráficos.
+Hoje: o quadro "Registro" da Visão geral mostra só os 8 últimos acontecimentos automáticos (criação, início de etapa,
+termo registrado, ambiente alterado). Não fica fixo na tela; rola junto com a página.
+Proposta:
+- Nova aba no projeto, **Histórico**: linha do tempo completa (etapas, reuniões com duração, itens concluídos com data,
+  termos, esperas, alterações) + tabela **horas por item do Plano** (e por pessoa e por etapa).
+- Na Visão geral fica só um resumo curto ("últimos acontecimentos").
+- Tempo medido por **item do Plano** (prancha), que é onde o cronômetro já fica. Medir por desenho dentro da prancha
+  exigiria escolher o desenho a cada início de cronômetro (mais cliques): não recomendado.
+- **Relatórios** fica para comparar projetos entre si e fazer gráficos (horas por série, por m², por tipo de projeto).
+
+## 17. Gestor Comercial e o Briefing (proposta — aguardando ok)
+
+Ideia do Luan: tirar do Gestor de Projetos o que ainda é captação.
+- Novo módulo **Comercial**, de acesso restrito (Luan e Elisa): **Oportunidades** com etapas/checklist de captação
+  (contato, briefing, proposta, reunião de apresentação, contrato, 1ª parcela…), com horas lançadas por quem faz.
+- **Briefing** passa a morar no Comercial (programa de necessidades, categorias e diretrizes são preenchidos lá).
+- Botão **"Fechado"** na oportunidade: o projeto nasce no Gestor já na **Abertura**, levando cliente, código, programa,
+  categorias e diretrizes.
+- Gestor de Projetos mostra só projetos ativos; **Suspensos** e **Arquivados** em botões/abas próprios.
+- Até o Comercial existir: tirar a etapa Briefing do Gestor e as horas de captação vão para a área
+  "Comercial e captação" do Tempo (já existe). Com isso, reunião de briefing não entra nas horas do projeto.
+- Acesso restrito: seguir o mesmo modelo usado no Financeiro (conferir na integração).
