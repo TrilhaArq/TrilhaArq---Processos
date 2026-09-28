@@ -119,3 +119,22 @@ Mantém os ajustes 3 e 4 (itens clicáveis com desenhos, situação com escolhas
 8.2 **Complementares como itens do Anteprojeto**, por disciplina: envio ao complementar, reunião 1, reunião 2,
     conclusão do complementar (lista completa virá do Luan).
 8.3 O Luan quer ver os ajustes funcionando no teste e depois terminar de definir o que aparece em cada etapa.
+
+## 9. Tarefas do projeto ligadas às Tarefas das pessoas (28/09)
+
+Muda a decisão anterior ("tarefas de projeto ficam só no projeto").
+9.1 Tarefa criada dentro do projeto vai para a aba **Tarefas da pessoa responsável** (agenda pessoal).
+9.2 Na criação, escolher o tipo, igual à agenda pessoal: **Tarefa · Demanda · Prioridade** (e Compromisso? a decidir).
+9.3 Proposta do Claude (a validar): a tarefa existe **num lugar só**, na agenda da pessoa, com a marca do projeto
+    (e da prancha, se houver). A aba Tarefas do projeto só **mostra** as tarefas com aquela marca, de todas as
+    pessoas. Assim não há duas cópias para sincronizar.
+Situações a resolver:
+- trocar o responsável = a tarefa muda de agenda (sai de uma pessoa, entra na outra);
+- concluir em qualquer um dos lugares conclui a mesma tarefa;
+- tarefa de projeto sem responsável não tem agenda onde morar: responsável obrigatório (ou "a definir" no projeto);
+- duas escalas de urgência: Prioridade/Demanda/Tarefa (agenda) e P1/P2/P3 (itens do Plano). Manter as duas ou unificar?
+- Compromisso de projeto (ex.: reunião com cliente) iria para a Agenda Google, como os compromissos pessoais,
+  e pode alimentar o futuro registro de reuniões;
+- "Meu trabalho" passa a mostrar só os itens do Plano de Projeto; tarefas ficam na aba Tarefas (com selo do projeto);
+- projeto apagado: tarefas ficam na agenda com "projeto removido";
+- na integração com o app oficial, usar o formato atual do módulo Tarefas (versão com Financeiro).
