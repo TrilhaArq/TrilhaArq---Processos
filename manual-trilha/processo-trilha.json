@@ -312,7 +312,29 @@
     "nome_arquivo": "NNN_TR_<PROJETO>_<DISCIPLINA>_<ETAPA> - <TÍTULO>.pdf",
     "codigo_projeto": {
       "acentos": false,
-      "padrao": "a definir"
+      "tipos": {
+        "RES": {
+          "nome": "Residencial",
+          "modelo": "do_zero"
+        },
+        "COM": {
+          "nome": "Comercial",
+          "modelo": "do_zero"
+        },
+        "HOT": {
+          "nome": "Hotelaria",
+          "modelo": "do_zero"
+        },
+        "REF": {
+          "nome": "Reforma",
+          "modelo": "reforma"
+        },
+        "INT": {
+          "nome": "Interiores",
+          "modelo": "interiores_marcenaria"
+        }
+      },
+      "formato": "a confirmar (proposta: TIPO + AA + NN + nome curto, ex.: RES2601-CASAMOTTA)"
     },
     "series": [
       {
@@ -495,11 +517,9 @@
     "Nome definitivo do termo de ciência de antecipação e texto dos três termos",
     "Cobrança de alteração no PL antes da aprovação (leitura atual: não cobra)",
     "Cadastro do programa de necessidades tipado (campos)",
-    "Tarefas de projeto × agenda pessoal",
     "Formato do registro de aceites pontuais",
     "Lighting design: serviço novo ou embutido",
     "O que fica só com os sócios (permissões)",
-    "Padrão do código do projeto",
     "Pasta padrão e template ArchiCAD (material pendente)"
   ],
   "programa_necessidades": {
@@ -851,7 +871,7 @@
         }
       }
     ],
-    "obs_area_ref": "Áreas atuais vêm de um único projeto e foram colocadas em \"confortável\" até o Luan confirmar a dimensão daquele projeto. Lista completa a construir com o Luan (fase comercial)."
+    "obs_area_ref": "Áreas atuais vêm do projeto residencial de referência, dimensão Confortável (confirmado pelo cliente no briefing). Colunas Compacta e Espaçosa a construir com o Luan (fase comercial)."
   },
   "categorias_projeto": {
     "situacao": "campos já no cadastro do projeto; regras de precificação e de áreas na fase do módulo comercial",
@@ -926,5 +946,9 @@
       "obs": "não existe no briefing (o briefing pergunta a topografia: plano, declive, aclive); definida pela Trilha após a visita"
     },
     "principio": "Nomes e opções iguais aos do formulário de briefing, para importação automática. Cada campo do app corresponde a uma pergunta do briefing."
+  },
+  "decisoes_app": {
+    "tarefas": "ficam no projeto e aparecem em 'Meu trabalho'; a aba Tarefas continua como agenda pessoal",
+    "cronometro": "mede até a prancha (projeto > etapa/fase > prancha)"
   }
 }

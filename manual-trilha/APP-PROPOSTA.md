@@ -157,3 +157,11 @@ que hoje está espalhada no briefing. O briefing vira só o formulário do clien
 - Garagem: 18 m² por vaga (confirmado).
 
 **Princípio (decidido 28/09):** nomes e opções do app iguais aos do formulário de briefing. Cada campo corresponde a uma pergunta, para a importação automática futura.
+
+## 8. Decisões tomadas (28/09)
+
+- Projeto nasce no briefing (situação "em proposta"); seção Cadastros; cliente e projeto separados.
+- Tarefas de projeto: ficam no projeto e aparecem em "Meu trabalho"; a aba Tarefas continua como agenda pessoal.
+- Cronômetro: mede até a prancha.
+- Código do projeto por tipo: RES residencial · COM comercial · HOT hotelaria · REF reforma · INT interiores. Formato completo a confirmar.
+- Áreas de referência atuais = dimensão Confortável.
