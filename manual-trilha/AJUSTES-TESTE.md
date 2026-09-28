@@ -53,7 +53,16 @@ para marcar e avançar.
 
 4.1 **Controles do cronômetro em cada item do Plano de Projeto:** iniciar, pausar e concluir, direto na tarefa em
     execução. Hoje o ▶ só existe na aba "Projetos" da área da pessoa (Meu trabalho), porque o cronômetro é
-    de cada pessoa. A definir: no Plano de Projeto (área do escritório), o cronômetro liga para quem está
-    usando o app (a pessoa escolhida em "Lançando como") ou para o responsável do item.
+    de cada pessoa. **Decidido:** o cronômetro é sempre de quem está usando o app (área da pessoa), como hoje.
 4.2 **Prazo (data) em cada item/tarefa do Plano de Projeto**, além do responsável, para organizar quando cada
     coisa precisa acontecer.
+
+## 5. Cronômetro: pausar pelo item e escolher a tarefa no Tempo (28/09)
+
+5.1 **Pausar pelo mesmo botão:** no Meu trabalho, o item em andamento ("● Em andamento") deve permitir pausar
+    com um clique (play ↔ pausa no mesmo botão). Hoje só inicia. Opinião do Claude: concordo; o botão alterna
+    Iniciar / Pausar, e "Concluir" fica ao lado (conclui a atividade e marca o item como pronto?) — confirmar.
+5.2 **Escolher a tarefa do projeto no próprio cronômetro (aba Tempo):** ao escolher Projeto → Casa Menezes →
+    Anteprojeto, mostrar a lista de itens do Plano de Projeto daquele projeto/etapa para selecionar com
+    facilidade, e ligar o cronômetro ao item.
+5.3 **Continuar podendo escrever uma tarefa livre**, nova, quando não estiver na lista.
