@@ -108,3 +108,4 @@ ele expõe (ex.: `Trilha.tempo.lancAtivos()`, `Trilha.tempo.custoLanc(l)`).
 - Link de teste (dados de exemplo): https://claude.ai/artifact/MCRcCpLbCTKURD3qUb6Wmx
 - Gestor de Projetos, Cadastros e Meu trabalho rodam primeiro no teste. Depois de aprovados, são publicados no link oficial.
 - Tempo: lançamentos e cronômetro guardam `pranchaId` quando iniciados pelo Meu trabalho (`Trilha.tempo.iniciar(combo)`).
+- **Atenção ao levar para o link oficial:** o teste foi feito sobre uma versão anterior do app (sem o Financeiro e sem ajustes gerais recentes). Antes de publicar no oficial, ler a versão publicada (Artifact `read` de cada arquivo) e encaixar os módulos novos nela, sem sobrescrever o Financeiro.
