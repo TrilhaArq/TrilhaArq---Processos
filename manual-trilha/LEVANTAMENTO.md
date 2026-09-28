@@ -178,7 +178,37 @@ Nome do arquivo exportado: `NNN_TR_<PROJETO>_<DISCIPLINA>_<ETAPA> - <TÍTULO DA 
 - **Complementares** por disciplina: contratado? por quem? recebido? compatibilizado? Estrutural obrigatório.
 - A ficha do projeto aproveita o briefing e o programa de necessidades (áreas por setor).
 
-## Perguntas — rodada 2
+## Situação em 28/09/2026 (após o M6 — levantamento por voz v2)
+
+- M6 absorvido no `MAPEAMENTO.md` v2, cruzado com contrato e proposta (regra do Luan: em divergência, vale o contrato).
+- Blocos: 0, 1, 2, 3, 5, 8 cobertos · 4 parcial (faltam pasta padrão e template ArchiCAD) · 6 coberto no estado atual · 7 adiado.
+- Materiais pendentes: pasta padrão (imagem), template ArchiCAD (PDF/print), apresentação e plantas de exemplo (EP e PE), termos de etapa.
+- Rodada 2: respondida pelo M6 ou resolvida pelo contrato, exceto os itens da rodada 3. Itens 37–39 (variações) adiados.
+
+## Perguntas — rodada 3 (para o chat de levantamento)
+
+1. Série 400 com mais de um pavimento: numeração posicional (ex.: 402 piso térreo, 403 piso 1º, 404 hidro térreo…)?
+2. Cobertura na série 100 (última planta) e na 400 (406): são pranchas diferentes (planta × mapeamento/detalhamento)?
+3. Projetos com mais de uma edificação (lodges, pousada): como ficam as séries? Os dois "100" do print vieram disso?
+4. IDs fixos 601 a 603: sem esquadria de madeira, a 603 continua 603?
+5. O que fica só com os sócios quando entrar um colaborador?
+6. Projeto Legal antecipado: em que momento começa a cobrança da revisão?
+7. Fiscalização e administração de obra: contratos separados do projeto?
+8. Iluminação (lighting design): novo serviço ou nova etapa?
+9. Nome do "guia do cliente".
+10. Antes do marco zero: se o cliente demora a pagar ou a entregar o topográfico, existe limite?
+11. Espera por complementares e órgãos: deve haver limite (pauta 8, `MAPEAMENTO.md` §11)?
+12. Pauta de revisão do contrato (`MAPEAMENTO.md` §11): concorda com a lista?
+
+## Decisões de app pendentes (para o chat do Gestor)
+
+- Tarefas de projeto × agenda pessoal (aba Tarefas).
+- Formato do registro de aceites, reuniões, revisões internas e interferências (poucos cliques).
+- Cadastro do programa de necessidades tipado (campos).
+- Nível do cronômetro (etapa, prancha ou desenho).
+- Alinhar as etapas do módulo Tempo (hoje: Compatibilização e Obra como etapas; sem Briefing) ao processo mapeado.
+
+## Perguntas — rodada 2 (histórico)
 
 ### A. Divergências entre a voz e os documentos (confirmar qual vale)
 1. Marco zero: contrato + topográfico + **documentos** (voz) ou contrato + topográfico + **1ª parcela paga** (contrato)? Ou os quatro?
