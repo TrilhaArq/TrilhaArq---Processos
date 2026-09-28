@@ -149,9 +149,11 @@ que hoje está espalhada no briefing. O briefing vira só o formulário do clien
 ## 6c. Categorias do projeto (pedido do Luan, 28/09)
 
 - Três categorias no cadastro do projeto, já na Entrega 1 (para os dados irem se acumulando):
-  - **Padrão:** médio · médio alto · alto · luxo.
-  - **Dimensão:** justo · confortável · folgado (no briefing: compacta · confortável · espaçosa).
-  - **Dificuldade do terreno:** baixa · normal · difícil · muito difícil.
-- A **dimensão** escolhe a área de referência de cada ambiente (catálogo com três colunas: justo, confortável, folgado).
+  - **Padrão:** as faixas do briefing: Médio (R$ 3.000–3.500/m²) · Médio Alto (3.500–4.500) · Alto (4.500–5.500) · Alto (5.500–7.000) · Luxo (acima de 7.000).
+  - **Dimensão:** Compacta · Confortável · Espaçosa (como no briefing).
+  - **Dificuldade do terreno:** baixa · normal · difícil · muito difícil (não vem do briefing: definida pela Trilha após a visita).
+- A **dimensão** escolhe a área de referência de cada ambiente (catálogo com três colunas: compacta, confortável, espaçosa).
 - Padrão e dificuldade vão direcionar a precificação: regras definidas junto com o Luan na fase do módulo comercial.
 - Garagem: 18 m² por vaga (confirmado).
+
+**Princípio (decidido 28/09):** nomes e opções do app iguais aos do formulário de briefing. Cada campo corresponde a uma pergunta, para a importação automática futura.

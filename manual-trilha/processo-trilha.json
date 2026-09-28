@@ -521,9 +521,9 @@
         "nome": "Hall / chapelaria",
         "setor": "social",
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": 4,
-          "folgado": null
+          "espacosa": null
         }
       },
       {
@@ -544,9 +544,9 @@
           "integracao"
         ],
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": 30,
-          "folgado": null
+          "espacosa": null
         }
       },
       {
@@ -559,9 +559,9 @@
           "cristaleira"
         ],
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": 20,
-          "folgado": null
+          "espacosa": null
         }
       },
       {
@@ -573,9 +573,9 @@
           "tv_polegadas"
         ],
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": 30,
-          "folgado": null
+          "espacosa": null
         }
       },
       {
@@ -587,9 +587,9 @@
           "tv_ou_projetor"
         ],
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": 10,
-          "folgado": null
+          "espacosa": null
         }
       },
       {
@@ -597,9 +597,9 @@
         "nome": "Escritório / suíte reversível",
         "setor": "social",
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": 14,
-          "folgado": null
+          "espacosa": null
         }
       },
       {
@@ -618,9 +618,9 @@
           "ducha_higienica"
         ],
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": 2.5,
-          "folgado": null
+          "espacosa": null
         }
       },
       {
@@ -634,9 +634,9 @@
           "banheiro_vinculado"
         ],
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": 16,
-          "folgado": null
+          "espacosa": null
         }
       },
       {
@@ -661,9 +661,9 @@
           "banheira"
         ],
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": 5,
-          "folgado": null
+          "espacosa": null
         }
       },
       {
@@ -675,9 +675,9 @@
         ],
         "area_molhada": true,
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": 6,
-          "folgado": null
+          "espacosa": null
         }
       },
       {
@@ -685,9 +685,9 @@
         "nome": "Closet",
         "setor": "intimo",
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": 8,
-          "folgado": null
+          "espacosa": null
         }
       },
       {
@@ -699,9 +699,9 @@
           "tv_polegadas"
         ],
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": 14,
-          "folgado": null
+          "espacosa": null
         }
       },
       {
@@ -725,9 +725,9 @@
           "tipo_chuveiro"
         ],
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": 3.5,
-          "folgado": null
+          "espacosa": null
         }
       },
       {
@@ -742,9 +742,9 @@
           "armario"
         ],
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": 18,
-          "folgado": null
+          "espacosa": null
         }
       },
       {
@@ -762,9 +762,9 @@
           "passar_roupa"
         ],
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": 8,
-          "folgado": null
+          "espacosa": null
         }
       },
       {
@@ -772,9 +772,9 @@
         "nome": "Depósito",
         "setor": "servico",
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": 6,
-          "folgado": null
+          "espacosa": null
         }
       },
       {
@@ -796,9 +796,9 @@
           "itens_bancada"
         ],
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": null,
-          "folgado": null
+          "espacosa": null
         }
       },
       {
@@ -815,9 +815,9 @@
           "elementos"
         ],
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": null,
-          "folgado": null
+          "espacosa": null
         }
       },
       {
@@ -832,9 +832,9 @@
           "material"
         ],
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": null,
-          "folgado": null
+          "espacosa": null
         }
       },
       {
@@ -845,9 +845,9 @@
           "ampliacao"
         ],
         "area_ref_m2": {
-          "justo": null,
+          "compacta": null,
           "confortavel": null,
-          "folgado": null
+          "espacosa": null
         }
       }
     ],
@@ -856,43 +856,63 @@
   "categorias_projeto": {
     "situacao": "campos já no cadastro do projeto; regras de precificação e de áreas na fase do módulo comercial",
     "padrao": {
+      "pergunta_briefing": "padrão de investimento por m²",
       "opcoes": [
-        "medio",
-        "medio_alto",
-        "alto",
-        "luxo"
+        {
+          "id": "medio",
+          "rotulo": "Médio",
+          "rs_m2": [
+            3000,
+            3500
+          ]
+        },
+        {
+          "id": "medio_alto",
+          "rotulo": "Médio Alto",
+          "rs_m2": [
+            3500,
+            4500
+          ]
+        },
+        {
+          "id": "alto_1",
+          "rotulo": "Alto",
+          "rs_m2": [
+            4500,
+            5500
+          ]
+        },
+        {
+          "id": "alto_2",
+          "rotulo": "Alto",
+          "rs_m2": [
+            5500,
+            7000
+          ]
+        },
+        {
+          "id": "luxo",
+          "rotulo": "Luxo",
+          "rs_m2": [
+            7000,
+            null
+          ]
+        }
       ],
-      "faixas_briefing_rs_m2": {
-        "medio": [
-          3000,
-          3500
-        ],
-        "medio_alto": [
-          3500,
-          4500
-        ],
-        "alto": [
-          4500,
-          7000
-        ],
-        "luxo": [
-          7000,
-          null
-        ]
-      },
-      "obs": "o briefing tem duas faixas 'Alto' (4.500–5.500 e 5.500–7.000); aqui unidas"
+      "obs": "o briefing tem dois rótulos 'Alto'; mantidos como estão, distinguidos pela faixa"
     },
     "dimensao": {
+      "pergunta_briefing": "qual opção espacial para casa melhor te atende?",
       "opcoes": [
-        "justo",
+        "compacta",
         "confortavel",
-        "folgado"
+        "espacosa"
       ],
-      "equivalente_briefing": {
-        "justo": "compacta",
-        "confortavel": "confortável",
-        "folgado": "espaçosa"
-      },
+      "rotulos": [
+        "Compacta",
+        "Confortável",
+        "Espaçosa"
+      ],
       "efeito": "define a coluna de área de referência usada para cada ambiente"
     },
     "dificuldade_terreno": {
@@ -902,7 +922,9 @@
         "dificil",
         "muito_dificil"
       ],
-      "efeito": "precificação e planejamento (a definir)"
-    }
+      "efeito": "precificação e planejamento (a definir)",
+      "obs": "não existe no briefing (o briefing pergunta a topografia: plano, declive, aclive); definida pela Trilha após a visita"
+    },
+    "principio": "Nomes e opções iguais aos do formulário de briefing, para importação automática. Cada campo do app corresponde a uma pergunta do briefing."
   }
 }
