@@ -231,3 +231,15 @@ Ideia do Luan: tirar do Gestor de Projetos o que ainda é captação.
 - Até o Comercial existir: tirar a etapa Briefing do Gestor e as horas de captação vão para a área
   "Comercial e captação" do Tempo (já existe). Com isso, reunião de briefing não entra nas horas do projeto.
 - Acesso restrito: seguir o mesmo modelo usado no Financeiro (conferir na integração).
+
+## Decisões do Luan (28/09, depois da 17)
+
+- **Horas:** continuam medidas por item do Plano (prancha / subitem principal da etapa). Nada muda.
+- **16 · Histórico: aprovado.** Cada registro com **dia e hora**. Finalidade: registro fiel para responder
+  questionamentos do cliente (quando cada etapa foi concluída, em quanto tempo, reuniões, termos).
+  Sugestão para garantir a fidelidade: registro não se apaga nem se edita; correção vira um novo registro.
+- **Relatórios: aprovado.** Análises, gráficos e comparações entre projetos ficam só na seção Relatórios.
+- **13 · Termos:** textos escritos em `TERMOS.md` (para revisão do Luan). Ao clicar no botão, abre um quadro de
+  **anotações opcional** (Encerramento de Etapa do EP e do AP e Termo de Ciência); o Encerramento de Projeto não tem
+  anotação. Gera o PDF com ou sem a anotação. Precisa de **nº e data do contrato** na Ficha do projeto.
+- **17 · Comercial e Briefing:** ainda sem resposta.

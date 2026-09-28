@@ -225,7 +225,13 @@
       "etapas": [
         "ep",
         "ap"
-      ]
+      ],
+      "texto": "manual-trilha/TERMOS.md",
+      "anotacoes": true,
+      "clausulas": {
+        "ep": "2.1.7",
+        "ap": "2.2.9"
+      }
     },
     {
       "id": "encerramento_projeto",
@@ -233,13 +239,24 @@
       "etapas": [
         "pe"
       ],
-      "nome_no_contrato": "Termo de Finalização de Projeto"
+      "nome_no_contrato": "Termo de Finalização de Projeto",
+      "texto": "manual-trilha/TERMOS.md",
+      "anotacoes": false,
+      "clausulas": {
+        "pe": "2.4.8"
+      }
     },
     {
       "id": "ciencia_antecipacao",
-      "nome": "Termo de Ciência de Antecipação (provisório)",
+      "nome": "Termo de Ciência de Antecipação",
       "quando": "qualquer pedido do cliente fora do momento previsto",
-      "efeito": "retrabalho causado é cobrado"
+      "efeito": "retrabalho causado é cobrado",
+      "texto": "manual-trilha/TERMOS.md",
+      "anotacoes": true,
+      "campos_extra": [
+        "o_que_antecipar",
+        "pre_requisito"
+      ]
     }
   ],
   "espera": {
