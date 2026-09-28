@@ -230,7 +230,8 @@ Ideia do Luan: tirar do Gestor de Projetos o que ainda é captação.
 - Gestor de Projetos mostra só projetos ativos; **Suspensos** e **Arquivados** em botões/abas próprios.
 - Até o Comercial existir: tirar a etapa Briefing do Gestor e as horas de captação vão para a área
   "Comercial e captação" do Tempo (já existe). Com isso, reunião de briefing não entra nas horas do projeto.
-- Acesso restrito: seguir o mesmo modelo usado no Financeiro (conferir na integração).
+- Acesso restrito: **ainda não existe no app** (nem no Financeiro). Sem colaboradores por enquanto; o sistema de
+  restrição será desenvolvido no momento oportuno. Até lá, o Comercial fica aberto como os demais módulos.
 
 ## Decisões do Luan (28/09, depois da 17)
 
