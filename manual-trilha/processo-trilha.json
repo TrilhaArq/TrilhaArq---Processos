@@ -520,13 +520,16 @@
         "id": "hall",
         "nome": "Hall / chapelaria",
         "setor": "social",
-        "area_ref_m2": 4
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": 4,
+          "folgado": null
+        }
       },
       {
         "id": "cozinha",
         "nome": "Cozinha / cozinha gourmet",
         "setor": "social",
-        "area_ref_m2": 30,
         "gera": [
           "ampliacao",
           "bancada"
@@ -539,50 +542,70 @@
           "equipamentos",
           "itens_bancada",
           "integracao"
-        ]
+        ],
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": 30,
+          "folgado": null
+        }
       },
       {
         "id": "jantar",
         "nome": "Jantar",
         "setor": "social",
-        "area_ref_m2": 20,
         "campos": [
           "lugares",
           "aparador",
           "cristaleira"
-        ]
+        ],
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": 20,
+          "folgado": null
+        }
       },
       {
         "id": "estar",
         "nome": "Estar",
         "setor": "social",
-        "area_ref_m2": 30,
         "campos": [
           "assentos",
           "tv_polegadas"
-        ]
+        ],
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": 30,
+          "folgado": null
+        }
       },
       {
         "id": "cinema",
         "nome": "Sala de TV / cinema",
         "setor": "social",
-        "area_ref_m2": 10,
         "campos": [
           "assentos",
           "tv_ou_projetor"
-        ]
+        ],
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": 10,
+          "folgado": null
+        }
       },
       {
         "id": "escritorio",
         "nome": "Escritório / suíte reversível",
         "setor": "social",
-        "area_ref_m2": 14
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": 14,
+          "folgado": null
+        }
       },
       {
         "id": "lavabo",
         "nome": "Lavabo",
         "setor": "social",
-        "area_ref_m2": 2.5,
         "gera": [
           "ampliacao",
           "bancada"
@@ -593,25 +616,33 @@
           "bancada_tipo",
           "sanitario",
           "ducha_higienica"
-        ]
+        ],
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": 2.5,
+          "folgado": null
+        }
       },
       {
         "id": "suite_master",
         "nome": "Suíte master (quarto)",
         "setor": "intimo",
-        "area_ref_m2": 16,
         "campos": [
           "cama",
           "tv_polegadas",
           "closet",
           "banheiro_vinculado"
-        ]
+        ],
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": 16,
+          "folgado": null
+        }
       },
       {
         "id": "banho_master",
         "nome": "Banho master",
         "setor": "intimo",
-        "area_ref_m2": 5,
         "gera": [
           "ampliacao",
           "bancada"
@@ -628,39 +659,55 @@
           "chuveiros",
           "tipo_chuveiro",
           "banheira"
-        ]
+        ],
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": 5,
+          "folgado": null
+        }
       },
       {
         "id": "spa",
         "nome": "SPA / banheira",
         "setor": "intimo",
-        "area_ref_m2": 6,
         "gera": [
           "ampliacao"
         ],
-        "area_molhada": true
+        "area_molhada": true,
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": 6,
+          "folgado": null
+        }
       },
       {
         "id": "closet",
         "nome": "Closet",
         "setor": "intimo",
-        "area_ref_m2": 8
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": 8,
+          "folgado": null
+        }
       },
       {
         "id": "quarto",
         "nome": "Quarto",
         "setor": "intimo",
-        "area_ref_m2": 14,
         "campos": [
           "cama",
           "tv_polegadas"
-        ]
+        ],
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": 14,
+          "folgado": null
+        }
       },
       {
         "id": "banho",
         "nome": "Banheiro",
         "setor": "intimo",
-        "area_ref_m2": 3.5,
         "gera": [
           "ampliacao",
           "bancada"
@@ -676,26 +723,34 @@
           "toalheiro_aquecido",
           "chuveiros",
           "tipo_chuveiro"
-        ]
+        ],
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": 3.5,
+          "folgado": null
+        }
       },
       {
         "id": "garagem",
         "nome": "Garagem (por vaga)",
         "setor": "servico",
-        "area_ref_m2": 18,
-        "obs": "na referência, 2 vagas somam 42 m² (21 m²/vaga): conferir",
+        "obs": "18 m² por vaga (confirmado pelo Luan). O total de 42 m² da proposta de referência é erro de tabela.",
         "campos": [
           "vagas_por_tipo",
           "coberta",
           "tomada_carro_eletrico",
           "armario"
-        ]
+        ],
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": 18,
+          "folgado": null
+        }
       },
       {
         "id": "lavanderia",
         "nome": "Lavanderia",
         "setor": "servico",
-        "area_ref_m2": 8,
         "gera": [
           "ampliacao",
           "bancada"
@@ -705,19 +760,27 @@
           "tanque",
           "maquina",
           "passar_roupa"
-        ]
+        ],
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": 8,
+          "folgado": null
+        }
       },
       {
         "id": "deposito",
         "nome": "Depósito",
         "setor": "servico",
-        "area_ref_m2": 6
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": 6,
+          "folgado": null
+        }
       },
       {
         "id": "gourmet",
         "nome": "Espaço gourmet",
         "setor": "lazer",
-        "area_ref_m2": null,
         "gera": [
           "ampliacao",
           "bancada"
@@ -731,13 +794,17 @@
           "tv_polegadas",
           "equipamentos_gourmet",
           "itens_bancada"
-        ]
+        ],
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": null,
+          "folgado": null
+        }
       },
       {
         "id": "piscina",
         "nome": "Piscina",
         "setor": "lazer",
-        "area_ref_m2": null,
         "gera": [
           "ampliacao"
         ],
@@ -746,30 +813,96 @@
           "tamanho",
           "aquecida",
           "elementos"
-        ]
+        ],
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": null,
+          "folgado": null
+        }
       },
       {
         "id": "escada",
         "nome": "Escada",
         "setor": "servico",
-        "area_ref_m2": null,
         "gera": [
           "ampliacao"
         ],
         "campos": [
           "tipo",
           "material"
-        ]
+        ],
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": null,
+          "folgado": null
+        }
       },
       {
         "id": "quintal",
         "nome": "Quintal / área externa",
         "setor": "externo",
-        "area_ref_m2": null,
         "gera": [
           "ampliacao"
-        ]
+        ],
+        "area_ref_m2": {
+          "justo": null,
+          "confortavel": null,
+          "folgado": null
+        }
       }
-    ]
+    ],
+    "obs_area_ref": "Áreas atuais vêm de um único projeto e foram colocadas em \"confortável\" até o Luan confirmar a dimensão daquele projeto. Lista completa a construir com o Luan (fase comercial)."
+  },
+  "categorias_projeto": {
+    "situacao": "campos já no cadastro do projeto; regras de precificação e de áreas na fase do módulo comercial",
+    "padrao": {
+      "opcoes": [
+        "medio",
+        "medio_alto",
+        "alto",
+        "luxo"
+      ],
+      "faixas_briefing_rs_m2": {
+        "medio": [
+          3000,
+          3500
+        ],
+        "medio_alto": [
+          3500,
+          4500
+        ],
+        "alto": [
+          4500,
+          7000
+        ],
+        "luxo": [
+          7000,
+          null
+        ]
+      },
+      "obs": "o briefing tem duas faixas 'Alto' (4.500–5.500 e 5.500–7.000); aqui unidas"
+    },
+    "dimensao": {
+      "opcoes": [
+        "justo",
+        "confortavel",
+        "folgado"
+      ],
+      "equivalente_briefing": {
+        "justo": "compacta",
+        "confortavel": "confortável",
+        "folgado": "espaçosa"
+      },
+      "efeito": "define a coluna de área de referência usada para cada ambiente"
+    },
+    "dificuldade_terreno": {
+      "opcoes": [
+        "baixa",
+        "normal",
+        "dificil",
+        "muito_dificil"
+      ],
+      "efeito": "precificação e planejamento (a definir)"
+    }
   }
 }

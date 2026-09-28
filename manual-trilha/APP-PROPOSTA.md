@@ -145,3 +145,13 @@ que hoje está espalhada no briefing. O briefing vira só o formulário do clien
 - Complementares do projeto apontam para contatos do tipo parceiro.
 - CPF, CNPJ e endereço são dados pessoais: com colaboradores, acesso só dos sócios.
 - Áreas de referência iniciais: `processo-trilha.json` → `programa_necessidades` (projeto residencial de referência).
+
+## 6c. Categorias do projeto (pedido do Luan, 28/09)
+
+- Três categorias no cadastro do projeto, já na Entrega 1 (para os dados irem se acumulando):
+  - **Padrão:** médio · médio alto · alto · luxo.
+  - **Dimensão:** justo · confortável · folgado (no briefing: compacta · confortável · espaçosa).
+  - **Dificuldade do terreno:** baixa · normal · difícil · muito difícil.
+- A **dimensão** escolhe a área de referência de cada ambiente (catálogo com três colunas: justo, confortável, folgado).
+- Padrão e dificuldade vão direcionar a precificação: regras definidas junto com o Luan na fase do módulo comercial.
+- Garagem: 18 m² por vaga (confirmado).
