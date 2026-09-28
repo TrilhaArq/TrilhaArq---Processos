@@ -1,9 +1,16 @@
 # Mapeamento do processo de projeto: Trilha Arquitetura Brasileira
 
-Versão 2, consolidada em 28/09/2026. Modelo mapeado em detalhe: **projeto do zero (residencial)**.
+Versão 3, consolidada em 28/09/2026. Modelo mapeado em detalhe: **projeto do zero (residencial)**.
 Reforma e Interiores/Marcenaria: só as diferenças macro (§7).
+Dados estruturados para o app: `processo-trilha.json`.
 
-**Fontes:** [V] levantamento por voz com o Luan, versão 2 (25 a 28/09/2026) · [C] contrato e Anexo 01 ·
+**Materiais que este levantamento deve gerar** (definidos pelo Luan):
+1. **Mapeamento do processo** (PDF, para o Luan): inclui administrativo, contrato, dinheiro, dores, melhorias e pendências. Base: este arquivo.
+2. **Manual do processo** (para funcionários e estagiários): formal, direto; sem administrativo nem contrato; só como as coisas acontecem.
+3. **Caminho do Projeto** (guia visual do cliente): etapas ligadas por setas, para reduzir a ansiedade. Não confundir com o Guia de Projeto.
+4. **App Gestor de Projetos**: objetivo principal.
+
+**Fontes:** [V] levantamento por voz com o Luan, versão 3 (25 a 28/09/2026) · [C] contrato e Anexo 01 ·
 [P] proposta de serviço · [B] formulário de briefing · [X] print de exportação de um executivo.
 **Regra de divergência (do Luan):** em conflito entre voz e contrato, **vale o contrato**. Só volta ao Luan
 o conflito grande. Os ajustes que dependem de mudar o contrato estão na §11 (pauta de revisão do contrato).
@@ -31,7 +38,8 @@ Tudo aqui é **padrão editável**. O app não deve ser rígido.
   - **EP:** a Elisa prepara topográfico, arquivo, terreno e estudo solar; o Luan faz a concepção; a Elisa finaliza 3D e imagens.
   - **AP:** revisão, estrutura e pontos com o Luan (a intenção é documentar os pontos para a Elisa assumir); acabamentos com Luan ou Elisa.
   - **PE:** a tendência é ficar mais com a Elisa.
-- [A CONFIRMAR] O que fica só com os sócios quando entrar um colaborador.
+- Apresentação do EP: o Luan conduz, com a Elisa incluída para assumir funções. [V]
+- **Adiado:** o que fica só com os sócios. Será decidido olhando o app inteiro, incluindo os módulos administrativos (ex.: Financeiro). [V]
 
 ---
 
@@ -57,7 +65,8 @@ Tudo aqui é **padrão editável**. O app não deve ser rígido.
 - Voz [V]: acrescenta os documentos (pessoais, registro, IPTU).
 - Aplicação da regra: vale o contrato. Os documentos são **pré-requisito do Projeto Legal** [C 3.3.3], não do marco zero.
   Colocar os documentos no marco zero atrasaria um prazo que o contrato já considera correndo. A inclusão vai para a revisão do contrato (§11).
-- Prazo para o cliente entregar topográfico e documentos: não existe [V]. Sem o topográfico, o prazo não começa [C 3.1].
+- **Antes do marco zero não há limite de tempo**, por decisão do Luan: o projeto simplesmente não começa [V]. Sem o topográfico, o prazo não corre [C 3.1].
+- Ideia para o contrato: em atraso longo (meses ou um ano), prever a revisão do valor da proposta por inflação. [V] Hoje só a proposta tem validade (30 dias) [P].
 
 **Briefing: captação, briefing e contratação** [V]
 - O Luan decidiu que o Briefing é a etapa 01 do projeto e que a mistura com captação e contratação precisa ser corrigida.
@@ -81,7 +90,13 @@ Captação ─► Briefing ─► Contratação (marco zero) ─► EP ─► AP
                                                             └─► PL (paralelo) ──┘
 ```
 
-**Termos:** "Termo de Encerramento de Etapa" (EP e AP) [V][C] · "Termo de Finalização de Projeto" (PE) [C 2.4.8] ✔C.
+**Três termos** [V], com texto a escrever junto com o Luan:
+| Termo | Quando | Contrato hoje |
+|---|---|---|
+| Termo de Encerramento de Etapa | fim do EP e do AP | mesmo nome [C 2.1.7, 2.2.9] |
+| Termo de Encerramento de Projeto | fim do PE; encerra o contrato | chama-se "Termo de **Finalização** de Projeto" [C 2.4.8] → novo nome vai para a revisão do contrato (§11) |
+| Termo de Ciência de Antecipação (nome provisório) | qualquer pedido do cliente fora do momento previsto; o cliente assume que o retrabalho será cobrado | não existe (§11) |
+
 O Projeto Legal não tem termo da Trilha: fecha com a aprovação.
 
 ### Estudo Preliminar (EP)
@@ -123,7 +138,10 @@ Pré-requisito: Termo de Encerramento do EP. [V][C 2.2.1]
 - Desenvolver, protocolar, acompanhar e ajustar até aprovar. Ordem: documentos → condomínio (se houver) → prefeitura. [V][C 2.3]
 - **Pré-requisitos contratuais** [C 3.3.3]: documentos do cliente + fim da revisão e dos ajustes do AP + lançamento estrutural pelo engenheiro.
   O que pela voz era "regra desejada" já é **regra do contrato**.
-- Exceção praticada: cliente ansioso começa antes [V]. **Contraria o 3.3.3.** A cláusula sugerida (termo de ciência + revisão cobrada) vai para a §11.
+- Exceção: cliente ansioso começa antes, **mediante Termo de Ciência de Antecipação** [V]. Hoje contraria o 3.3.3 e precisa entrar no contrato (§11).
+- **Cobrança de alteração:** depois de **protocolado e aprovado**, qualquer alteração de causa externa (cliente, mudança de estrutura, outra intervenção)
+  gera adicional; erro ou escolha da Trilha não é cobrado [V]. A cláusula 9.1 só cobre alterações "após aceite e termo de etapa", e o PL não tem termo:
+  **o contrato não cobre esse caso** (§11). Antes da aprovação, a leitura é que não se cobra [A CONFIRMAR].
 - Prazo: 20 dias úteis para desenvolver e protocolar; depois depende do órgão, sem responsabilidade da Trilha. [C 3.3.3, 2.3.5]
 - Taxas e documentos por conta do cliente. [C 2.3.3–2.3.4]
 
@@ -143,7 +161,9 @@ Pré-requisito: Termo de Encerramento do EP. [V][C 2.2.1]
   Isso coincide com a regra que o Luan decidiu por voz (20 dias úteis, suspenso, sai das prioridades, retomada depois de alguns dias).
 - Não existe cronograma padrão [V]. **Os prazos do contrato já são a base de um cronograma padrão** (EP 40; AP 20–30 + 15 + 10 + 15;
   PL 20; PE 40–60 dias úteis, fora as esperas).
-- Espera por complementares e por órgãos: não conta no prazo da Trilha, mas não tem limite. O projeto pode ficar aberto indefinidamente. [C 3.2]
+- **Espera por complementares e órgãos: sem trava de limite**, por decisão do Luan; não conta no prazo da Trilha [V][C 3.2].
+  O app registra o **prazo informado** pela empresa ou órgão (para saber quando voltar ao projeto) e o **tempo real** da espera. [V]
+- A regra dos 20 dias úteis vale só para o cliente. [V]
 
 ### Alterações e aditivos [C 9.1]
 | Situação | AP | PE |
@@ -162,7 +182,15 @@ Pré-requisito: Termo de Encerramento do EP. [V][C 2.2.1]
 - A prancha tem ID **calculado** por série + posição na lista (mover ou inserir recalcula).
 - O desenho tem nome próprio, sem número de prancha: planta baixa, corte AA, fachada 01, `amp01 - cozinha - planta baixa`…
 - O número da ampliação (amp) é fixo por ambiente; uma ampliação pode ocupar mais de uma prancha.
-- IDs fixos: 601 a 603. [V]
+- **As séries nunca se repetem:** cada série tem até 99 IDs; mais pavimentos ou unidades só ocupam mais números na mesma série. [V]
+- 601, 602 e 603 são sempre criados por padrão e removidos à mão quando não existem. [V]
+- **Cobertura:** a planta de cobertura (última da série 100) sempre existe. O 406 é um mapeamento específico (caimentos da laje, ou terças,
+  caibros e paginação de telhas), incluído por padrão e removível. [V]
+- **Série 400 com vários pavimentos:** cada mapeamento ocupa uma prancha por pavimento, em sequência (3 pavimentos: 402–404 piso,
+  405–407 hidro, 408–410 elétrica, 411–413 forro e iluminação) [V]. O mapeamento de cobertura vem **por último**, como no Plano de Projeto
+  da proposta ("413 Mapeamento/Detalhamento de Cobertura", depois dos forros) [P]. ✔ resolve a dúvida da posição.
+- **Mais de uma edificação** (lodge, pousada): não cria série nova. Ex.: 101 implantação; 102 planta geral; 103 unidade-modelo (ou uma prancha
+  por unidade diferente); cobertura depois ou junto de cada unidade. As duas formas valem. [V]
 
 | Série | Conteúdo [V] | Quantidade varia por | Nasce em |
 |---|---|---|---|
@@ -178,7 +206,9 @@ Pré-requisito: Termo de Encerramento do EP. [V][C 2.2.1]
 | 1000 | Documentos A4: 1001 terraplenagem; 1002 revestimentos (especificação e quantitativo); 1003 louças e metais; 1004 equipamentos; 1005 tomadas e interruptores; 1006 iluminação | — (rascunho) | PE |
 
 **Sem série:** imagens atualizadas (sem compromisso de quantidade), Guia de Projeto, BIMx (atualizado ao fim do EP, AP e PE). [V]
-**EP:** apresentação PDF widescreen, renders avulsos, plantas cotadas (A3, 1/100), BIMx; animação como bônus. [V]
+**EP:** apresentação PDF widescreen, renders avulsos (cerca de 15 numa residência, um único tópico no Plano), plantas cotadas (A3, 1/100), BIMx;
+animação como bônus, conforme o tempo e a avaliação da Trilha. [V] O Anexo 01 promete 10 imagens [C]: a prática entrega mais, sem conflito.
+**Iluminação:** as pranchas 405 e 1006 continuam como são; o lighting design (serviço novo ou embutido) foi adiado. [V]
 **Quantitativos:** entregues para revestimentos, pontos elétricos e iluminação; não há quantitativo total. [V]
 O contrato não promete quantitativo; só a proposta fala em "quantitativos gerais" [P]. Vale o contrato: ajustar o texto da proposta (§11). ✔C
 
@@ -257,7 +287,9 @@ O contrato não promete quantitativo; só a proposta fala em "quantitativos gera
   - alterações em obra dependem de autorização da Trilha (7.5, 7.8);
   - a Trilha não emite RRT de execução;
   - placa de autoria e ensaio fotográfico autorizados (8.7–8.8).
-- Serviços de obra: administração (12% do custo global), fiscalização e execução, oferecidos à parte na proposta. [P][V]
+- **Fiscalização e administração de obra: contratos à parte**, fora do Gestor de Projetos, com um app de obra próprio (em desenvolvimento separado).
+  O Gestor termina no Termo de Encerramento de Projeto. [V] A proposta já os apresenta como serviços separados (administração: 12% do custo global) [P];
+  o contrato de projeto recomenda contratar a obra por administração [C 7.7]. (sugestão: prever um ponto de ligação entre os dois módulos)
 - Prática: indicar executores e fazer reuniões para explicar o projeto. [V]
 
 ---
@@ -269,17 +301,25 @@ estudo preliminar, anteprojeto, projeto legal, projeto básico opcional, projeto
 
 ---
 
-## 11. Pauta para a revisão do contrato e da proposta
+## 11. Pontos a ajustar no contrato (lista pedida pelo Luan)
 
-Pontos em que a prática ou uma decisão nova ainda não está no contrato. Enquanto não forem revisados, **vale o contrato**.
+Numeração igual à §5 do levantamento por voz v3. A coluna "Contrato hoje" foi conferida no texto do contrato e da proposta.
+Enquanto não houver revisão, **vale o contrato**. Esta lista vai para a revisão do contrato em outro chat.
 
-| # | Tema | Hoje no contrato ou proposta | Decisão ou prática |
-|---|---|---|---|
-| 1 | Marco zero | contrato + 1ª parcela + topográfico (3.3.1) | incluir documentos (pessoais, registro, IPTU)? |
-| 2 | Rodadas pontuais do EP | sem limite; 15 dias úteis por revisão (3.3.1) | 2 rodadas, com a excedente cobrada |
-| 3 | Cliente ansioso no PL | PL só depois do lançamento estrutural (3.3.3) | antecipar com termo de ciência e revisão cobrada |
-| 4 | Plano de Projeto (Anexo 01) | numeração antiga; 10 imagens e 1 animação no EP | séries 100 a 1000; animação como bônus; imagens sem quantidade |
-| 5 | Quantitativos | proposta: "quantitativos gerais" | só revestimentos, pontos e iluminação |
-| 6 | Formatos para complementares | .pln/.ifc (2.2.8, 7.3) | também DWG |
-| 7 | Numeração do contrato | 2.3.3 e 2.4.5 repetidos | corrigir |
-| 8 | Espera por complementares e órgãos | fora do prazo, sem limite (3.2) | definir limite ou tratamento? [A CONFIRMAR] |
+| # | Tema | Contrato hoje | Decisão da Trilha | Ação |
+|---|---|---|---|---|
+| 1 | Marco zero | contrato assinado + 1ª parcela + topográfico (3.3.1); documentos só como pré-requisito do PL (3.3.3) | contrato + documentos + topográfico + pagamento; sem limite antes dele | incluir documentos; avaliar cláusula de revisão do valor se o atraso antes do marco zero for longo |
+| 2 | Rodadas do EP | até 1 revisão total inclusa (2.1.5); revisões pontuais em 15 dias úteis, **sem limite** (3.3.1); 2ª revisão total = 20% (9.1) | 2 rodadas, lista única de pedidos, prazo de resposta; excedente cobrada | incluir o limite de 2 rodadas pontuais e o valor da excedente |
+| 3 | Antecipação | não existe; PL só depois do lançamento estrutural (3.3.3) | Termo de Ciência de Antecipação para qualquer pedido fora do momento previsto; retrabalho cobrado | criar a cláusula e o termo |
+| 4 | Alteração no PL aprovado | 9.1 cobra alterações "após ACEITE e assinatura do termo"; o PL não tem termo → **não coberto** | alteração de causa externa depois de protocolado e aprovado = adicional | criar o critério de origem para o PL |
+| 5 | Nomes dos termos | "Termo de Encerramento de Etapa" (2.1.7, 2.2.9); "Termo de **Finalização** de Projeto" (2.4.8); na 9.1 aparece "termo de finalização de etapas" | encerramento de etapa; encerramento de projeto | uniformizar os nomes |
+| 6 | Quantitativos | o contrato não promete; a **proposta** diz "listagens com quantitativos gerais" (PE) | só revestimentos, pontos elétricos e iluminação | ajustar o texto da proposta |
+| 7 | Suspensão | retenção pelo cliente > 20 dias úteis → suspenso; reativação em até 20 dias úteis (3.4); vale para todas as etapas | igual | ✔ já coberto; nada a mudar |
+| 8 | Alteração no executivo | nenhuma alteração do cliente; se houver, aditivo (2.4.2, 9.1: 0–5% pequena, 0–20% maior) | ajuste fino interno sem cobrança; demanda do cliente cobrada | ✔ coberto; opcional: explicitar o "ajuste fino interno" |
+| 9 | Lançamentos no AP | fase 1 = revisão e ajustes técnicos para enviar aos complementares; fase 2 = compatibilização (2.2.2) | igual ao contrato | ✔ coberto |
+| 10 | Numeração repetida | 2.3.3 e 2.4.5 aparecem duas vezes | — | corrigir |
+| 11 | Pranchas e DWG | Anexo 01 com numeração antiga; troca só em .pln/.ifc (2.2.8, 7.3, 7.4) | séries 100 a 1000; também DWG | atualizar o Anexo 01 e os formatos |
+| 12 | Papel da Elisa | proposta: diretora de projetos e responsável técnica | igual | ✔ coerente |
+| 13 | Obra | não emite RRT de execução; recomenda contratar por administração (7.7); proposta separa administração e fiscalização | contratos à parte | ✔ coerente; opcional: citar o contrato de obra |
+| 14 | Espera por terceiros | tempos de cliente, complementares e órgãos fora do prazo (3.2); sem responsabilidade pelo prazo do órgão (2.3.5) | sem limite; só medir | ✔ coberto |
+| 15 | Anexo 01 (Plano de Projeto) | numeração antiga; EP com "10 imagens" e "01 animação"; quantitativo EP 24 com 15 itens; a Trilha pode alterar o Plano | séries 100 a 1000; cerca de 15 imagens; animação como bônus | atualizar o modelo do Anexo |

@@ -178,7 +178,15 @@ Nome do arquivo exportado: `NNN_TR_<PROJETO>_<DISCIPLINA>_<ETAPA> - <TÍTULO DA 
 - **Complementares** por disciplina: contratado? por quem? recebido? compatibilizado? Estrutural obrigatório.
 - A ficha do projeto aproveita o briefing e o programa de necessidades (áreas por setor).
 
-## Situação em 28/09/2026 (após o M6 — levantamento por voz v2)
+## Situação em 28/09/2026 (após o M7 — levantamento por voz v3)
+
+- M7 (voz v3, substitui M5 e M6) absorvido no `MAPEAMENTO.md` v3 e em `processo-trilha.json`.
+- Rodada 3 respondida: 1 (400 posicional), 2 (cobertura 100 sempre + 406 removível), 3 (várias edificações), 4 (601–603 padrão removíveis),
+  6 (cobrança no PL após aprovação), 7 (obra à parte, app próprio), 8 (lighting adiado), 9 ("Caminho do Projeto"), 10 (sem limite antes do marco zero),
+  11 (terceiros sem limite, só medir), 12 (lista de ajustes do contrato: `MAPEAMENTO.md` §11, já conferida no texto do contrato). Item 5 adiado.
+- Quatro materiais a gerar: mapeamento (PDF), manual, Caminho do Projeto, app.
+
+## Situação anterior (após o M6 — levantamento por voz v2)
 
 - M6 absorvido no `MAPEAMENTO.md` v2, cruzado com contrato e proposta (regra do Luan: em divergência, vale o contrato).
 - Blocos: 0, 1, 2, 3, 5, 8 cobertos · 4 parcial (faltam pasta padrão e template ArchiCAD) · 6 coberto no estado atual · 7 adiado.
