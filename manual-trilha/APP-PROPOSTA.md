@@ -82,9 +82,50 @@
 | **2 · Registros e terceiros** | Registros (reuniões, aceites, alterações, revisões, rodadas), complementares e interferências com PDF, prazo em dias úteis com pausa, alerta de suspensão, termos em PDF |
 | **3 · Inteligência** | Checklists por desenho, biblioteca de padrões técnicos, Anexo 01 / índice / nomes de arquivo gerados, cronograma padrão com horas reais, horas por prancha, modelos de reforma e interiores |
 
+## 6a. Programa de necessidades configurável (pedido do Luan, 28/09)
+
+O programa deixa de ser uma lista de áreas e passa a ser o **cadastro técnico de cada ambiente**, com a configuração
+que hoje está espalhada no briefing. O briefing vira só o formulário do cliente; a informação passa a morar no projeto.
+
+**Três camadas**
+1. **Catálogo de tipos de ambiente** (Configurações, editável): cada tipo tem setor, campos de configuração e regras
+   (gera ampliação? gera bancada? área molhada?).
+2. **Ambientes do projeto**: nome, tipo, setor, pavimento, quantidade, área prevista, vínculo (ex.: banho → suíte),
+   configuração, observações do cliente e histórico de alterações.
+3. **Diretrizes gerais do projeto** (na Ficha): uso, moradores e pets, acessibilidade, estética e materiais, relação
+   com exterior, paisagismo e rua, sistema construtivo, sistemas (solar, reúso, ar, aquecimento, automação),
+   forma de execução, padrão de investimento.
+
+**Tipos e campos iniciais (tirados do briefing residencial)**
+| Tipo | Campos de configuração | Gera |
+|---|---|---|
+| Cozinha | ilha; água quente; exaustão; equipamentos; itens da bancada (cuba, calha úmida, lixeira, triturador); integração | ampliação 500, bancada 700 |
+| Jantar | lugares; aparador; cristaleira | — |
+| Estar / TV / cinema | assentos; TV (polegadas) ou projetor | — |
+| Dormitório / suíte / suíte master | cama; TV; closet; banheiro vinculado | — |
+| Banheiro / lavabo | água quente; bancada (louça ou esculpida); cubas; sanitário (caixa acoplada ou válvula); ducha higiênica; bidê; toalheiro aquecido; chuveiro(s) e tipo; banheira | ampliação 500, bancada 700 |
+| Lavanderia | tanque (tipo e quantidade); máquina (tipo e quantidade); passar roupa | ampliação 500, bancada 700 |
+| Garagem | vagas por tipo; coberta; tomada para carro elétrico; armário/depósito | — |
+| Espaço gourmet | ilha; água quente; mesa; sofás; TV; equipamentos; itens da bancada | ampliação 500, bancada 700 |
+| Piscina | modelo; tamanho; aquecida; elementos (prainha, hidro, bar, raia, cascata, deck) | ampliação 500 |
+| Escada | tipo; material | ampliação 500 |
+| Outros (escritório, hall, depósito, despensa, rouparia, serviço…) | observações | — |
+
+**O que a configuração alimenta**
+- Plano de Projeto: ampliações e bancadas geradas pelos tipos.
+- Totais por setor + 10% circulação + 10% paredes (como na proposta).
+- Futuro: documentos da série 1000 (1003 louças e metais, 1004 equipamentos) a partir das escolhas;
+  módulo comercial (áreas de referência e peso por tipo para precificar).
+- Mudança de configuração depois de um termo vira registro de alteração (origem: cliente).
+
+**Como o briefing entra no app**
+- Agora: o Claude lê o briefing (PDF ou resposta do formulário) e preenche o programa pelo chat. Depois, ajuste manual no app.
+- Depois: importar a planilha de respostas do Google Forms, com as perguntas ligadas aos campos do catálogo.
+- Sugestão: ajustar o formulário para cada pergunta corresponder a um campo (e corrigir a pergunta da máquina de lavar).
+
 ## 7. Decisões para começar a Entrega 1
 
-1. Programa de necessidades: campos por ambiente (tipo, área, pavimento, quantidade) bastam?
+1. ~~Programa de necessidades: campos por ambiente bastam?~~ → substituído pelo programa configurável (§6a).
 2. Tarefas de projeto: só no projeto e em "Meu trabalho" (recomendado) ou também na agenda pessoal?
 3. Cronômetro: até a prancha (recomendado) ou até o desenho?
 4. Código do projeto: qual padrão?
