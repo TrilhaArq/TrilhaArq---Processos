@@ -92,3 +92,21 @@ Vale para os cartões da página principal do Gestor e para a Visão geral de ca
       e os quadros das etapas (Briefing, Estudo Preliminar, Anteprojeto…), com a mesma largura dos quadros;
     - na linha de números (prazo da etapa, pranchas, horas no projeto), incluir a **data final**;
     - logo abaixo desses quadros, a **barra de prazo** que muda de cor (verde / amarela / vermelha).
+
+## 7. Itens do Plano de Projeto: prazo, contagem de desenhos e prioridade (28/09)
+
+Mantém os ajustes 3 e 4 (itens clicáveis com desenhos, situação com escolhas visíveis). Acrescenta:
+
+7.1 **Data-limite** em cada item (já anotado no 4.2).
+7.2 **Contagem de desenhos concluídos** visível no item (ex.: 1/4), com estética própria.
+7.3 **Prioridade** em cada item: botão pequeno com três níveis.
+    - Nível 1 = mais urgente · nível 2 = intermediário · nível 3 = menos urgente.
+    - Cores: 1 vermelho · 2 laranja · 3 amarelo (a fala trocou os números; confirmar este mapeamento).
+    - Sem nível = sem prioridade definida (padrão).
+7.4 **Na área da pessoa (aba Projetos / Meu trabalho):** escolher a visualização
+    - **por projeto** (como hoje) ou
+    - **por prioridade** (nível 1, depois 2, depois 3, depois sem prioridade; dentro de cada nível, por prazo).
+    Os itens mostram a cor da prioridade.
+7.5 **Forma visual** (sugestão do Claude, a validar): selo curto "P1 / P2 / P3" na cor do nível + uma faixa fina
+    da mesma cor na borda esquerda do item. Não pintar o item inteiro: pintar tudo compete com as cores de
+    situação (em andamento, pronto) e de prazo, e dificulta a leitura.
