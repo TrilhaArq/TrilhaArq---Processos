@@ -66,3 +66,23 @@ para marcar e avançar.
     Anteprojeto, mostrar a lista de itens do Plano de Projeto daquele projeto/etapa para selecionar com
     facilidade, e ligar o cronômetro ao item.
 5.3 **Continuar podendo escrever uma tarefa livre**, nova, quando não estiver na lista.
+
+## 6. Cartões do painel geral e Visão geral do projeto: prazo e progresso (28/09)
+
+Vale para os cartões da página principal do Gestor e para a Visão geral de cada projeto.
+
+6.1 **Manter** os números atuais: pranchas, prazo em dias úteis restantes e horas trabalhadas.
+6.2 **Data final do prazo:** calcular a data-limite (dias úteis, pulando fins de semana) e mostrar a data.
+6.3 **Barra horizontal de prazo** na linha de baixo, ao lado/abaixo da data: vai se enchendo conforme o prazo
+    passa; cheia = prazo esgotado. Cor conforme o tempo consumido:
+    - verde: até 30% do prazo;
+    - amarela: de 30% a 60%;
+    - vermelha: nos últimos 40% (acima de 60%).
+6.4 **Barra vertical de progresso do projeto** na lateral esquerda do cartão, subindo conforme o projeto é
+    concluído, com a porcentagem escrita dentro.
+
+Pontos a confirmar na hora de processar:
+- a data e a barra de prazo são da **etapa atual** (como o prazo hoje) ou do **projeto inteiro**?
+- nas esperas (prazo pausado), a data final vai sendo empurrada para frente — confirmar;
+- a % do projeto vem dos itens concluídos do Plano de Projeto (todas as etapas) — com peso igual por item ou
+  por etapa (ex.: pesos do contrato EP 50 / AP 25 / PE 25)?
