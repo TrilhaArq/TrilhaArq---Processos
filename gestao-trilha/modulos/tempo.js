@@ -26,7 +26,7 @@
     lancAtivos().forEach(function (l) { if (l.pessoaId === pid && doMes(l, mes)) { min += l.min; dias[ymd(new Date(l.inicio))] = 1; } });
     return { min: min, dias: Object.keys(dias).length };
   }
-  T.tempo = { lancAtivos: lancAtivos, alvoNome: alvoNome, catDe: catDe, rotulo: rotulo, custoLanc: custoLanc, doMes: doMes, CAT_LABEL: CAT_LABEL, timers: function () { return S.timers; } };
+  T.tempo = { lancAtivos: lancAtivos, alvoNome: alvoNome, catDe: catDe, rotulo: rotulo, custoLanc: custoLanc, doMes: doMes, CAT_LABEL: CAT_LABEL, timers: function () { return S.timers; }, iniciar: function (combo) { return startAtividade(combo); } };
 
   // ---------- gravação agrupada ----------
   function mesDoc(pid, iniIso) { return pid + "_" + ymd(new Date(iniIso)).slice(0, 7); }
@@ -85,7 +85,7 @@
   // ---------- cronômetro ----------
   function myTimer() { return T.state.pessoaId ? S.timers[T.state.pessoaId] : null; }
   function mesmaAtiv(a, c) {
-    return a.tipo === c.tipo && a.alvoId === c.alvoId && (a.etapaId || null) === (c.etapaId || null) && (a.topicoId || null) === (c.topicoId || null) &&
+    return a.tipo === c.tipo && a.alvoId === c.alvoId && (a.etapaId || null) === (c.etapaId || null) && (a.topicoId || null) === (c.topicoId || null) && (a.pranchaId || null) === (c.pranchaId || null) &&
       (a.descricao || "").trim().toLowerCase() === (c.descricao || "").trim().toLowerCase();
   }
   function aparelho() { return { id: T.device.id, nome: T.device.nome, em: new Date().toISOString() }; }
@@ -96,7 +96,7 @@
     delete S.timers[pid]; S.confirm = null; T.scheduleRender();
     try {
       if (min >= 1) {
-        lancId = await addLanc({ pessoaId: pid, atividadeId: t.atividadeId || null, tipo: t.tipo, alvoId: t.alvoId, etapaId: t.etapaId || null, topicoId: t.topicoId || null, descricao: t.descricao || "",
+        lancId = await addLanc({ pessoaId: pid, atividadeId: t.atividadeId || null, tipo: t.tipo, alvoId: t.alvoId, etapaId: t.etapaId || null, topicoId: t.topicoId || null, pranchaId: t.pranchaId || null, descricao: t.descricao || "",
           inicio: t.inicio, fim: fim.toISOString(), min: Math.round(min * 10) / 10, origem: "cronometro", motivo: modo, paradoEm: aparelho(), criadoEm: fim.toISOString(), excluido: false, ajustes: [] });
       }
       var itens = T.clone(ativs(pid)), a = t.atividadeId ? T.byId(itens, t.atividadeId) : null;
@@ -129,9 +129,9 @@
     if (myTimer()) await stopTimer("trocar");
     var itens = T.clone(ativs(pid)), agora = new Date().toISOString(), a = ativId ? T.byId(itens, ativId) : null;
     if (!a) a = itens.filter(function (x) { return x.status !== "concluida" && mesmaAtiv(x, combo); })[0];
-    if (!a) { a = { id: T.novoId(), tipo: combo.tipo, alvoId: combo.alvoId, etapaId: combo.etapaId || null, topicoId: combo.topicoId || null, descricao: combo.descricao || "", criadoEm: agora }; itens.push(a); }
+    if (!a) { a = { id: T.novoId(), tipo: combo.tipo, alvoId: combo.alvoId, etapaId: combo.etapaId || null, topicoId: combo.topicoId || null, pranchaId: combo.pranchaId || null, descricao: combo.descricao || "", criadoEm: agora }; itens.push(a); }
     a.status = "andamento"; a.ultimoUso = agora; delete a.concluidoEm;
-    var t = { pessoaId: pid, atividadeId: a.id, tipo: a.tipo, alvoId: a.alvoId, etapaId: a.etapaId || null, topicoId: a.topicoId || null, descricao: a.descricao || "", inicio: agora, dispositivo: { id: T.device.id, nome: T.device.nome } };
+    var t = { pessoaId: pid, atividadeId: a.id, tipo: a.tipo, alvoId: a.alvoId, etapaId: a.etapaId || null, topicoId: a.topicoId || null, pranchaId: a.pranchaId || null, descricao: a.descricao || "", inicio: agora, dispositivo: { id: T.device.id, nome: T.device.nome } };
     S.timers[pid] = t; T.scheduleRender();
     try { await saveAtivs(pid, itens); await T.db.doc("timers/" + pid).set(t); } catch (e) { T.showError(e); }
   }

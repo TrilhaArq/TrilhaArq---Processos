@@ -94,9 +94,17 @@ ele expõe (ex.: `Trilha.tempo.lancAtivos()`, `Trilha.tempo.custoLanc(l)`).
 |---|---|---|---|
 | Tempo | `modulos/tempo.js` | pessoa | em uso |
 | Tarefas | `modulos/tarefas.js` | pessoa | em uso |
-| Projetos (cadastro) | `modulos/projetos.js` | admin | em uso — será ampliado pelo Gestor de Projetos |
+| Meu trabalho (aba "Projetos") | `modulos/meutrabalho.js` | pessoa | **teste** — pranchas e tarefas da pessoa, ▶ inicia o cronômetro na prancha |
+| Gestor de Projetos | `modulos/gestor.js` | admin | **teste** — coleção `gp/<projetoId>` (etapa, fase, esperas, marco zero, legal, pranchas, tarefas, ambientes, eventos) |
+| Cadastros | `modulos/cadastros.js` | admin | **teste** — coleções `contatos/<id>` e `obras/<id>`; acrescenta `clienteIds`, `codigo`, `sigla`, `categorias` em `projetos` |
+| Horas e custos (antigo Projetos) | `modulos/projetos.js` | admin | em uso |
 | Relatórios | `modulos/relatorios.js` | admin | em uso |
 | Configurações | `modulos/config.js` | admin | em uso |
 | Financeiro | — | admin | "Em breve" na capa |
-| Gestor de projetos | — | admin | "Em breve" na capa |
 | Gestor de obras (orçamento de obras) | — | admin | "Em breve" na capa — portar o app de orçamento (skill orcamento-obra-trilha), itens agrupados por obra |
+
+## 7. Versão de teste
+
+- Link de teste (dados de exemplo): https://claude.ai/artifact/MCRcCpLbCTKURD3qUb6Wmx
+- Gestor de Projetos, Cadastros e Meu trabalho rodam primeiro no teste. Depois de aprovados, são publicados no link oficial.
+- Tempo: lançamentos e cronômetro guardam `pranchaId` quando iniciados pelo Meu trabalho (`Trilha.tempo.iniciar(combo)`).
