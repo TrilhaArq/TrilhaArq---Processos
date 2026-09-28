@@ -1,7 +1,7 @@
 # Ajustes pedidos no teste do Gestor de Projetos
 
 Link de teste: https://claude.ai/artifact/MCRcCpLbCTKURD3qUb6Wmx
-Situação: **recebendo** (só anotar; processar quando o Luan liberar).
+Situação: **ajustes 1 a 9 processados** e publicados no teste (versão 2, 28/09). Próximos ajustes: anotar abaixo.
 
 ## 1. Ajuste geral: o processo mapeado precisa aparecer inteiro no app (28/09)
 
@@ -138,3 +138,22 @@ Situações a resolver:
 - "Meu trabalho" passa a mostrar só os itens do Plano de Projeto; tarefas ficam na aba Tarefas (com selo do projeto);
 - projeto apagado: tarefas ficam na agenda com "projeto removido";
 - na integração com o app oficial, usar o formato atual do módulo Tarefas (versão com Financeiro).
+
+## Processamento (28/09) — como ficou
+
+- Plano de Projeto com abas por etapa: **Abertura · Estudo Preliminar · Anteprojeto · Projeto Legal · Projeto Executivo**.
+  Listas montadas a partir do Plano de Projeto da proposta e do levantamento; o Luan revisa no teste.
+- Etapa **Abertura** no fluxo (Briefing → Abertura → EP → AP → PE → Encerrado). Topográfico e documentos do
+  marco zero são marcados pelos itens da Abertura.
+- Itens: código (série+posição, AP01…, PL01…), desenhos/subitens com caixinha e contagem, checklist por desenho,
+  link do PDF-guia por desenho, prazo, responsável, situação (menu com as opções), prioridade P1/P2/P3 (selo e faixa),
+  "+ Adicionar item" visível em cada grupo, mover e remover.
+- Séries 100–400 no Anteprojeto e de novo no Executivo; complementares por disciplina (envio, reunião 1, reunião 2,
+  conclusão); fechamento do Executivo (revisão, Guia, imagens, BIMx, reunião, termo, entrega física).
+- Cartões: barra vertical de % do projeto, data final e barra de prazo colorida (verde <30%, amarela 30–60%,
+  vermelha >60%; listrada quando pausado). Visão geral: barra horizontal de conclusão, data final, barra de prazo.
+- Meu trabalho: por projeto / por prioridade; ▶ Iniciar, ❚❚ Pausar e ✓ Concluir (concluir manda o item para
+  "Revisão interna").
+- Aba Tempo: ao escolher projeto e etapa, lista os itens do Plano; continua aceitando tarefa livre.
+- Tarefas do projeto moram na agenda da pessoa (Tarefa, Demanda, Prioridade, Compromisso → Agenda Google), com
+  selo do projeto; trocar responsável move a tarefa.

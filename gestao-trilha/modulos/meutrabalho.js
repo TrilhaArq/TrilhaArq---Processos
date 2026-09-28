@@ -1,63 +1,80 @@
-/* Módulo Meu trabalho (área da pessoa) — pranchas e tarefas de projeto atribuídas à pessoa, em todos os projetos,
- * com botão para iniciar o cronômetro já na prancha. Lê e grava pelo Trilha.gestor (dados em gp/<projetoId>). */
+/* Módulo Meu trabalho (área da pessoa, aba "Projetos") — itens do Plano de Projeto atribuídos à pessoa,
+ * vistos por projeto ou por prioridade, com cronômetro (iniciar, pausar, concluir) direto no item.
+ * Lê e grava pelo Trilha.gestor (dados em gp/<projetoId>). As tarefas de projeto ficam na aba Tarefas. */
 (function () {
   "use strict";
   var T = window.Trilha, $ = T.$, esc = T.esc;
-  var S = { verProntas: false };
+  var S = { modo: T.ls("mt.modo") || "projeto", verProntas: false };
 
   function itensDa(pid) {
     var out = [];
     if (!T.gestor) return out;
     T.state.projetos.forEach(function (p) {
       var g = T.gestor.gp(p.id); if (!g || g.etapa === "encerrado") return;
-      var pr = T.gestor.ordenarPranchas(g.pranchas || []), ids = T.gestor.idsPranchas(pr);
-      var minhas = pr.filter(function (x) { return x.resp === pid && (S.verProntas || (x.sit !== "pronto" && x.sit !== "entregue")); });
-      var tarefas = (g.tarefas || []).filter(function (t) { return t.resp === pid && !t.feita; });
-      if (minhas.length || tarefas.length) out.push({ p: p, g: g, pr: minhas, ids: ids, tf: tarefas });
+      var cod = T.gestor.codigos(g);
+      (g.itens || []).forEach(function (x) {
+        if (x.resp !== pid || (!S.verProntas && T.gestor.feito(x))) return;
+        out.push({ p: p, g: g, x: x, cod: cod[x.id] });
+      });
     });
     return out;
   }
+  function ordemItem(a, b) { return String(a.x.prazo || "9999").localeCompare(String(b.x.prazo || "9999")) || String(a.cod || "").localeCompare(String(b.cod || ""), "pt", { numeric: true }); }
+  function linha(o, timer, mostrarProjeto) {
+    var x = o.x, et = T.gestor.etapas[x.etapa] || {}, rodando = timer && timer.pranchaId === x.id, hoje = T.ymd(new Date()), atras = x.prazo && x.prazo < hoje && !T.gestor.feito(x);
+    var chave = esc(o.p.id) + "|" + x.id;
+    var tempo = T.tempo && T.tempo.iniciar && et.tempo ? (rodando ? '<button class="btn btn-small btn-stop" data-pausar="1">❚❚ Pausar</button><button class="btn btn-small" data-concluir="' + chave + '">✓ Concluir</button>' : '<button class="btn btn-small btn-primary" data-play="' + chave + '">▶ Iniciar</button>') : "";
+    return '<div class="it-row mt-row' + (x.prio ? " prio-" + x.prio : "") + (rodando ? " is-live" : "") + '">' +
+      '<span class="it-cod num">' + esc(o.cod || "·") + "</span>" +
+      '<span class="it-tit static">' + (x.prio ? '<span class="prio-tag p' + x.prio + '">P' + x.prio + "</span>" : "") + esc(x.titulo) + ' <em class="pr-et">' + esc(et.nome || "") + (mostrarProjeto ? " · " + esc(o.p.codigo || o.p.nome) : "") + "</em>" + T.gestor.desenhosProg(x) + "</span>" +
+      (x.prazo ? '<span class="badge static' + (atras ? " is-overdue" : "") + '">' + T.fmtYmd(x.prazo) + "</span>" : '<span class="hint">sem prazo</span>') +
+      '<select class="sit-sel s-' + x.sit + '" data-msit="' + chave + '" aria-label="Situação">' + T.optHtml(T.gestor.SIT, x.sit) + "</select>" +
+      '<span class="mt-timer">' + tempo + "</span></div>";
+  }
   function render() {
-    var pid = T.state.pessoaId, grupos = itensDa(pid), hoje = T.ymd(new Date()), timer = T.tempo && T.tempo.timers()[pid];
-    var html = grupos.map(function (x) {
-      var et = T.gestor.etapas[x.g.etapa] || {};
-      return '<div class="card gp-box"><div class="section-head"><div><h3 class="panel-title" style="margin:0">' + esc(x.p.nome) + '</h3><div class="section-meta">' + esc(x.p.codigo || "") + " · " + esc(T.gestor.etapaNome(x.p.id)) + '</div></div><button class="link" data-abrir="' + esc(x.p.id) + '">Abrir projeto</button></div>' +
-        x.pr.map(function (r) {
-          var rodando = timer && timer.pranchaId === r.id;
-          var podeTempo = !!(T.tempo && T.tempo.iniciar && T.gestor.etapas[r.etapa] && T.gestor.etapas[r.etapa].tempo);
-          return '<div class="pr-row mt-row"><span class="pr-id num">' + x.ids[r.id] + '</span><span class="pr-tit">' + esc(r.titulo) + ' <em class="pr-et">' + (r.etapa === "ap" ? "AP" : "PE") + "</em></span>" +
-            '<button class="sit-btn s-' + r.sit + '" data-msit="' + esc(x.p.id) + "|" + r.id + '">' + esc(T.gestor.sitNome(r.sit)) + "</button>" +
-            (podeTempo ? '<button class="btn btn-small' + (rodando ? "" : " btn-primary") + '" data-play="' + esc(x.p.id) + "|" + r.id + '"' + (rodando ? " disabled" : "") + ">" + (rodando ? "● Em andamento" : "▶ Iniciar") + "</button>" : "") + "</div>";
-        }).join("") +
-        x.tf.map(function (t) {
-          var atras = t.prazo && t.prazo < hoje;
-          return '<div class="pr-row mt-row"><input type="checkbox" class="task-check" data-mtf="' + esc(x.p.id) + "|" + t.id + '" aria-label="Concluir tarefa"><span class="pr-tit">' + esc(t.txt) + "</span>" + (t.prazo ? '<span class="badge static' + (atras ? " is-overdue" : "") + '">' + T.fmtYmd(t.prazo) + "</span>" : "") + "</div>";
-        }).join("") + "</div>";
-    }).join("");
-    $("mt-body").innerHTML = html || '<div class="empty">Nada atribuído a você nos projetos em andamento. As pranchas e tarefas aparecem aqui quando alguém escolhe você como responsável no Gestor de Projetos.</div>';
+    var pid = T.state.pessoaId, lista = itensDa(pid), timer = T.tempo && T.tempo.timers()[pid], html = "";
+    T.each("#mt-modo [data-modo]", function (b) { b.classList.toggle("is-selected", b.dataset.modo === S.modo); });
+    if (S.modo === "prioridade") {
+      html = [[1, "P1 · mais urgente"], [2, "P2 · intermediária"], [3, "P3 · menos urgente"], [0, "Sem prioridade"]].map(function (n) {
+        var its = lista.filter(function (o) { return (o.x.prio || 0) === n[0]; }).sort(ordemItem);
+        return its.length ? '<div class="card gp-box"><div class="section-head"><h3 class="panel-title" style="margin:0">' + (n[0] ? '<span class="prio-tag p' + n[0] + '">P' + n[0] + "</span>" : "") + esc(n[1]) + '</h3><span class="section-meta">' + its.length + "</span></div>" + its.map(function (o) { return linha(o, timer, true); }).join("") + "</div>" : "";
+      }).join("");
+    } else {
+      var porProj = {};
+      lista.forEach(function (o) { (porProj[o.p.id] = porProj[o.p.id] || []).push(o); });
+      html = Object.keys(porProj).map(function (k) {
+        var its = porProj[k].sort(function (a, b) { return (a.x.prio || 9) - (b.x.prio || 9) || ordemItem(a, b); }), p = its[0].p;
+        return '<div class="card gp-box"><div class="section-head"><div><h3 class="panel-title" style="margin:0">' + esc(p.nome) + '</h3><div class="section-meta">' + esc(p.codigo || "") + " · " + esc(T.gestor.etapaNome(p.id)) + '</div></div><button class="link" data-abrir="' + esc(p.id) + '">Abrir projeto</button></div>' + its.map(function (o) { return linha(o, timer, false); }).join("") + "</div>";
+      }).join("");
+    }
+    $("mt-body").innerHTML = html || '<div class="empty">Nada atribuído a você nos projetos em andamento. Os itens aparecem aqui quando você é escolhido como responsável no Plano de Projeto.</div>';
     $("mt-prontas").checked = S.verProntas;
   }
-  var html = '<div class="section-head"><h2 class="section-title">Meu trabalho nos projetos</h2><label class="gp-check"><input type="checkbox" id="mt-prontas"> Mostrar pranchas prontas</label></div><div id="mt-body" class="mt-body"></div>';
+  var html = '<div class="section-head"><h2 class="section-title">Meu trabalho nos projetos</h2><div class="form-actions"><div class="segmented" id="mt-modo"><button class="seg-pill" data-modo="projeto">Por projeto</button><button class="seg-pill" data-modo="prioridade">Por prioridade</button></div><label class="gp-check"><input type="checkbox" id="mt-prontas"> Mostrar prontos</label></div></div>' +
+    '<p class="hint" style="margin:0 0 12px">As tarefas de projeto ficam na aba Tarefas, com o selo do projeto.</p><div id="mt-body" class="mt-body"></div>';
   function init() {
     $("mt-prontas").addEventListener("change", function () { S.verProntas = this.checked; render(); });
+    $("mt-modo").addEventListener("click", function (e) { var b = e.target.closest("[data-modo]"); if (!b) return; S.modo = b.dataset.modo; T.ls("mt.modo", S.modo); render(); });
     $("view-meutrabalho").addEventListener("click", function (e) {
       var b;
       if ((b = e.target.closest("[data-abrir]"))) { T.gestor.abrir(b.dataset.abrir); return; }
-      if ((b = e.target.closest("[data-msit]"))) { var a = b.dataset.msit.split("|"); T.gestor.mudarPrancha(a[0], a[1], function (p) { p.sit = T.gestor.cicloSit(p.sit); }); return; }
+      if (e.target.closest("[data-pausar]")) { T.tempo.parar("pausar"); return; }
+      if ((b = e.target.closest("[data-concluir]"))) {
+        var c2 = b.dataset.concluir.split("|"); T.tempo.parar("concluir");
+        T.gestor.mudarItem(c2[0], c2[1], function (x) { if (!T.gestor.feito(x)) x.sit = "revisao"; });
+        return;
+      }
       if ((b = e.target.closest("[data-play]"))) {
-        var c = b.dataset.play.split("|"), g = T.gestor.gp(c[0]), pr = T.byId(g.pranchas || [], c[1]), ids = T.gestor.idsPranchas(T.gestor.ordenarPranchas(g.pranchas || []));
-        T.tempo.iniciar({ tipo: "projeto", alvoId: c[0], etapaId: T.gestor.etapas[pr.etapa].tempo, topicoId: null, descricao: ids[pr.id] + " · " + pr.titulo, pranchaId: pr.id });
-        if (pr.sit === "a_fazer") T.gestor.mudarPrancha(c[0], pr.id, function (p) { p.sit = "andamento"; });
-        T.toast("Cronômetro iniciado em " + ids[pr.id], { label: "Ver no Tempo", fn: function () { T.go("pessoa", "tempo"); } });
+        var c = b.dataset.play.split("|"), g = T.gestor.gp(c[0]), x = T.byId(g.itens || [], c[1]), cod = T.gestor.codigos(g)[x.id];
+        T.tempo.iniciar({ tipo: "projeto", alvoId: c[0], etapaId: T.gestor.etapas[x.etapa].tempo, topicoId: null, descricao: (cod ? cod + " · " : "") + x.titulo, pranchaId: x.id });
+        if (x.sit === "a_fazer") T.gestor.mudarItem(c[0], x.id, function (it) { it.sit = "andamento"; });
+        T.toast("Cronômetro iniciado", { label: "Ver no Tempo", fn: function () { T.go("pessoa", "tempo"); } });
       }
     });
     $("view-meutrabalho").addEventListener("change", function (e) {
-      var t = e.target; if (!t.dataset.mtf) return; var a = t.dataset.mtf.split("|");
-      T.gestor.salvar(a[0], function (x) { var tf = T.byId(x.tarefas || [], a[1]); if (tf) { tf.feita = true; tf.feitaEm = new Date().toISOString(); } });
-      T.toast("Tarefa concluída");
+      var t = e.target; if (!t.dataset.msit) return; var a = t.dataset.msit.split("|");
+      T.gestor.mudarItem(a[0], a[1], function (x) { x.sit = t.value; if (T.gestor.feito(x)) (x.desenhos || []).forEach(function (d) { d.feito = true; }); });
     });
   }
-  T.register({
-    id: "meutrabalho", label: "Projetos", area: "pessoa", html: html, init: init, render: render
-  });
+  T.register({ id: "meutrabalho", label: "Projetos", area: "pessoa", html: html, init: init, render: render });
 })();
