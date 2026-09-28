@@ -48,3 +48,12 @@ para marcar e avançar.
 3.5 **Checklist dentro de cada desenho:** o desenho também abre e mostra o seu checklist.
 3.6 **Procedimento do desenho:** lugar para anexar/abrir o PDF-guia com o processo específico daquele desenho
     (padrões e checklists por desenho, previstos no mapeamento).
+
+## 4. Plano de Projeto: cronômetro e prazo nos itens (28/09)
+
+4.1 **Controles do cronômetro em cada item do Plano de Projeto:** iniciar, pausar e concluir, direto na tarefa em
+    execução. Hoje o ▶ só existe na aba "Projetos" da área da pessoa (Meu trabalho), porque o cronômetro é
+    de cada pessoa. A definir: no Plano de Projeto (área do escritório), o cronômetro liga para quem está
+    usando o app (a pessoa escolhida em "Lançando como") ou para o responsável do item.
+4.2 **Prazo (data) em cada item/tarefa do Plano de Projeto**, além do responsável, para organizar quando cada
+    coisa precisa acontecer.
