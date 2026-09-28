@@ -130,3 +130,18 @@ que hoje está espalhada no briefing. O briefing vira só o formulário do clien
 3. Cronômetro: até a prancha (recomendado) ou até o desenho?
 4. Código do projeto: qual padrão?
 5. O módulo Projetos atual vira a ficha do Gestor (recomendado) ou continua separado?
+
+## 6b. Seção Cadastros (pedido do Luan, 28/09)
+
+- Botão **Cadastros** no Escritório: um lugar para cadastrar e consultar tudo o que é registro-base.
+- **Cliente e projeto são registros separados.** Um projeto pode ter mais de um cliente (ex.: casal) e um cliente pode ter vários projetos.
+- **Contatos** (uma lista, filtrável por tipo): cliente, fornecedor, mão de obra, parceiro.
+  - Fornecedor, mão de obra, parceiro: tipo (ex.: engenheiro estrutural, marmoraria, eletricista), nome, contato, empresa, e-mail, CPF/CNPJ, razão social, endereço, descrição, observação.
+  - Cliente: nome, contato, e-mail, CPF/CNPJ, razão social, endereço, projetos (vínculo), descrição, observação.
+- **Projetos**: criados no briefing (situação "em proposta"), ligados a um ou mais clientes.
+- **Obras**: ligadas a um projeto e a clientes; base para o app de obra.
+- **Colaboradores**: o mesmo cadastro de pessoas que já existe (Luan, Elisa), ampliado.
+- Cadastro rápido no contexto: ao criar um projeto, "+ novo cliente" sem sair da tela; o registro aparece em Cadastros.
+- Complementares do projeto apontam para contatos do tipo parceiro.
+- CPF, CNPJ e endereço são dados pessoais: com colaboradores, acesso só dos sócios.
+- Áreas de referência iniciais: `processo-trilha.json` → `programa_necessidades` (projeto residencial de referência).

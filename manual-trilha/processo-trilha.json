@@ -6,156 +6,491 @@
     "fonte": "MAPEAMENTO.md v3 (levantamento por voz v3 cruzado com contrato e proposta)",
     "observacao": "Padrão editável. Cada projeto recebe uma cópia do modelo do seu tipo e pode acrescentar, remover e reordenar tudo."
   },
-
-  "hierarquia": ["projeto", "etapa", "fase", "prancha", "desenho", "item_checklist"],
-
+  "hierarquia": [
+    "projeto",
+    "etapa",
+    "fase",
+    "prancha",
+    "desenho",
+    "item_checklist"
+  ],
   "etapas": [
     {
-      "id": "briefing", "nome": "Briefing", "ordem": 1,
+      "id": "briefing",
+      "nome": "Briefing",
+      "ordem": 1,
       "descricao": "Coleta de informações e programa de necessidades. Base do escopo contratado (contrato 1.2).",
       "termo_saida": null
     },
     {
-      "id": "ep", "nome": "Estudo Preliminar", "ordem": 2,
-      "prerequisitos": ["marco_zero"],
-      "prazo_dias_uteis": { "primeira_apresentacao": 40, "revisao_pontual": 15, "revisao_total": [30, 40] },
-      "rodadas": { "ajuste_pontual_limite": 2, "revisao_total_inclusa": 1, "excedente": "cobrada", "segunda_revisao_total_aditivo_pct": 20 },
+      "id": "ep",
+      "nome": "Estudo Preliminar",
+      "ordem": 2,
+      "prerequisitos": [
+        "marco_zero"
+      ],
+      "prazo_dias_uteis": {
+        "primeira_apresentacao": 40,
+        "revisao_pontual": 15,
+        "revisao_total": [
+          30,
+          40
+        ]
+      },
+      "rodadas": {
+        "ajuste_pontual_limite": 2,
+        "revisao_total_inclusa": 1,
+        "excedente": "cobrada",
+        "segunda_revisao_total_aditivo_pct": 20
+      },
       "codigo_desenhos": "AP",
       "codigo_desenhos_significado": "Apresentação (desenhos de apresentação, não técnicos)",
       "termo_saida": "encerramento_etapa"
     },
     {
-      "id": "ap", "nome": "Anteprojeto", "ordem": 3,
-      "prerequisitos": ["termo_encerramento_ep"],
-      "fases": [
-        { "id": "ap1", "nome": "Revisão e lançamentos", "prazo_dias_uteis": [20, 30],
-          "conteudo": "Revisão geral, lançamento estrutural e lançamento de pontos; primeiras pranchas 100/200/300; envio aos complementares" },
-        { "id": "ap2", "nome": "Compatibilização", "prazo_dias_uteis": { "estrutural": 15, "demais": 10 },
-          "prazo_conta_de": "entrega de cada complementar", "rodadas_padrao_por_disciplina": 2,
-          "conteudo": "Ciclos com calculista e engenharias; aceite do Luan libera os executivos das engenharias" },
-        { "id": "ap3", "nome": "Definições", "prazo_dias_uteis": 15, "prazo_conta_de": "definições do cliente",
-          "conteudo": "Acabamentos, revestimentos, forro e iluminação finais, louças e metais, bancadas, esquadrias; série 400 montada" }
+      "id": "ap",
+      "nome": "Anteprojeto",
+      "ordem": 3,
+      "prerequisitos": [
+        "termo_encerramento_ep"
       ],
-      "condicao_encerramento": ["estrutural_contratado_e_desenvolvido"],
-      "rodadas": { "limite": null },
+      "fases": [
+        {
+          "id": "ap1",
+          "nome": "Revisão e lançamentos",
+          "prazo_dias_uteis": [
+            20,
+            30
+          ],
+          "conteudo": "Revisão geral, lançamento estrutural e lançamento de pontos; primeiras pranchas 100/200/300; envio aos complementares"
+        },
+        {
+          "id": "ap2",
+          "nome": "Compatibilização",
+          "prazo_dias_uteis": {
+            "estrutural": 15,
+            "demais": 10
+          },
+          "prazo_conta_de": "entrega de cada complementar",
+          "rodadas_padrao_por_disciplina": 2,
+          "conteudo": "Ciclos com calculista e engenharias; aceite do Luan libera os executivos das engenharias"
+        },
+        {
+          "id": "ap3",
+          "nome": "Definições",
+          "prazo_dias_uteis": 15,
+          "prazo_conta_de": "definições do cliente",
+          "conteudo": "Acabamentos, revestimentos, forro e iluminação finais, louças e metais, bancadas, esquadrias; série 400 montada"
+        }
+      ],
+      "condicao_encerramento": [
+        "estrutural_contratado_e_desenvolvido"
+      ],
+      "rodadas": {
+        "limite": null
+      },
       "termo_saida": "encerramento_etapa"
     },
     {
-      "id": "pl", "nome": "Projeto Legal", "ordem": 4, "paralela_a": "ap",
-      "prerequisitos": ["documentos_cliente", "fim_fase_ap1", "lancamento_estrutural_engenheiro"],
+      "id": "pl",
+      "nome": "Projeto Legal",
+      "ordem": 4,
+      "paralela_a": "ap",
+      "prerequisitos": [
+        "documentos_cliente",
+        "fim_fase_ap1",
+        "lancamento_estrutural_engenheiro"
+      ],
       "antecipacao_permitida_com": "ciencia_antecipacao",
-      "prazo_dias_uteis": { "desenvolver_e_protocolar": 20, "apos_protocolo": "depende do órgão" },
-      "sequencia": ["organizar documentos", "condomínio (se houver)", "prefeitura"],
+      "prazo_dias_uteis": {
+        "desenvolver_e_protocolar": 20,
+        "apos_protocolo": "depende do órgão"
+      },
+      "sequencia": [
+        "organizar documentos",
+        "condomínio (se houver)",
+        "prefeitura"
+      ],
       "cobranca_alteracao": "após protocolado e aprovado, alteração de causa externa gera adicional",
       "termo_saida": null,
       "saida": "documentos de aprovação"
     },
     {
-      "id": "pe", "nome": "Projeto Executivo", "ordem": 5,
-      "prerequisitos": ["termo_encerramento_ap", "pl_aprovado"],
-      "antecipacao_permitida_com": null,
-      "prazo_dias_uteis": [40, 60],
-      "fases": [
-        { "id": "pe1", "nome": "Desenhos base", "series": ["100", "200", "300"] },
-        { "id": "pe2", "nome": "Mapeamentos, ampliações e detalhamentos", "series": ["400", "500", "600", "700", "800", "900", "1000"] }
+      "id": "pe",
+      "nome": "Projeto Executivo",
+      "ordem": 5,
+      "prerequisitos": [
+        "termo_encerramento_ap",
+        "pl_aprovado"
       ],
-      "alteracoes": { "ajuste_fino_interno": "sem cobrança", "pedido_cliente": "aditivo (cláusula 9)" },
+      "antecipacao_permitida_com": null,
+      "prazo_dias_uteis": [
+        40,
+        60
+      ],
+      "fases": [
+        {
+          "id": "pe1",
+          "nome": "Desenhos base",
+          "series": [
+            "100",
+            "200",
+            "300"
+          ]
+        },
+        {
+          "id": "pe2",
+          "nome": "Mapeamentos, ampliações e detalhamentos",
+          "series": [
+            "400",
+            "500",
+            "600",
+            "700",
+            "800",
+            "900",
+            "1000"
+          ]
+        }
+      ],
+      "alteracoes": {
+        "ajuste_fino_interno": "sem cobrança",
+        "pedido_cliente": "aditivo (cláusula 9)"
+      },
       "termo_saida": "encerramento_projeto"
     }
   ],
-
   "modelos": {
-    "do_zero": { "exemplos": ["residência", "restaurante", "pousada", "chalé", "institucional"], "etapas": ["briefing", "ep", "ap", "pl", "pe"], "situacao": "mapeado" },
-    "reforma": { "exemplos": ["apartamento", "residência", "restaurante"], "etapas": ["briefing", "ep", "pe"], "etapas_opcionais": ["pl"], "complementares": "sob demanda", "situacao": "diferenças macro" },
-    "interiores_marcenaria": { "etapas": ["briefing", "ep", "pe"], "situacao": "diferenças macro" }
+    "do_zero": {
+      "exemplos": [
+        "residência",
+        "restaurante",
+        "pousada",
+        "chalé",
+        "institucional"
+      ],
+      "etapas": [
+        "briefing",
+        "ep",
+        "ap",
+        "pl",
+        "pe"
+      ],
+      "situacao": "mapeado"
+    },
+    "reforma": {
+      "exemplos": [
+        "apartamento",
+        "residência",
+        "restaurante"
+      ],
+      "etapas": [
+        "briefing",
+        "ep",
+        "pe"
+      ],
+      "etapas_opcionais": [
+        "pl"
+      ],
+      "complementares": "sob demanda",
+      "situacao": "diferenças macro"
+    },
+    "interiores_marcenaria": {
+      "etapas": [
+        "briefing",
+        "ep",
+        "pe"
+      ],
+      "situacao": "diferenças macro"
+    }
   },
-
   "marco_zero": {
-    "contrato": ["contrato_assinado", "primeira_parcela_paga", "topografico"],
-    "decisao_trilha": ["contrato_assinado", "documentos", "topografico", "primeira_parcela_paga"],
+    "contrato": [
+      "contrato_assinado",
+      "primeira_parcela_paga",
+      "topografico"
+    ],
+    "decisao_trilha": [
+      "contrato_assinado",
+      "documentos",
+      "topografico",
+      "primeira_parcela_paga"
+    ],
     "vigente": "contrato",
     "limite_antes": null
   },
-
   "termos": [
-    { "id": "encerramento_etapa", "nome": "Termo de Encerramento de Etapa", "etapas": ["ep", "ap"] },
-    { "id": "encerramento_projeto", "nome": "Termo de Encerramento de Projeto", "etapas": ["pe"], "nome_no_contrato": "Termo de Finalização de Projeto" },
-    { "id": "ciencia_antecipacao", "nome": "Termo de Ciência de Antecipação (provisório)", "quando": "qualquer pedido do cliente fora do momento previsto", "efeito": "retrabalho causado é cobrado" }
+    {
+      "id": "encerramento_etapa",
+      "nome": "Termo de Encerramento de Etapa",
+      "etapas": [
+        "ep",
+        "ap"
+      ]
+    },
+    {
+      "id": "encerramento_projeto",
+      "nome": "Termo de Encerramento de Projeto",
+      "etapas": [
+        "pe"
+      ],
+      "nome_no_contrato": "Termo de Finalização de Projeto"
+    },
+    {
+      "id": "ciencia_antecipacao",
+      "nome": "Termo de Ciência de Antecipação (provisório)",
+      "quando": "qualquer pedido do cliente fora do momento previsto",
+      "efeito": "retrabalho causado é cobrado"
+    }
   ],
-
   "espera": {
-    "cliente": { "limite_dias_uteis": 20, "apos_limite": "suspenso", "reativacao_ate_dias_uteis": 20, "cobranca": false },
-    "terceiros": { "tipos": ["complementar", "condominio", "prefeitura"], "limite": null, "registrar": ["prazo_informado", "tempo_real"] },
+    "cliente": {
+      "limite_dias_uteis": 20,
+      "apos_limite": "suspenso",
+      "reativacao_ate_dias_uteis": 20,
+      "cobranca": false
+    },
+    "terceiros": {
+      "tipos": [
+        "complementar",
+        "condominio",
+        "prefeitura"
+      ],
+      "limite": null,
+      "registrar": [
+        "prazo_informado",
+        "tempo_real"
+      ]
+    },
     "conta_no_prazo_da_trilha": false
   },
-
   "aditivos_pct": {
     "segunda_revisao_total_ep": 20,
-    "pequena": { "ap": [0, 2], "pe": [0, 5] },
-    "maior": { "ap": [0, 10], "pe": [0, 20] },
+    "pequena": {
+      "ap": [
+        0,
+        2
+      ],
+      "pe": [
+        0,
+        5
+      ]
+    },
+    "maior": {
+      "ap": [
+        0,
+        10
+      ],
+      "pe": [
+        0,
+        20
+      ]
+    },
     "grande": "negociação; pode cobrar a etapa inteira"
   },
-
-  "situacoes_entregavel": ["a_fazer", "em_desenvolvimento", "revisao_interna", "pronto", "entregue", "aguardando"],
-
+  "situacoes_entregavel": [
+    "a_fazer",
+    "em_desenvolvimento",
+    "revisao_interna",
+    "pronto",
+    "entregue",
+    "aguardando"
+  ],
   "pranchas": {
     "regra_id": "série + posição na lista; mover, inserir ou remover recalcula",
     "max_por_serie": 99,
     "series_nunca_repetem": true,
     "desenho_independente_da_prancha": true,
     "ampliacao_numero_fixo_por_ambiente": true,
-    "formatos": { "100-300": "A1 estendido, 1/50", "600": "caderno A4, 1 esquadria por folha", "800": "caderno A3", "1000": "A4", "ep_plantas": "A3, 1/100" },
+    "formatos": {
+      "100-300": "A1 estendido, 1/50",
+      "600": "caderno A4, 1 esquadria por folha",
+      "800": "caderno A3",
+      "1000": "A4",
+      "ep_plantas": "A3, 1/100"
+    },
     "revisao_inicial": "R00",
     "nome_arquivo": "NNN_TR_<PROJETO>_<DISCIPLINA>_<ETAPA> - <TÍTULO>.pdf",
-    "codigo_projeto": { "acentos": false, "padrao": "a definir" },
+    "codigo_projeto": {
+      "acentos": false,
+      "padrao": "a definir"
+    },
     "series": [
-      { "serie": "100", "nome": "Implantação, plantas e cobertura", "nasce_em": "ap", "varia_por": "pavimento",
-        "padrao": ["Implantação (+ informações gerais e quadro de áreas)", "Planta baixa por pavimento", "Planta de cobertura (sempre, última)"] },
-      { "serie": "200", "nome": "Cortes", "nasce_em": "ap", "varia_por": "corte", "minimo_desenhos": 4, "minimo_pranchas": 2,
-        "incluir_em_todas": ["quadro de esquadrias", "legenda de hachuras"] },
-      { "serie": "300", "nome": "Elevações", "nasce_em": "ap", "varia_por": "fachada", "minimo_desenhos": 4,
-        "incluir_em_todas": ["quadro de esquadrias", "legenda de hachuras"] },
-      { "serie": "400", "nome": "Mapeamentos", "nasce_em": "ap", "varia_por": "pavimento",
+      {
+        "serie": "100",
+        "nome": "Implantação, plantas e cobertura",
+        "nasce_em": "ap",
+        "varia_por": "pavimento",
         "padrao": [
-          { "nome": "Topografia e terraplenagem", "por_pavimento": false },
-          { "nome": "Piso e acabamento", "por_pavimento": true },
-          { "nome": "Hidrossanitário", "por_pavimento": true },
-          { "nome": "Elétrica", "por_pavimento": true },
-          { "nome": "Forro e iluminação", "por_pavimento": true },
-          { "nome": "Mapeamento de cobertura", "por_pavimento": false, "removivel": true, "posicao": "última" }
-        ] },
-      { "serie": "500", "nome": "Ampliações", "nasce_em": "pe", "varia_por": "ambiente do programa (áreas molhadas, escadas, piscina)",
-        "padrao": ["Cozinha", "Área de serviço / lavanderia", "Banheiro (um por banheiro)", "Área gourmet", "Escada", "Piscina"] },
-      { "serie": "600", "nome": "Esquadrias", "nasce_em": "pe", "ids_fixos": true, "removivel_manual": true,
-        "padrao": ["601 Alumínio e vidro", "602 Madeira", "603 Guarda-corpo e corrimão"] },
-      { "serie": "700", "nome": "Marmoraria", "nasce_em": "pe", "varia_por": "pavimento e bancada de área molhada",
-        "padrao": ["Planta de marmoraria (por pavimento)", "Detalhamento de bancada (uma por ambiente)"] },
-      { "serie": "800", "nome": "Detalhamentos construtivos", "nasce_em": "pe", "varia_por": "livre", "padrao": ["Detalhe (exemplo)"] },
-      { "serie": "900", "nome": "Marcenaria", "nasce_em": "pe", "condicional": "serviço de marcenaria contratado",
-        "padrao": ["Mapa de marcenaria (por pavimento)", "Uma prancha por marcenaria"] },
-      { "serie": "1000", "nome": "Documentos", "nasce_em": "pe", "situacao": "rascunho",
-        "padrao": ["1001 Terraplenagem", "1002 Revestimentos (especificação e quantitativo)", "1003 Louças e metais", "1004 Equipamentos", "1005 Tomadas e interruptores", "1006 Iluminação"] }
+          "Implantação (+ informações gerais e quadro de áreas)",
+          "Planta baixa por pavimento",
+          "Planta de cobertura (sempre, última)"
+        ]
+      },
+      {
+        "serie": "200",
+        "nome": "Cortes",
+        "nasce_em": "ap",
+        "varia_por": "corte",
+        "minimo_desenhos": 4,
+        "minimo_pranchas": 2,
+        "incluir_em_todas": [
+          "quadro de esquadrias",
+          "legenda de hachuras"
+        ]
+      },
+      {
+        "serie": "300",
+        "nome": "Elevações",
+        "nasce_em": "ap",
+        "varia_por": "fachada",
+        "minimo_desenhos": 4,
+        "incluir_em_todas": [
+          "quadro de esquadrias",
+          "legenda de hachuras"
+        ]
+      },
+      {
+        "serie": "400",
+        "nome": "Mapeamentos",
+        "nasce_em": "ap",
+        "varia_por": "pavimento",
+        "padrao": [
+          {
+            "nome": "Topografia e terraplenagem",
+            "por_pavimento": false
+          },
+          {
+            "nome": "Piso e acabamento",
+            "por_pavimento": true
+          },
+          {
+            "nome": "Hidrossanitário",
+            "por_pavimento": true
+          },
+          {
+            "nome": "Elétrica",
+            "por_pavimento": true
+          },
+          {
+            "nome": "Forro e iluminação",
+            "por_pavimento": true
+          },
+          {
+            "nome": "Mapeamento de cobertura",
+            "por_pavimento": false,
+            "removivel": true,
+            "posicao": "última"
+          }
+        ]
+      },
+      {
+        "serie": "500",
+        "nome": "Ampliações",
+        "nasce_em": "pe",
+        "varia_por": "ambiente do programa (áreas molhadas, escadas, piscina)",
+        "padrao": [
+          "Cozinha",
+          "Área de serviço / lavanderia",
+          "Banheiro (um por banheiro)",
+          "Área gourmet",
+          "Escada",
+          "Piscina"
+        ]
+      },
+      {
+        "serie": "600",
+        "nome": "Esquadrias",
+        "nasce_em": "pe",
+        "ids_fixos": true,
+        "removivel_manual": true,
+        "padrao": [
+          "601 Alumínio e vidro",
+          "602 Madeira",
+          "603 Guarda-corpo e corrimão"
+        ]
+      },
+      {
+        "serie": "700",
+        "nome": "Marmoraria",
+        "nasce_em": "pe",
+        "varia_por": "pavimento e bancada de área molhada",
+        "padrao": [
+          "Planta de marmoraria (por pavimento)",
+          "Detalhamento de bancada (uma por ambiente)"
+        ]
+      },
+      {
+        "serie": "800",
+        "nome": "Detalhamentos construtivos",
+        "nasce_em": "pe",
+        "varia_por": "livre",
+        "padrao": [
+          "Detalhe (exemplo)"
+        ]
+      },
+      {
+        "serie": "900",
+        "nome": "Marcenaria",
+        "nasce_em": "pe",
+        "condicional": "serviço de marcenaria contratado",
+        "padrao": [
+          "Mapa de marcenaria (por pavimento)",
+          "Uma prancha por marcenaria"
+        ]
+      },
+      {
+        "serie": "1000",
+        "nome": "Documentos",
+        "nasce_em": "pe",
+        "situacao": "rascunho",
+        "padrao": [
+          "1001 Terraplenagem",
+          "1002 Revestimentos (especificação e quantitativo)",
+          "1003 Louças e metais",
+          "1004 Equipamentos",
+          "1005 Tomadas e interruptores",
+          "1006 Iluminação"
+        ]
+      }
     ],
     "varias_edificacoes": "não cria série nova: planta geral + unidade-modelo ou uma prancha por unidade diferente; cobertura depois ou junto de cada unidade",
-    "sem_serie": ["Imagens renderizadas (EP: cerca de 15; atualizadas: sem compromisso)", "Guia de Projeto", "Modelo BIMx (atualizado no fim do EP, AP e PE)", "Apresentação do EP (PDF widescreen)", "Animação (bônus)"]
+    "sem_serie": [
+      "Imagens renderizadas (EP: cerca de 15; atualizadas: sem compromisso)",
+      "Guia de Projeto",
+      "Modelo BIMx (atualizado no fim do EP, AP e PE)",
+      "Apresentação do EP (PDF widescreen)",
+      "Animação (bônus)"
+    ]
   },
-
   "complementares": {
     "contratacao": "cliente",
-    "obrigatorios": ["estrutural"],
-    "padrao": ["estrutural", "hidrossanitário", "elétrico", "SPDA", "climatização"],
-    "raros": ["paisagismo", "luminotécnico"],
+    "obrigatorios": [
+      "estrutural"
+    ],
+    "padrao": [
+      "estrutural",
+      "hidrossanitário",
+      "elétrico",
+      "SPDA",
+      "climatização"
+    ],
+    "raros": [
+      "paisagismo",
+      "luminotécnico"
+    ],
     "interlocutor": "Luan",
     "rodadas_padrao": 2,
-    "formatos_troca": [".pln", ".ifc", ".dwg"]
+    "formatos_troca": [
+      ".pln",
+      ".ifc",
+      ".dwg"
+    ]
   },
-
   "papeis": {
     "luan": "decisão final, comercial, administrativo, concepção, estrutura, pontos, compatibilização, contato com cliente e complementares, revisão final",
     "elisa": "Diretora de Projetos, responsável técnica, emite a RRT, desenvolvimento",
     "colaborador": "desenhos e partes simples"
   },
-
   "pendencias": [
     "Nome definitivo do termo de ciência de antecipação e texto dos três termos",
     "Cobrança de alteração no PL antes da aprovação (leitura atual: não cobra)",
@@ -166,5 +501,275 @@
     "O que fica só com os sócios (permissões)",
     "Padrão do código do projeto",
     "Pasta padrão e template ArchiCAD (material pendente)"
-  ]
+  ],
+  "programa_necessidades": {
+    "fonte_referencia": "Programa de necessidades do projeto residencial de referência (proposta, ago/2025, 287 m²). Primeira referência; refinar com novos projetos.",
+    "acrescimos_pct": {
+      "circulacao": 10,
+      "paredes_e_estrutura": 10
+    },
+    "setores": [
+      "social",
+      "intimo",
+      "servico",
+      "lazer",
+      "externo"
+    ],
+    "tipos": [
+      {
+        "id": "hall",
+        "nome": "Hall / chapelaria",
+        "setor": "social",
+        "area_ref_m2": 4
+      },
+      {
+        "id": "cozinha",
+        "nome": "Cozinha / cozinha gourmet",
+        "setor": "social",
+        "area_ref_m2": 30,
+        "gera": [
+          "ampliacao",
+          "bancada"
+        ],
+        "area_molhada": true,
+        "campos": [
+          "ilha",
+          "agua_quente",
+          "exaustao",
+          "equipamentos",
+          "itens_bancada",
+          "integracao"
+        ]
+      },
+      {
+        "id": "jantar",
+        "nome": "Jantar",
+        "setor": "social",
+        "area_ref_m2": 20,
+        "campos": [
+          "lugares",
+          "aparador",
+          "cristaleira"
+        ]
+      },
+      {
+        "id": "estar",
+        "nome": "Estar",
+        "setor": "social",
+        "area_ref_m2": 30,
+        "campos": [
+          "assentos",
+          "tv_polegadas"
+        ]
+      },
+      {
+        "id": "cinema",
+        "nome": "Sala de TV / cinema",
+        "setor": "social",
+        "area_ref_m2": 10,
+        "campos": [
+          "assentos",
+          "tv_ou_projetor"
+        ]
+      },
+      {
+        "id": "escritorio",
+        "nome": "Escritório / suíte reversível",
+        "setor": "social",
+        "area_ref_m2": 14
+      },
+      {
+        "id": "lavabo",
+        "nome": "Lavabo",
+        "setor": "social",
+        "area_ref_m2": 2.5,
+        "gera": [
+          "ampliacao",
+          "bancada"
+        ],
+        "area_molhada": true,
+        "campos": [
+          "agua_quente",
+          "bancada_tipo",
+          "sanitario",
+          "ducha_higienica"
+        ]
+      },
+      {
+        "id": "suite_master",
+        "nome": "Suíte master (quarto)",
+        "setor": "intimo",
+        "area_ref_m2": 16,
+        "campos": [
+          "cama",
+          "tv_polegadas",
+          "closet",
+          "banheiro_vinculado"
+        ]
+      },
+      {
+        "id": "banho_master",
+        "nome": "Banho master",
+        "setor": "intimo",
+        "area_ref_m2": 5,
+        "gera": [
+          "ampliacao",
+          "bancada"
+        ],
+        "area_molhada": true,
+        "campos": [
+          "agua_quente",
+          "bancada_tipo",
+          "cubas",
+          "sanitario",
+          "ducha_higienica",
+          "bide",
+          "toalheiro_aquecido",
+          "chuveiros",
+          "tipo_chuveiro",
+          "banheira"
+        ]
+      },
+      {
+        "id": "spa",
+        "nome": "SPA / banheira",
+        "setor": "intimo",
+        "area_ref_m2": 6,
+        "gera": [
+          "ampliacao"
+        ],
+        "area_molhada": true
+      },
+      {
+        "id": "closet",
+        "nome": "Closet",
+        "setor": "intimo",
+        "area_ref_m2": 8
+      },
+      {
+        "id": "quarto",
+        "nome": "Quarto",
+        "setor": "intimo",
+        "area_ref_m2": 14,
+        "campos": [
+          "cama",
+          "tv_polegadas"
+        ]
+      },
+      {
+        "id": "banho",
+        "nome": "Banheiro",
+        "setor": "intimo",
+        "area_ref_m2": 3.5,
+        "gera": [
+          "ampliacao",
+          "bancada"
+        ],
+        "area_molhada": true,
+        "campos": [
+          "agua_quente",
+          "bancada_tipo",
+          "cubas",
+          "sanitario",
+          "ducha_higienica",
+          "bide",
+          "toalheiro_aquecido",
+          "chuveiros",
+          "tipo_chuveiro"
+        ]
+      },
+      {
+        "id": "garagem",
+        "nome": "Garagem (por vaga)",
+        "setor": "servico",
+        "area_ref_m2": 18,
+        "obs": "na referência, 2 vagas somam 42 m² (21 m²/vaga): conferir",
+        "campos": [
+          "vagas_por_tipo",
+          "coberta",
+          "tomada_carro_eletrico",
+          "armario"
+        ]
+      },
+      {
+        "id": "lavanderia",
+        "nome": "Lavanderia",
+        "setor": "servico",
+        "area_ref_m2": 8,
+        "gera": [
+          "ampliacao",
+          "bancada"
+        ],
+        "area_molhada": true,
+        "campos": [
+          "tanque",
+          "maquina",
+          "passar_roupa"
+        ]
+      },
+      {
+        "id": "deposito",
+        "nome": "Depósito",
+        "setor": "servico",
+        "area_ref_m2": 6
+      },
+      {
+        "id": "gourmet",
+        "nome": "Espaço gourmet",
+        "setor": "lazer",
+        "area_ref_m2": null,
+        "gera": [
+          "ampliacao",
+          "bancada"
+        ],
+        "area_molhada": true,
+        "campos": [
+          "ilha",
+          "agua_quente",
+          "mesa_lugares",
+          "sofas_lugares",
+          "tv_polegadas",
+          "equipamentos_gourmet",
+          "itens_bancada"
+        ]
+      },
+      {
+        "id": "piscina",
+        "nome": "Piscina",
+        "setor": "lazer",
+        "area_ref_m2": null,
+        "gera": [
+          "ampliacao"
+        ],
+        "campos": [
+          "modelo",
+          "tamanho",
+          "aquecida",
+          "elementos"
+        ]
+      },
+      {
+        "id": "escada",
+        "nome": "Escada",
+        "setor": "servico",
+        "area_ref_m2": null,
+        "gera": [
+          "ampliacao"
+        ],
+        "campos": [
+          "tipo",
+          "material"
+        ]
+      },
+      {
+        "id": "quintal",
+        "nome": "Quintal / área externa",
+        "setor": "externo",
+        "area_ref_m2": null,
+        "gera": [
+          "ampliacao"
+        ]
+      }
+    ]
+  }
 }
