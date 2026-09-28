@@ -157,3 +157,11 @@ Situações a resolver:
 - Aba Tempo: ao escolher projeto e etapa, lista os itens do Plano; continua aceitando tarefa livre.
 - Tarefas do projeto moram na agenda da pessoa (Tarefa, Demanda, Prioridade, Compromisso → Agenda Google), com
   selo do projeto; trocar responsável move a tarefa.
+
+## 10. Excluir, suspender, arquivar e áreas no novo projeto (recebido, não processado)
+
+Pedido do Luan:
+- **Excluir** projeto, colaborador e demais cadastros **somente pela seção Cadastros** (sai o "Apagar" da Ficha do Gestor).
+- Na **página do projeto**: botões **Suspender** e **Arquivar**.
+- **Alerta de confirmação** para todas essas ações (excluir, suspender, arquivar).
+- Ao **criar um projeto**, permitir **editar a área dos ambientes** no programa de necessidades (passo 3 do assistente).
