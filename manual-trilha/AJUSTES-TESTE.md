@@ -173,3 +173,29 @@ Pedido do Luan (por voz):
 - Ao clicar numa etapa, os projetos dessa etapa **sobem para o início da tela**; os demais continuam abaixo.
 - Objetivo: entrar direto, por exemplo, num Projeto Executivo sem rolar por todos os outros projetos.
 - Mesmo jeito dos botões que já existem para mudar a ordem da lista.
+- Complemento: cada botão de etapa mostra a **quantidade de projetos** naquela etapa (ex.: "Executivo · 3").
+
+## 12. Indicadores da tela inicial do Gestor (recebido, não processado)
+
+- Os 4 indicadores do topo (em andamento, suspensos e os outros dois) hoje são 4 quadrinhos separados: o Luan não gostou.
+- Juntar os 4 num **único quadro branco**, com os textos soltos dentro (como já foi feito em outros lugares do app).
+- Ocupar **menos espaço** na tela (faixa mais baixa e compacta).
+
+## 13. Termos como botão que gera PDF (recebido, não processado)
+
+- Termo de Encerramento de Etapa e Termo de Encerramento de Projeto **não** devem ser item de checklist da etapa.
+- Devem aparecer **entre as etapas / no fim da etapa**, como **botão**.
+- Ao clicar, o app gera o **PDF pronto** com os dados do cliente e do projeto, para enviar (mesmo jeito dos recibos
+  do Financeiro).
+- Vale também para o Termo de Ciência (antecipação).
+- Depende do texto dos termos (material pendente).
+
+## 14. Reuniões do projeto (pergunta do Luan — decisão pendente)
+
+Pergunta: onde contar as reuniões (inclusive as do briefing), que também são custo do projeto?
+Situação hoje: não existe esse lugar no teste. Estava previsto na Entrega 2 como **Registros** (APP-PROPOSTA §2 e §7),
+ainda não construído. O "Registro" que aparece no projeto é só o histórico automático. A aba Tempo também
+não tem a etapa Briefing, então reunião de briefing não tem onde ser lançada corretamente.
+Recomendação feita: registrar a reunião **uma vez só, no projeto** (botão "+ Reunião": data, etapa, participantes,
+duração, pauta e decisões), e o app lança a duração **automaticamente no Tempo** de cada participante. Acrescentar
+a etapa **Briefing** no Tempo. Aguardando o ok do Luan.
