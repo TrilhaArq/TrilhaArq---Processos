@@ -24,3 +24,13 @@ para marcar e avançar.
     topográfico, documentos, abrir pasta e arquivo ArchiCAD, análise de legislação… Todas as funções mapeadas
     (entrada, etapas, fases, complementares, termos, encerramento) devem aparecer como checklist do projeto.
 1.5 Se não souber organizar alguma lista, perguntar ao Luan; se souber, montar direto.
+
+## 2. Nova etapa inicial e nomes (28/09)
+
+2.1 **Etapa inicial própria** (antes do Estudo Preliminar), com as tarefas-base: topográfico, documentos, pasta
+    padrão, arquivo ArchiCAD, dados do cliente e do terreno, análise de legislação e **modelar o terreno**.
+    Terreno modelado = arquivo-base pronto para iniciar o projeto.
+    Abas do quadro: [etapa inicial] · Estudo Preliminar · Anteprojeto · Projeto Legal · Projeto Executivo.
+    Nome sugerido pelo Claude: **Abertura** (alternativas: Base do projeto, Preparação). Aguardando escolha.
+2.2 **Renomear a aba "Pranchas"**: é onde está tudo o que o projeto produz e onde se vê em que ponto ele está.
+    Nome sugerido pelo Claude: **Plano de Projeto** (alternativas: Andamento, Produção). Aguardando escolha.
