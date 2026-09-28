@@ -11,8 +11,14 @@ Documento-mestre de como a **Trilha Arquitetura Brasileira** trabalha. Tem dois 
 
 | Arquivo | Conteúdo | Situação |
 |---|---|---|
-| `MANUAL.md` | O manual em si, por capítulos | em construção |
+| `MANUAL.md` | Esqueleto inicial do manual (substituído por `pdf/fonte/manual.html`) | histórico |
 | `LEVANTAMENTO.md` | Registro do levantamento: material recebido, decisões tomadas, dúvidas em aberto | em andamento |
+| `MAPEAMENTO.md` | Mapeamento completo do processo, com fontes (texto-base dos PDFs) | v3 |
+| `processo-trilha.json` | Dados estruturados do processo para o app | v3 |
+| `pdf/Mapeamento-Processo-Trilha.pdf` | Material 1: mapeamento para os sócios | v1 |
+| `pdf/Manual-Processo-Trilha.pdf` | Material 2: manual para a equipe (sem administrativo nem contrato) | v1 |
+| `pdf/Caminho-do-Projeto-Trilha.pdf` | Material 3: guia visual para o cliente | v1 |
+| `pdf/fonte/` | HTML e script para regenerar os PDFs (`node render.js`, com Playwright) | — |
 
 ## Como evolui
 
