@@ -81,8 +81,14 @@ Vale para os cartões da página principal do Gestor e para a Visão geral de ca
 6.4 **Barra vertical de progresso do projeto** na lateral esquerda do cartão, subindo conforme o projeto é
     concluído, com a porcentagem escrita dentro.
 
-Pontos a confirmar na hora de processar:
-- a data e a barra de prazo são da **etapa atual** (como o prazo hoje) ou do **projeto inteiro**?
-- nas esperas (prazo pausado), a data final vai sendo empurrada para frente — confirmar;
-- a % do projeto vem dos itens concluídos do Plano de Projeto (todas as etapas) — com peso igual por item ou
-  por etapa (ex.: pesos do contrato EP 50 / AP 25 / PE 25)?
+**Decidido (28/09):**
+- Data e barra de prazo = **etapa atual**. Data em formato de data (ex.: 02/10/2026).
+- Em espera por alguém de fora da Trilha (cliente, engenheiro, condomínio, prefeitura), o prazo pausa: a data
+  final vai sendo empurrada e a barra fica parada até o prazo voltar a correr.
+- % do projeto = itens concluídos no Plano de Projeto, do projeto todo (leitura: cada item com o mesmo peso).
+
+6.5 **Na Visão geral do projeto aberto:**
+    - a barra de conclusão total fica **horizontal**, entre os botões (Visão geral, Plano de Projeto, Tarefas…)
+      e os quadros das etapas (Briefing, Estudo Preliminar, Anteprojeto…), com a mesma largura dos quadros;
+    - na linha de números (prazo da etapa, pranchas, horas no projeto), incluir a **data final**;
+    - logo abaixo desses quadros, a **barra de prazo** que muda de cor (verde / amarela / vermelha).
