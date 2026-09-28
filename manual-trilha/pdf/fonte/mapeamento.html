@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Mapeamento do Processo de Projeto — Trilha</title>
+<link rel="stylesheet" href="fonts/local.css">
+<style>
+  :root{
+    --bg:#fff; --surface-muted:oklch(96% 0.006 145); --border:oklch(88% 0.008 145);
+    --ink:oklch(20% 0.01 145); --body:oklch(36% 0.012 145); --muted:oklch(55% 0.012 145);
+    --accent:#88AC67; --accent-deep:#5f8443; --accent-tint:oklch(95% 0.03 145);
+    --danger:#b3593f; --danger-tint:oklch(95% 0.03 40); --warn:#a57a22; --warn-tint:oklch(96% 0.04 85);
+    --info:#4f7390; --info-tint:oklch(95% 0.02 240);
+  }
+  @page{ size:A4; margin:18mm 17mm 20mm 17mm; }
+  *{ box-sizing:border-box; }
+  html{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  body{ margin:0; font-family:"Work Sans",sans-serif; font-size:9.6pt; line-height:1.5; color:var(--body); background:var(--bg); }
+  h1,h2,h3,h4{ font-family:"Comfortaa",sans-serif; color:var(--ink); font-weight:700; line-height:1.25; }
+  h2{ font-size:17pt; margin:0 0 4mm; padding-top:1mm; }
+  h2 .num{ color:var(--accent); margin-right:3mm; }
+  h3{ font-size:11.5pt; margin:6mm 0 2mm; }
+  h4{ font-size:9.8pt; margin:4mm 0 1.5mm; }
+  p{ margin:0 0 2.2mm; }
+  h2,h3,h4{ break-after:avoid; }
+  .keep{ break-inside:avoid; }
+  ul,ol{ margin:0 0 2.5mm; padding-left:5mm; }
+  li{ margin:0 0 .9mm; }
+  strong{ color:var(--ink); font-weight:600; }
+  code{ font-family:ui-monospace,Consolas,monospace; font-size:8.6pt; background:var(--surface-muted); padding:0 1mm; border-radius:2px; }
+  .src{ color:var(--muted); font-size:7.8pt; white-space:nowrap; }
+  section.chap{ break-before:page; }
+  .lead{ font-size:10.6pt; color:var(--ink); border-left:3px solid var(--accent); padding:1mm 0 1mm 4mm; margin:0 0 5mm; }
+  table{ width:100%; border-collapse:collapse; margin:1mm 0 4mm; font-size:8.7pt; break-inside:auto; }
+  th{ font-family:"Comfortaa",sans-serif; font-weight:700; color:var(--ink); text-align:left; background:var(--accent-tint); padding:1.8mm 2mm; border-bottom:1px solid var(--border); font-size:8.3pt; }
+  td{ padding:1.6mm 2mm; border-bottom:1px solid var(--border); vertical-align:top; }
+  tr{ break-inside:avoid; }
+  .box{ border:1px solid var(--border); border-radius:10px; padding:3mm 4mm; margin:2mm 0 4mm; break-inside:avoid; }
+  .box h4{ margin-top:0; }
+  .box.falha{ border-color:oklch(80% 0.06 40); background:var(--danger-tint); }
+  .box.sug{ border-color:oklch(80% 0.06 145); background:var(--accent-tint); }
+  .box.falta{ border-color:oklch(82% 0.06 85); background:var(--warn-tint); }
+  .box.info{ border-color:oklch(82% 0.04 240); background:var(--info-tint); }
+  .tag{ display:inline-block; font-family:"Comfortaa",sans-serif; font-weight:700; font-size:7pt; letter-spacing:.3px; text-transform:uppercase; padding:.4mm 2mm; border-radius:99px; vertical-align:1px; margin-right:1.5mm; }
+  .t-falha{ background:var(--danger); color:#fff; } .t-sug{ background:var(--accent-deep); color:#fff; }
+  .t-falta{ background:var(--warn); color:#fff; } .t-ok{ background:var(--accent); color:#fff; } .t-info{ background:var(--info); color:#fff; }
+  .sev{ font-family:"Comfortaa",sans-serif; font-weight:700; font-size:7.4pt; padding:.3mm 1.8mm; border-radius:99px; white-space:nowrap; }
+  .alta{ background:var(--danger); color:#fff; } .media{ background:var(--warn); color:#fff; } .baixa{ background:oklch(70% 0.02 145); color:#fff; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:4mm; }
+  .grid3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:3mm; }
+  .card{ border:1px solid var(--border); border-radius:10px; padding:3mm; break-inside:avoid; }
+  .card h4{ margin:0 0 1mm; }
+  .kpi{ font-family:"Comfortaa",sans-serif; font-size:17pt; color:var(--accent-deep); font-weight:700; line-height:1.1; }
+  .small{ font-size:8.3pt; }
+  .muted{ color:var(--muted); }
+
+  /* capa */
+  .cover{ height:257mm; display:flex; flex-direction:column; justify-content:space-between; }
+  .cover .logo{ width:52mm; }
+  .cover .band{ border-top:3px solid var(--accent); padding-top:8mm; }
+  .cover h1{ font-size:30pt; margin:0 0 4mm; letter-spacing:-.3px; }
+  .cover .sub{ font-size:12pt; color:var(--body); max-width:140mm; }
+  .cover .meta{ font-size:9pt; color:var(--muted); line-height:1.7; }
+  .cover .meta b{ color:var(--ink); font-weight:600; }
+
+  /* sumário */
+  .toc{ columns:2; column-gap:10mm; font-size:9.6pt; }
+  .toc div{ padding:1.2mm 0; border-bottom:1px dotted var(--border); break-inside:avoid; }
+  .toc span{ color:var(--accent-deep); font-family:"Comfortaa"; font-weight:700; margin-right:2mm; }
+
+  /* fluxo */
+  .flow{ display:flex; align-items:stretch; gap:0; margin:3mm 0 2mm; }
+  .flow .st{ flex:1; border:1px solid var(--border); border-radius:8px; padding:2mm; text-align:center; background:#fff; }
+  .flow .st b{ display:block; font-family:"Comfortaa"; color:var(--ink); font-size:8.6pt; }
+  .flow .st small{ color:var(--muted); font-size:7.2pt; line-height:1.3; display:block; margin-top:.8mm; }
+  .flow .st.pre{ background:var(--surface-muted); }
+  .flow .st.main{ border-color:var(--accent); background:var(--accent-tint); }
+  .flow .ar{ width:6mm; display:flex; align-items:center; justify-content:center; color:var(--accent-deep); font-size:12pt; }
+  .gate{ display:inline-block; font-size:7pt; color:var(--accent-deep); font-family:"Comfortaa"; font-weight:700; }
+  .parallel{ margin-left:46%; width:34%; border:1px dashed var(--accent); border-radius:8px; padding:1.6mm 2mm; text-align:center; font-size:8pt; background:#fff; }
+  .parallel b{ font-family:"Comfortaa"; color:var(--ink); }
+</style>
+</head>
+<body>
+
+<!-- CAPA -->
+<div class="cover">
+  <img class="logo" src="logo.png" alt="Trilha Arquitetura Brasileira">
+  <div class="band">
+    <h1>Mapeamento do Processo de Projeto</h1>
+    <p class="sub">O processo da Trilha organizado de ponta a ponta: como funciona hoje, o que está no contrato, onde há falhas, o que vale melhorar e o que ainda falta definir.</p>
+  </div>
+  <div class="meta">
+    <b>Documento interno — uso dos sócios</b><br>
+    Versão 1 · 28 de setembro de 2026<br>
+    Base: levantamento por voz (versão 3), briefing, proposta, contrato e padrão de exportação de um projeto executivo<br>
+    Modelo mapeado em detalhe: projeto do zero (residencial)
+  </div>
+</div>
+
+<!-- SUMÁRIO -->
+<section class="chap">
+  <h2>Sumário</h2>
+  <div class="toc">
+    <div><span>01</span>Como ler este documento</div>
+    <div><span>02</span>Visão geral e situação do levantamento</div>
+    <div><span>03</span>O caminho do projeto</div>
+    <div><span>04</span>Entrada: captação, briefing e contratação</div>
+    <div><span>05</span>Etapas em detalhe</div>
+    <div><span>06</span>Regras do processo: portões, prazos e esperas</div>
+    <div><span>07</span>Entregáveis, pranchas e padrões</div>
+    <div><span>08</span>Complementares e aprovações</div>
+    <div><span>09</span>Pessoas e papéis</div>
+    <div><span>10</span>Variações por tipo de projeto</div>
+    <div><span>11</span>Encerramento e passagem para obra</div>
+    <div><span>12</span>Dinheiro e contrato</div>
+    <div><span>13</span>Dores atuais</div>
+    <div><span>14</span>Análise: falhas e pontos a revisar</div>
+    <div><span>15</span>Sugestões de melhoria</div>
+    <div><span>16</span>Ajustes a fazer no contrato e na proposta</div>
+    <div><span>17</span>Dados faltantes: perguntas para responder</div>
+    <div><span>18</span>Temas que talvez faltem abordar</div>
+    <div><span>19</span>O que vem depois</div>
+  </div>
+
+  <h2 style="margin-top:12mm"><span class="num">01</span>Como ler este documento</h2>
+  <p class="lead">Este é o retrato organizado de tudo o que foi levantado até aqui. Serve para você ler inteiro, conferir e apontar o que falta ou está errado.</p>
+  <h4>Fontes citadas ao lado das informações</h4>
+  <table>
+    <tr><th style="width:18mm">Marca</th><th>Fonte</th></tr>
+    <tr><td><b>[V]</b></td><td>Levantamento por voz com o Luan (versão 3, 25 a 28/09/2026)</td></tr>
+    <tr><td><b>[C]</b></td><td>Contrato de projeto residencial e Anexo 01 (Plano de Projeto), com o número da cláusula</td></tr>
+    <tr><td><b>[P]</b></td><td>Proposta de serviço de projeto residencial</td></tr>
+    <tr><td><b>[B]</b></td><td>Formulário de briefing inicial residencial</td></tr>
+    <tr><td><b>[X]</b></td><td>Lista de PDFs exportados de um projeto executivo</td></tr>
+  </table>
+  <h4>Selos usados</h4>
+  <p><span class="tag t-falha">Falha</span> problema real no processo, no contrato ou na prática, com o motivo explicado.</p>
+  <p><span class="tag t-sug">Sugestão</span> proposta do Claude, ainda não validada por você.</p>
+  <p><span class="tag t-falta">Falta dado</span> informação que ainda precisa vir de você.</p>
+  <p><span class="tag t-ok">Resolvido</span> dúvida que o contrato ou a proposta já responde.</p>
+  <div class="box info"><h4>Regra de divergência</h4>Quando o que foi dito por voz diverge do contrato, <b>vale o contrato</b> até que ele seja revisado. As mudanças que dependem do contrato estão reunidas no capítulo 16. Os documentos de referência são de um cliente real; aqui aparecem só as regras, sem dados pessoais.</div>
+</section>
+
+<!-- 02 -->
+<section class="chap">
+  <h2><span class="num">02</span>Visão geral e situação do levantamento</h2>
+  <p class="lead">O processo do projeto do zero residencial está mapeado de ponta a ponta. Faltam os padrões de arquivo e as variações de reforma e interiores, que foram adiadas.</p>
+
+  <h3>A Trilha</h3>
+  <ul>
+    <li>Escritório em Juiz de Fora (MG), fundado em novembro de 2020. <span class="src">[P]</span></li>
+    <li>Valores: honestidade, respeito, qualidade, sustentabilidade, dedicação, pé no chão, "menos é mais". <span class="src">[P]</span></li>
+    <li>Linguagem essencialista, contemporânea e brasileira, com estrutura frequentemente aparente. <span class="src">[V][P]</span></li>
+    <li>Projeto 100% em BIM (ArchiCAD), renders no Lumion; o cliente recebe PDF e link BIMx. <span class="src">[V][C 7.3]</span></li>
+    <li>Atuação: arquitetura, interiores, urbanismo, hospitalar, fiscalização e execução de obra. <span class="src">[P]</span></li>
+  </ul>
+
+  <h3>Os quatro materiais que este trabalho vai gerar</h3>
+  <div class="grid2">
+    <div class="card"><h4>1 · Mapeamento do processo</h4><span class="small">Este documento. Para os sócios. Inclui administrativo, contrato, dinheiro, falhas, melhorias e pendências.</span></div>
+    <div class="card"><h4>2 · Manual do processo</h4><span class="small">Para funcionários e estagiários. Formal e direto, sem administrativo nem contrato: só como as coisas acontecem.</span></div>
+    <div class="card"><h4>3 · Caminho do Projeto</h4><span class="small">Guia visual para o cliente, com as etapas ligadas por setas, para reduzir a ansiedade. Não confundir com o Guia de Projeto.</span></div>
+    <div class="card"><h4>4 · App Gestor de Projetos</h4><span class="small">Objetivo principal. Módulo do app Gestão Trilha, construído sobre este mapeamento.</span></div>
+  </div>
+
+  <h3>Situação do levantamento</h3>
+  <table>
+    <tr><th>Bloco</th><th>Situação</th><th>O que falta</th></tr>
+    <tr><td>Visão geral</td><td><span class="sev baixa">coberto</span></td><td>—</td></tr>
+    <tr><td>Entrada do projeto</td><td><span class="sev baixa">coberto</span></td><td>Separar captação, briefing e contratação</td></tr>
+    <tr><td>Fluxo de etapas</td><td><span class="sev baixa">coberto</span></td><td>Limite de rodadas do Anteprojeto</td></tr>
+    <tr><td>Entregáveis</td><td><span class="sev baixa">coberto</span></td><td>Checklists por desenho</td></tr>
+    <tr><td>Padrões</td><td><span class="sev media">parcial</span></td><td>Pasta padrão, template ArchiCAD, código do projeto</td></tr>
+    <tr><td>Complementares</td><td><span class="sev baixa">coberto</span></td><td>—</td></tr>
+    <tr><td>Pessoas e papéis</td><td><span class="sev media">parcial</span></td><td>O que fica só com os sócios (adiado)</td></tr>
+    <tr><td>Variações por tipo</td><td><span class="sev alta">adiado</span></td><td>Reforma e interiores/marcenaria em detalhe</td></tr>
+    <tr><td>Dores atuais</td><td><span class="sev baixa">coberto</span></td><td>—</td></tr>
+  </table>
+</section>
+
+<!-- 03 -->
+<section class="chap">
+  <h2><span class="num">03</span>O caminho do projeto</h2>
+  <p class="lead">Três fases antes do projeto (captação, briefing, contratação), quatro etapas contratadas e um encerramento. O Projeto Legal corre em paralelo ao Anteprojeto.</p>
+
+  <div class="flow">
+    <div class="st pre"><b>Captação</b><small>contato, visita, proposta, decisão</small></div><div class="ar">›</div>
+    <div class="st pre"><b>Briefing</b><small>formulário, programa de necessidades</small></div><div class="ar">›</div>
+    <div class="st pre"><b>Contratação</b><small>contrato, 1ª parcela, topográfico → marco zero</small></div>
+  </div>
+  <div class="flow">
+    <div class="st main"><b>Estudo Preliminar</b><small>até 40 d.u.</small><span class="gate">■ termo de etapa</span></div><div class="ar">›</div>
+    <div class="st main"><b>Anteprojeto</b><small>3 fases · 20–30 + 15 + 10 + 15 d.u.</small><span class="gate">■ termo de etapa</span></div><div class="ar">›</div>
+    <div class="st main"><b>Projeto Executivo</b><small>2 fases · 40–60 d.u.</small><span class="gate">■ termo de projeto</span></div><div class="ar">›</div>
+    <div class="st pre"><b>Encerramento</b><small>entrega, Guia de Projeto, obra</small></div>
+  </div>
+  <div class="parallel"><b>Projeto Legal</b> — em paralelo · 20 d.u. até o protocolo · fecha com a aprovação</div>
+  <p class="small muted" style="margin-top:2mm">d.u. = dias úteis, contados só depois dos pré-requisitos e sem os períodos de espera [C 3.1, 3.2]. ■ = portão com termo assinado pelo cliente.</p>
+
+  <h3>Regras de encadeamento</h3>
+  <table>
+    <tr><th style="width:38mm">Para…</th><th>É preciso</th><th style="width:22mm">Fonte</th></tr>
+    <tr><td>Começar o Estudo Preliminar</td><td>Marco zero: contrato assinado + 1ª parcela paga + topográfico</td><td class="src">[C 3.3.1]</td></tr>
+    <tr><td>Começar o Anteprojeto</td><td>Termo de Encerramento do Estudo Preliminar assinado</td><td class="src">[V][C 2.2.1]</td></tr>
+    <tr><td>Começar o Projeto Legal</td><td>Documentos do cliente + fim da fase 1 do Anteprojeto + lançamento estrutural pelo engenheiro. Exceção só com Termo de Ciência de Antecipação</td><td class="src">[C 3.3.3][V]</td></tr>
+    <tr><td>Encerrar o Anteprojeto</td><td>Estrutural contratado e desenvolvido; sem estrutural contratado, o projeto é suspenso</td><td class="src">[V][C 2.2.4]</td></tr>
+    <tr><td>Começar o Executivo</td><td>Termo do Anteprojeto + Projeto Legal aprovado. Sem exceção</td><td class="src">[V][C 2.4.1]</td></tr>
+    <tr><td>Reforma e interiores</td><td>Estudo Preliminar encerrado → Executivo</td><td class="src">[V]</td></tr>
+  </table>
+
+  <h3>Três modelos de processo</h3>
+  <table>
+    <tr><th>Modelo</th><th>Exemplos</th><th>Etapas</th><th>Situação</th></tr>
+    <tr><td><b>Do zero</b></td><td>residência, restaurante, pousada, chalé, institucional</td><td>EP → AP → PL (paralelo) → PE</td><td>mapeado</td></tr>
+    <tr><td><b>Reforma</b></td><td>apartamento, residência, restaurante</td><td>EP → PE (PL e complementares se necessário)</td><td>só o macro</td></tr>
+    <tr><td><b>Interiores e marcenaria</b></td><td>—</td><td>EP → PE</td><td>só o macro</td></tr>
+  </table>
+</section>
+
+<!-- 04 -->
+<section class="chap">
+  <h2><span class="num">04</span>Entrada: captação, briefing e contratação</h2>
+  <p class="lead">Do primeiro contato ao contrato leva cerca de um mês. O prazo do projeto só começa no marco zero.</p>
+
+  <table>
+    <tr><th style="width:6mm">#</th><th>Passo</th><th>Como acontece</th><th style="width:16mm">Fonte</th></tr>
+    <tr><td>1</td><td>Primeiro contato</td><td>Atendimento, entendimento da demanda</td><td class="src">[V]</td></tr>
+    <tr><td>2</td><td>Visita ao terreno ou imóvel</td><td>Gera levantamento fotográfico. Checklist de análise do terreno é evolução desejada</td><td class="src">[V]</td></tr>
+    <tr><td>3</td><td>Briefing inicial</td><td>Formulário preenchido pelo cliente, antes da proposta, "para desenvolver um orçamento"</td><td class="src">[V][B]</td></tr>
+    <tr><td>4</td><td>Proposta</td><td>Montada pelo Luan: apresentação da Trilha, demanda, programa de necessidades com áreas, processo, Plano de Projeto, custo estimado da obra (padrão × m²), investimento, serviços extras. Válida por 30 dias</td><td class="src">[V][P]</td></tr>
+    <tr><td>5</td><td>Reunião de proposta</td><td>A proposta é apresentada, não enviada</td><td class="src">[V]</td></tr>
+    <tr><td>6</td><td>Decisão do cliente</td><td>Sem registro formal de propostas perdidas (ficam no Drive)</td><td class="src">[V]</td></tr>
+    <tr><td>7</td><td>Documentos</td><td>Topográfico planialtimétrico, documentos pessoais, registro do imóvel, IPTU</td><td class="src">[V]</td></tr>
+    <tr><td>8</td><td>Contrato</td><td>O escopo repete a demanda e o programa; o Anexo 01 é o Plano de Projeto</td><td class="src">[C]</td></tr>
+    <tr><td>9</td><td>Abertura interna</td><td>Pasta padrão duplicada; arquivo ArchiCAD padrão com dados do cliente, do terreno e análise de legislação</td><td class="src">[V]</td></tr>
+  </table>
+
+  <h3>O formulário de briefing</h3>
+  <p class="small">Identificação · uso · metragem e "espacialidade" · terreno e topografia · pavimentos · moradores e pets · acessibilidade · expectativas sobre a casa e sobre o serviço · programa por setor (social, íntimo, serviço, garagem, lazer) · detalhes por ambiente (cozinha, jantar, estar, dormitórios, banhos, lavanderia, gourmet, piscina) · itens soltos · prazo e sistema construtivo · estética e materiais · relação com exterior, paisagismo e rua · sistemas (solar, reúso, ar, aquecimento, automação) · quem executa a obra · investimento e padrão por m² com referência ao CUB. <span class="src">[B]</span></p>
+
+  <h3>Marco zero</h3>
+  <div class="grid2">
+    <div class="card"><h4>No contrato (vale hoje)</h4>Contrato assinado · 1ª parcela paga · topográfico. <span class="src">[C 3.3.1]</span><br><span class="small muted">Documentos pessoais, registro e IPTU são pré-requisito do Projeto Legal [C 3.3.3].</span></div>
+    <div class="card"><h4>Decisão da Trilha</h4>Contrato · documentos · topográfico · pagamento. Sem limite de tempo antes do marco zero: o projeto simplesmente não começa. <span class="src">[V]</span></div>
+  </div>
+
+  <h3>Captação, briefing e contratação</h3>
+  <p>Hoje a palavra "briefing" cobre três coisas diferentes. O contrato mostra que o briefing acontece <b>antes</b> dele: o projeto segue "as especificações preliminares documentadas através dos questionários de briefing" e as etapas contratadas começam no Estudo Preliminar. <span class="src">[C 1.2, cl. 2]</span></p>
+  <table>
+    <tr><th>Fase</th><th>Natureza</th><th>Vai de… até…</th></tr>
+    <tr><td><b>Captação</b></td><td>comercial</td><td>primeiro contato → decisão do cliente (visita, proposta, reunião)</td></tr>
+    <tr><td><b>Briefing</b></td><td>coleta de informações</td><td>formulário, reuniões e programa de necessidades</td></tr>
+    <tr><td><b>Contratação</b></td><td>administrativa</td><td>contrato, pagamento, topográfico, documentos → marco zero</td></tr>
+  </table>
+</section>
+
+<!-- 05 -->
+<section class="chap">
+  <h2><span class="num">05</span>Etapas em detalhe</h2>
+  <p class="lead">Cada etapa tem pré-requisito, prazo em dias úteis e um portão de saída. O conteúdo abaixo junta a voz e o contrato.</p>
+
+  <h3>Estudo Preliminar (EP)</h3>
+  <ul>
+    <li><b>Conteúdo:</b> estudos (terreno, insolação, ventilação, chuva, visuais, legislação, demanda) → concepção → decisão interna → modelo 3D → render → apresentação. Já mostra estrutura preliminar, ventilação, visuais e terraplenagem. <span class="src">[V][P]</span></li>
+    <li><b>Prazo:</b> até 40 dias úteis para a 1ª apresentação; 15 dias úteis por revisão pontual; 30 a 40 dias úteis para revisão total. <span class="src">[C 3.3.1]</span></li>
+    <li><b>Rodadas:</b> 2 rodadas de ajuste, cada uma com uma lista única de pedidos; pedidos fora da lista esperam a próxima; rodada excedente cobrada. <span class="src">[V]</span> Uma revisão total inclusa; a 2ª custa 20% do contrato. <span class="src">[C 2.1.5, 9.1]</span></li>
+    <li><b>Apresentação:</b> capa → imagem impactante → análise do terreno → estudos de concepção → imagens → plantas e cortes → imagens → esquemas técnicos → imagens finais. O cliente "descobre" o projeto; as imagens vão de fora para dentro. <span class="src">[V]</span></li>
+    <li><b>Entrega:</b> apresentação em PDF widescreen, cerca de 15 renders, plantas cotadas (A3, 1/100), link BIMx; animação como bônus. Os desenhos levam o código "AP" (Apresentação). <span class="src">[V]</span></li>
+    <li><b>Portão:</b> apresentação → aceite → Termo de Encerramento de Etapa. Revisar depois do termo = aditivo. <span class="src">[C 2.1.7]</span></li>
+  </ul>
+
+  <h3>Anteprojeto (AP): "apertar os parafusos"</h3>
+  <table>
+    <tr><th style="width:30mm">Fase</th><th>Conteúdo</th><th style="width:30mm">Prazo</th></tr>
+    <tr><td><b>1 · Revisão e lançamentos</b></td><td>Medidas, áreas, cobertura, calhas, tubos de queda, contrapiso, forro detalhado; lançamento estrutural e de pontos (elétrica, hidráulica, rede, climatização, forro e iluminação); primeiras pranchas 100/200/300 ao cliente; envio aos complementares (DWG e BIM)</td><td>20–30 d.u.</td></tr>
+    <tr><td><b>2 · Compatibilização</b></td><td>Ciclos com o calculista e as engenharias (em geral 2 rodadas por disciplina). Termina com o aceite do Luan, que libera os executivos das engenharias</td><td>15 d.u. estrutural + 10 d.u. demais, contados da entrega de cada complementar</td></tr>
+    <tr><td><b>3 · Definições</b></td><td>Acabamentos, revestimentos, forro e iluminação finais, louças e metais, bancadas, esquadrias. Série 400 montada</td><td>15 d.u. após as definições do cliente</td></tr>
+  </table>
+  <ul>
+    <li>A divisão das fases segue o contrato: os lançamentos fecham a fase 1 e a fase 2 é a compatibilização. <span class="src">[C 2.2.2]</span> <span class="tag t-ok">Resolvido</span></li>
+    <li>Aceites pontuais do cliente por WhatsApp, e-mail ou reunião; hoje não são registrados. Sem limite de rodadas nem de reuniões. <span class="src">[V]</span></li>
+    <li>Se o cliente não define os acabamentos, a Trilha especifica e segue. <span class="src">[V][C 2.2.7]</span></li>
+    <li><b>Portão:</b> reunião final → aceite → Termo de Encerramento de Etapa.</li>
+  </ul>
+
+  <h3>Projeto Legal (PL), em paralelo</h3>
+  <ul>
+    <li>Desenvolver, protocolar, acompanhar e ajustar até aprovar: documentos → condomínio (se houver) → prefeitura. <span class="src">[V][C 2.3]</span></li>
+    <li>20 dias úteis até o protocolo; depois, o prazo é do órgão, sem responsabilidade da Trilha. Taxas por conta do cliente. <span class="src">[C 3.3.3, 2.3.4–2.3.5]</span></li>
+    <li>Antecipação (cliente ansioso) só com Termo de Ciência de Antecipação. <span class="src">[V]</span></li>
+    <li>Alteração de causa externa depois de protocolado e aprovado gera adicional; erro ou escolha da Trilha não é cobrado. <span class="src">[V]</span></li>
+    <li><b>Portão:</b> a própria aprovação; condomínio e prefeitura emitem os documentos.</li>
+  </ul>
+
+  <h3>Projeto Executivo (PE)</h3>
+  <ul>
+    <li>Etapa interna: sem alteração do cliente, sem nova compatibilização, sem marco intermediário. <span class="src">[V][C 2.4.2]</span></li>
+    <li>Fase 1: séries 100, 200 e 300 evoluídas. Fase 2: séries 400 a 1000. 40 a 60 dias úteis. <span class="src">[V][C 3.3.4]</span></li>
+    <li>"Ajuste fino" é interno e não é cobrado; pedido do cliente é aditivo (0–5% pequeno, 0–20% maior). <span class="src">[V][C 9.1]</span></li>
+    <li><b>Portão:</b> reunião abrindo as pranchas → aceite → Termo de Encerramento de Projeto (no contrato: "de Finalização"). <span class="src">[V][C 2.4.8]</span></li>
+  </ul>
+</section>
+
+<!-- 06 -->
+<section class="chap">
+  <h2><span class="num">06</span>Regras do processo: portões, prazos e esperas</h2>
+  <p class="lead">O contrato já protege o prazo da Trilha: nada conta enquanto se espera pelo cliente, pelos complementares ou pelos órgãos.</p>
+
+  <h3>Os três termos</h3>
+  <table>
+    <tr><th>Termo</th><th>Quando</th><th>No contrato hoje</th></tr>
+    <tr><td><b>Encerramento de Etapa</b></td><td>fim do EP e do AP</td><td>mesmo nome [C 2.1.7, 2.2.9]</td></tr>
+    <tr><td><b>Encerramento de Projeto</b></td><td>fim do PE; encerra o contrato</td><td>"Finalização de Projeto" [C 2.4.8]</td></tr>
+    <tr><td><b>Ciência de Antecipação</b> (nome provisório)</td><td>qualquer pedido do cliente fora do momento previsto; o retrabalho causado é cobrado</td><td>não existe</td></tr>
+  </table>
+
+  <h3>Prazos e esperas</h3>
+  <table>
+    <tr><th>Situação</th><th>Regra</th><th style="width:22mm">Fonte</th></tr>
+    <tr><td>Início da contagem</td><td>Só depois dos pré-requisitos de cada etapa</td><td class="src">[C 3.1]</td></tr>
+    <tr><td>Esperas que não contam</td><td>Análise e definições do cliente, complementares, órgãos de aprovação</td><td class="src">[C 3.2]</td></tr>
+    <tr><td>Cliente parado</td><td>Mais de 20 dias úteis → projeto suspenso, sai da lista de prioridades; a Trilha marca a retomada em até 20 dias úteis. Sem cobrança. Vale para todas as etapas</td><td class="src">[V][C 3.4]</td></tr>
+    <tr><td>Complementares e órgãos</td><td>Sem limite. Registrar o prazo informado e o tempo real da espera</td><td class="src">[V]</td></tr>
+    <tr><td>Antes do marco zero</td><td>Sem limite. O projeto não começa</td><td class="src">[V]</td></tr>
+    <tr><td>Atendimento</td><td>Horário comercial, 8h às 18h, segunda a sexta</td><td class="src">[C 7.11]</td></tr>
+  </table>
+
+  <h3>Alterações e aditivos</h3>
+  <table>
+    <tr><th>Situação</th><th>Anteprojeto</th><th>Executivo</th></tr>
+    <tr><td>2ª revisão total do Estudo Preliminar</td><td colspan="2">20% do contrato</td></tr>
+    <tr><td>Pequena (fachada, esquadria, layout, acabamento)</td><td>0–2%</td><td>0–5%</td></tr>
+    <tr><td>Maior (ambientes, escadas, programa, sistema estrutural)</td><td>0–10%</td><td>0–20%</td></tr>
+    <tr><td>Grande (inviabiliza o projeto ou reabre etapa)</td><td colspan="2">negociação; pode cobrar a etapa inteira</td></tr>
+  </table>
+  <p class="small muted">Fonte: [C 9.1]. Vale para alterações depois do termo de etapa. O critério de <b>origem</b> (interna ou do cliente) decide se há cobrança no Executivo e no Projeto Legal [V].</p>
+
+  <div class="keep"><h3>Um cronograma padrão já existe no contrato</h3>
+  <div class="grid3">
+    <div class="card"><div class="kpi">40</div><span class="small">d.u. até a 1ª apresentação do EP</span></div>
+    <div class="card"><div class="kpi">60–70</div><span class="small">d.u. de trabalho da Trilha no AP (20–30 + 15 + 10 + 15), fora as esperas</span></div>
+    <div class="card"><div class="kpi">40–60</div><span class="small">d.u. no Executivo</span></div>
+  </div>
+  <p class="small">Somando só o trabalho da Trilha: de 140 a 170 dias úteis (cerca de 6,5 a 8 meses) do marco zero à entrega, fora as esperas e as revisões. É uma referência para o cronograma padrão que ainda não existe. <span class="tag t-sug">Sugestão</span></p></div>
+</section>
+
+<!-- 07 -->
+<section class="chap">
+  <h2><span class="num">07</span>Entregáveis, pranchas e padrões</h2>
+  <p class="lead">O projeto se organiza em pranchas numeradas por série. A prancha tem número calculado pela posição; o desenho tem nome próprio.</p>
+
+  <h3>Regras de numeração</h3>
+  <ul>
+    <li>ID da prancha = série + posição na lista; mover ou inserir recalcula. Cada série tem até 99 IDs e <b>nunca se repete</b>. <span class="src">[V]</span></li>
+    <li>O desenho tem nome próprio (<code>planta baixa</code>, <code>corte AA</code>, <code>amp01 - cozinha - elevação 01</code>). O número da ampliação é fixo por ambiente e pode ocupar mais de uma prancha. <span class="src">[V]</span></li>
+    <li>601, 602 e 603 são sempre criados e removidos à mão quando não existem. <span class="src">[V]</span></li>
+    <li>Série 400 com vários pavimentos: um mapeamento por pavimento, em sequência; o mapeamento de cobertura vem por último. <span class="src">[V][P]</span></li>
+    <li>Mais de uma edificação (lodge, pousada): não cria série nova; planta geral + unidade-modelo ou uma prancha por unidade diferente. <span class="src">[V]</span></li>
+  </ul>
+
+  <h3>Séries do projeto do zero</h3>
+  <table>
+    <tr><th style="width:12mm">Série</th><th>Conteúdo</th><th style="width:30mm">Varia por</th><th style="width:12mm">Nasce</th></tr>
+    <tr><td><b>100</b></td><td>101 implantação (+ informações gerais e quadro de áreas); plantas por pavimento; última: planta de cobertura (sempre existe)</td><td>pavimento</td><td>AP</td></tr>
+    <tr><td><b>200</b></td><td>Cortes (mínimo 4, em 2 pranchas) + quadro de esquadrias e legenda de hachuras</td><td>corte</td><td>AP</td></tr>
+    <tr><td><b>300</b></td><td>Elevações (mínimo 4) + quadro de esquadrias e legenda de hachuras</td><td>fachada</td><td>AP</td></tr>
+    <tr><td><b>400</b></td><td>401 topografia e terraplenagem; piso e acabamento; hidrossanitário; elétrica; forro e iluminação; mapeamento de cobertura (removível)</td><td>pavimento</td><td>AP</td></tr>
+    <tr><td><b>500</b></td><td>Ampliações: cozinha, serviço/lavanderia, cada banheiro, gourmet, escada, piscina</td><td>ambiente do programa</td><td>PE</td></tr>
+    <tr><td><b>600</b></td><td>601 alumínio e vidro · 602 madeira · 603 guarda-corpo e corrimão (cadernos A4)</td><td>folhas</td><td>PE</td></tr>
+    <tr><td><b>700</b></td><td>701 planta de marmoraria; bancadas</td><td>pavimento e bancada</td><td>PE</td></tr>
+    <tr><td><b>800</b></td><td>Detalhamentos construtivos (caderno A3)</td><td>livre</td><td>PE</td></tr>
+    <tr><td><b>900</b></td><td>Marcenaria: mapa e uma prancha por peça. <b>Só se contratada</b></td><td>pavimento e peça</td><td>PE</td></tr>
+    <tr><td><b>1000</b></td><td>Documentos A4: terraplenagem, revestimentos, louças e metais, equipamentos, tomadas e interruptores, iluminação (rascunho)</td><td>—</td><td>PE</td></tr>
+  </table>
+  <p class="small"><b>Sem série:</b> imagens (EP ≈ 15; atualizadas sem compromisso de quantidade), Guia de Projeto, BIMx (atualizado no fim do EP, AP e PE), apresentação do EP, animação (bônus). <b>Quantitativos:</b> só revestimentos, pontos elétricos e iluminação; não há quantitativo total. <span class="src">[V]</span></p>
+
+  <h3>Padrões de arquivo</h3>
+  <table>
+    <tr><th>Item</th><th>Padrão</th></tr>
+    <tr><td>Modelo</td><td>EP e PE são o mesmo modelo BIM evoluindo; muda a representação</td></tr>
+    <tr><td>Formatos</td><td>A1 estendido, 1/50 (100 a 300) · esquadrias A4 · detalhes A3 · documentos A4 · plantas do EP A3, 1/100</td></tr>
+    <tr><td>Revisões</td><td>Começa em R00; revisão considerável → R01, R02; aparece no nome do arquivo e em campo da prancha</td></tr>
+    <tr><td>Nome do arquivo</td><td><code>NNN_TR_&lt;PROJETO&gt;_&lt;DISCIPLINA&gt;_&lt;ETAPA&gt; - &lt;TÍTULO&gt;.pdf</code> [X]</td></tr>
+    <tr><td>Código do projeto</td><td>Criado pela Trilha, sem acentos; padrão a definir</td></tr>
+  </table>
+</section>
+
+<!-- 08 -->
+<section class="chap">
+  <h2><span class="num">08</span>Complementares e aprovações</h2>
+  <p class="lead">O cliente contrata; a Trilha indica, gerencia e compatibiliza sem cobrança extra. O estrutural é obrigatório e sempre vem primeiro.</p>
+  <ul>
+    <li>Padrão: estrutural (fundação, concreto e/ou metálica), hidrossanitário, elétrico (iluminação de apoio, rede, automação), SPDA, climatização. Raros: paisagismo e luminotécnico. <span class="src">[V]</span></li>
+    <li>Sem estrutural contratado, o projeto é suspenso; os demais complementares são recomendados. <span class="src">[C 2.2.4–2.2.5]</span></li>
+    <li>Só o Luan fala com os complementares; a Elisa não participa da compatibilização. <span class="src">[V]</span></li>
+    <li>Troca de arquivos em .pln/.ifc pelo contrato; na prática também em DWG. <span class="src">[C 2.2.8][V]</span></li>
+    <li>Atraso de engenheiro: sem consequência formal, só cobrança. Os prazos são os definidos pelas empresas. <span class="src">[V]</span></li>
+    <li>Interferências hoje anotadas em papel, e se perdem. <span class="src">[V]</span></li>
+  </ul>
+  <div class="grid2">
+    <div class="card"><h4>Estrutural (sempre primeiro)</h4><ol class="small"><li>A Trilha lança pilares, vigas e laje</li><li>Reunião com o calculista</li><li>Envio do projeto</li><li>Lançamento preliminar do calculista</li><li>Nova reunião</li><li>Ok da Trilha; o calculista envia</li><li>A Trilha importa e sobrepõe no ArchiCAD</li><li>Ajustes até fechar</li></ol></div>
+    <div class="card"><h4>Demais disciplinas</h4><ol class="small"><li>Reunião inicial: projeto e especificações</li><li>A disciplina lança e envia</li><li>A Trilha importa, sobrepõe e revisa</li><li>Ida e volta, em geral 2 rodadas</li><li>Aceite do Luan libera o executivo da disciplina</li></ol></div>
+  </div>
+  <h3>Aprovações</h3>
+  <p>Documentos → condomínio (quando houver) → prefeitura. Os documentos e as taxas são do cliente; o prazo do órgão não é responsabilidade da Trilha. <span class="src">[V][C 2.3]</span></p>
+</section>
+
+<!-- 09 -->
+<section class="chap">
+  <h2><span class="num">09</span>Pessoas e papéis</h2>
+  <p class="lead">Quase tudo passa pelo Luan. A Elisa é a responsável técnica e emite a RRT, mas ainda não decide as questões técnicas.</p>
+  <table>
+    <tr><th style="width:24mm">Pessoa</th><th>Hoje</th></tr>
+    <tr><td><b>Luan</b></td><td>Comercial, administrativo, gestão, decisão final. Concepção, estrutura, pontos, cobertura, pluvial, compatibilização. Único contato com cliente e complementares. Revisão final.</td></tr>
+    <tr><td><b>Elisa</b></td><td>Diretora de Projetos e responsável técnica; emite a RRT. Desenvolvimento de projeto, sem comercial e sem contato com o cliente. Começa a participar das apresentações.</td></tr>
+    <tr><td><b>Colaborador futuro</b></td><td>Desenhos e partes simples, com pouca decisão; cresce com a capacitação.</td></tr>
+  </table>
+  <h3>Quem faz o quê, por etapa</h3>
+  <table>
+    <tr><th>Etapa</th><th>Luan</th><th>Elisa</th></tr>
+    <tr><td>Estudo Preliminar</td><td>Concepção; conduz a apresentação</td><td>Topográfico, arquivo, terreno, estudo solar; finaliza 3D e imagens; acompanha a apresentação</td></tr>
+    <tr><td>Anteprojeto</td><td>Revisão geral, estrutura, lançamento de pontos, compatibilização</td><td>Acabamentos (com o Luan); deve assumir os pontos quando o padrão estiver documentado</td></tr>
+    <tr><td>Executivo</td><td>Atua e revisa</td><td>Tendência de ficar com a maior parte</td></tr>
+  </table>
+  <p><b>Direção:</b> a Elisa assume mais responsabilidade e o Luan passa a demandar. <b>Adiado:</b> o que fica só com os sócios, a decidir junto com as permissões do app. <span class="src">[V]</span></p>
+</section>
+
+<!-- 10 + 11 -->
+<section class="chap">
+  <h2><span class="num">10</span>Variações por tipo de projeto</h2>
+  <p class="lead">A lógica é a mesma nos três modelos; muda a lista de etapas e de entregáveis. O detalhamento foi adiado.</p>
+  <ul>
+    <li><b>Reforma:</b> sem Anteprojeto; normalmente sem Projeto Legal e sem complementares, mas pode precisar. <span class="src">[V]</span></li>
+    <li><b>Interiores e marcenaria:</b> sem Anteprojeto, Legal e complementares. Na proposta, a marcenaria está inclusa no serviço de interiores. <span class="src">[V][P]</span></li>
+    <li>Os termos continuam valendo; o Luan já tem a estrutura de reforma e interiores e vai passá-la depois. <span class="src">[V]</span></li>
+  </ul>
+
+  <h2 style="margin-top:10mm"><span class="num">11</span>Encerramento e passagem para obra</h2>
+  <p class="lead">O Gestor de Projetos termina no Termo de Encerramento de Projeto. A obra é outro contrato e terá um app próprio.</p>
+  <ul>
+    <li>Entrega digital por e-mail; a entrega física (fichários, caixas) está em implantação. O contrato já a prevê, com custo do cliente (impressão, box, placa de obra, envio). <span class="src">[V][C 2.4.5]</span></li>
+    <li><b>Guia de Projeto</b> (PDF A4): capa, informações gerais, lista-guia das pranchas, documentos da série 1000, desenhos no padrão do EP, perspectivas e imagens atualizadas. <span class="src">[V]</span></li>
+    <li>A obra só começa com o projeto finalizado; alterações em obra dependem de autorização da Trilha; a Trilha não emite RRT de execução. <span class="src">[C 5.7, 7.5, 7.8]</span></li>
+    <li>Placa de autoria e ensaio fotográfico autorizados pelo cliente. <span class="src">[C 8.7–8.8]</span></li>
+    <li>Fiscalização e administração de obra: contratos à parte (administração a 12% do custo global na proposta). <span class="src">[V][P]</span></li>
+    <li>Prática: indicar executores e fazer reuniões para explicar o projeto. <span class="src">[V]</span></li>
+  </ul>
+</section>
+
+<!-- 12 -->
+<section class="chap">
+  <h2><span class="num">12</span>Dinheiro e contrato</h2>
+  <p class="lead">O honorário é fechado por projeto e pago em parcelas mensais de data fixa, sem ligação com as entregas.</p>
+  <p class="small muted">Valores do projeto residencial de referência (2025), sem identificar o cliente.</p>
+  <table>
+    <tr><th style="width:44mm">Item</th><th>Como está</th><th style="width:22mm">Fonte</th></tr>
+    <tr><td>Forma de preço</td><td>Valor fechado do projeto arquitetônico (briefing, EP, PL, AP e PE). No projeto de referência, cerca de 2,4% do custo estimado da obra</td><td class="src">[P]</td></tr>
+    <tr><td>Estimativa do custo da obra</td><td>Padrão × área (ex.: médio-alto, R$ 3.500 a 4.500/m²), apresentada na proposta</td><td class="src">[P]</td></tr>
+    <tr><td>Pagamento</td><td>Entrada + parcelas mensais iguais com datas fixas (10 no projeto de referência), <b>sem vínculo com as etapas</b></td><td class="src">[C 4.2]</td></tr>
+    <tr><td>Nota fiscal</td><td>Acréscimo de 17% quando o cliente pede nota</td><td class="src">[P]</td></tr>
+    <tr><td>Incluso</td><td>RRT de projeto</td><td class="src">[P][C 6.7]</td></tr>
+    <tr><td>Não incluso</td><td>Taxas cartoriais e de aprovação, topográfico, sondagem, complementares, marcenaria e interiores, RRT de execução, impressões</td><td class="src">[C 4.3]</td></tr>
+    <tr><td>Peso das etapas (rescisão)</td><td>EP 50% · AP 25% · PE 25%. O Projeto Legal não tem peso</td><td class="src">[C 10.3]</td></tr>
+    <tr><td>Aditivos</td><td>Tabela da cláusula 9 (capítulo 06)</td><td class="src">[C 9.1]</td></tr>
+    <tr><td>Serviços extras</td><td>Interiores (com marcenaria), marcenaria avulsa, execução/administração de obra (12%), fiscalização</td><td class="src">[P]</td></tr>
+    <tr><td>Direitos autorais</td><td>Da Trilha; o projeto não pode ser replicado em outro terreno nem cedido; uso livre das imagens pela Trilha</td><td class="src">[C 8]</td></tr>
+  </table>
+  <div class="box info"><h4>Onde entra o app</h4>O módulo Tempo do Gestão Trilha já mede horas por projeto e etapa. Com as etapas alinhadas ao processo mapeado, dá para comparar horas gastas × honorário por projeto e por etapa, e chegar à margem real. Hoje o preço é estimado sem esse dado.</div>
+</section>
+
+<!-- 13 -->
+<section class="chap">
+  <h2><span class="num">13</span>Dores atuais</h2>
+  <p class="lead">A dor principal é a sobrecarga: duas pessoas, entrega de altíssima qualidade, margem apertada e quase tudo concentrado no Luan.</p>
+  <table>
+    <tr><th>Dor</th><th>Efeito</th></tr>
+    <tr><td>Sobrecarga do Luan (projeto, administrativo, gestão, comercial)</td><td>Gargalo em decisões e revisões; o escritório não cresce além do tempo dele</td></tr>
+    <tr><td>Processo com estrutura, mas sem documentação nem painel</td><td>Sem visão do estado de cada projeto nem do próximo passo</td></tr>
+    <tr><td>Ferramenta anterior (Volbi) complexa demais</td><td>Não foi adotada: muitos cliques e páginas</td></tr>
+    <tr><td>Padrões técnicos não registrados (ex.: altura de ponto elétrico)</td><td>Pesquisa repetida, esquecimentos, retrabalho</td></tr>
+    <tr><td>Retrabalho com o cliente</td><td>Apresentações e reuniões de ajuste consomem muito tempo, sem medição</td></tr>
+    <tr><td>Cliente é quem mais atrasa (perfis: direto, avulso, indeciso)</td><td>Projetos parados, planejamento difícil</td></tr>
+    <tr><td>Proposta lenta de montar</td><td>Cerca de 1 mês do contato ao contrato</td></tr>
+    <tr><td>Interferências em papel; revisão interna sem registro</td><td>Informação perdida; qualidade depende da memória</td></tr>
+  </table>
+</section>
+
+<!-- 14 -->
+<section class="chap">
+  <h2><span class="num">14</span>Análise: falhas e pontos a revisar</h2>
+  <p class="lead">Encontrei 16 pontos. Os de gravidade alta afetam dinheiro ou a proteção contratual da Trilha e merecem atenção primeiro.</p>
+  <p class="small muted">Cada ponto traz o motivo (fonte ou raciocínio) e a gravidade estimada. Gravidade: alta = afeta margem, contrato ou continuidade; média = gera retrabalho ou risco de atrito; baixa = organização.</p>
+
+  <div class="box falha"><h4><span class="sev alta">Alta</span> 1 · Anteprojeto sem limite de rodadas nem de reuniões</h4>
+  <b>Por quê:</b> a cláusula 9 só cobra alterações <i>depois</i> do termo de etapa. Durante o Anteprojeto, todo ajuste pedido é absorvido. Somado à margem apertada e às reuniões sem medição, é o lugar mais provável de horas não pagas. <span class="src">[V][C 9.1]</span></div>
+
+  <div class="box falha"><h4><span class="sev alta">Alta</span> 2 · Alteração no Projeto Legal aprovado não tem cobertura no contrato</h4>
+  <b>Por quê:</b> a cláusula 9.1 cobra "após aceite e assinatura do termo", e o Legal não tem termo. A regra decidida (causa externa depois da aprovação = adicional) não tem base contratual hoje. <span class="src">[C 9.1][V]</span></div>
+
+  <div class="box falha"><h4><span class="sev alta">Alta</span> 3 · Responsabilidade técnica separada da decisão técnica</h4>
+  <b>Por quê:</b> a Elisa emite a RRT, mas quem decide estrutura, pontos e compatibilização é o Luan, e ela não participa das reuniões com os engenheiros. Quem responde tecnicamente não acompanha as decisões que assina. Também é o maior ponto de dependência de uma só pessoa. <span class="src">[V]</span></div>
+
+  <div class="box falha"><h4><span class="sev alta">Alta</span> 4 · Aceites e decisões do cliente sem registro</h4>
+  <b>Por quê:</b> os aceites pontuais do Anteprojeto acontecem por WhatsApp, e-mail ou reunião e não são guardados. Sem registro, é difícil provar que algo foi aprovado e depois cobrar um aditivo. <span class="src">[V]</span></div>
+
+  <div class="box falha"><h4><span class="sev alta">Alta</span> 5 · Preço sem base em horas reais</h4>
+  <b>Por quê:</b> não há cronograma padrão nem histórico de horas por etapa, e a margem é apertada. O módulo Tempo mede horas, mas as etapas dele (com "Compatibilização" e "Obra", sem "Briefing") não batem com o processo mapeado. <span class="src">[V][app]</span></div>
+
+  <div class="box falha"><h4><span class="sev media">Média</span> 6 · Cobrança da 3ª rodada do EP sem base no contrato</h4>
+  <b>Por quê:</b> a decisão é 2 rodadas pontuais, mas o contrato não limita as revisões pontuais (só as totais). <span class="src">[C 2.1.5, 3.3.1]</span></div>
+
+  <div class="box falha"><h4><span class="sev media">Média</span> 7 · Antecipação sem termo nem cláusula</h4>
+  <b>Por quê:</b> começar o Legal antes do lançamento estrutural contraria a cláusula 3.3.3. Hoje isso é feito sem documento que transfira o risco ao cliente. <span class="src">[C 3.3.3][V]</span></div>
+
+  <div class="box falha"><h4><span class="sev media">Média</span> 8 · Plano de Projeto e proposta prometem o que a prática não entrega</h4>
+  <b>Por quê:</b> o Anexo 01 usa a numeração antiga e promete "01 animação" (hoje bônus); a proposta promete "quantitativos gerais" (hoje só parciais). O que está escrito é o que o cliente leu. <span class="src">[C Anexo 01][P]</span></div>
+
+  <div class="box falha"><h4><span class="sev media">Média</span> 9 · Interferências de compatibilização em papel</h4>
+  <b>Por quê:</b> anotações se perdem, e não há como mostrar ao cliente ou ao engenheiro o que foi apontado e resolvido. <span class="src">[V]</span></div>
+
+  <div class="box falha"><h4><span class="sev media">Média</span> 10 · Pós-entrega sem limite</h4>
+  <b>Por quê:</b> o contrato obriga a Trilha a analisar e autorizar alterações em obra (7.5), mesmo sem contrato de fiscalização. Dúvidas do construtor podem virar trabalho sem remuneração. <span class="src">[C 7.5][V]</span></div>
+
+  <div class="box falha"><h4><span class="sev media">Média</span> 11 · Esperas por terceiros sem limite nem aviso ao cliente</h4>
+  <b>Por quê:</b> decisão consciente de não travar, mas o projeto pode ficar aberto indefinidamente, ocupando atenção. O cliente nem sempre sabe que a espera é do engenheiro ou do órgão. <span class="src">[V][C 3.2]</span></div>
+
+  <div class="box falha"><h4><span class="sev media">Média</span> 12 · Pagamento desligado das entregas</h4>
+  <b>Por quê:</b> parcelas mensais de data fixa são boas para o caixa, mas se o projeto atrasa por culpa do cliente a Trilha segue recebendo, e se adianta ela entrega antes de receber. Na rescisão, os pesos (50/25/25) não incluem o Projeto Legal. <span class="src">[C 4.2, 10.3]</span></div>
+
+  <div class="box falha"><h4><span class="sev media">Média</span> 13 · Revisão interna sem registro nem checklist</h4>
+  <b>Por quê:</b> a qualidade depende da memória do revisor; com um colaborador novo, o risco de erro cresce. <span class="src">[V]</span></div>
+
+  <div class="box falha"><h4><span class="sev baixa">Baixa</span> 14 · Nomes e numeração inconsistentes no contrato</h4>
+  "Finalização" × "Encerramento" de projeto; "termo de finalização de etapas" na 9.1; itens 2.3.3 e 2.4.5 repetidos. <span class="src">[C]</span></div>
+
+  <div class="box falha"><h4><span class="sev baixa">Baixa</span> 15 · Marco zero diferente entre a prática e o contrato</h4>
+  O contrato não exige documentos para o prazo começar. Se a Trilha espera os documentos, pode atrasar um prazo que já está correndo. <span class="src">[C 3.3.1][V]</span></div>
+
+  <div class="box falha"><h4><span class="sev baixa">Baixa</span> 16 · Propostas perdidas sem registro</h4>
+  Sem motivo de perda nem taxa de conversão, não há como saber se o preço, o prazo ou a apresentação afasta clientes. <span class="src">[V]</span></div>
+</section>
+
+<!-- 15 -->
+<section class="chap">
+  <h2><span class="num">15</span>Sugestões de melhoria</h2>
+  <p class="lead">As sugestões abaixo respondem às falhas do capítulo 14. Todas precisam da sua validação.</p>
+  <table>
+    <tr><th style="width:8mm">#</th><th>Sugestão</th><th style="width:22mm">Responde a</th><th style="width:22mm">Esforço</th></tr>
+    <tr><td>1</td><td><b>Limitar as rodadas do Anteprojeto</b> por fase (ex.: 1 rodada de ajuste na fase 1 e 1 na fase 3), com base nas horas medidas nos próximos projetos. Antes de limitar, medir.</td><td>falha 1</td><td>contrato + app</td></tr>
+    <tr><td>2</td><td><b>Ata curta após cada reunião ou aceite</b>: 3 a 5 linhas por e-mail ou WhatsApp com o que foi decidido. O app gera o texto a partir do registro.</td><td>falhas 1, 4</td><td>baixo</td></tr>
+    <tr><td>3</td><td><b>Cláusula de alteração no Projeto Legal</b> com o critério de origem (externa = adicional) e o momento (após protocolo/aprovação).</td><td>falha 2</td><td>contrato</td></tr>
+    <tr><td>4</td><td><b>Plano de transição da Elisa por atividade</b>: primeiro o lançamento de pontos (já previsto), depois a participação nas reuniões com complementares, depois a revisão final do Executivo. Com a RRT dela, faz sentido ela acompanhar a compatibilização.</td><td>falha 3</td><td>médio</td></tr>
+    <tr><td>5</td><td><b>Alinhar as etapas do módulo Tempo ao processo</b> (Briefing, EP, AP com 3 fases, PL, PE com 2 fases; Compatibilização como fase) e cronometrar também reuniões. Em 3 a 5 projetos já existe base para precificar.</td><td>falhas 1, 5</td><td>app</td></tr>
+    <tr><td>6</td><td><b>Cronograma padrão a partir do contrato</b>: usar os prazos das cláusulas 3.3 como ponto de partida e ajustar com as horas reais.</td><td>falha 5</td><td>baixo</td></tr>
+    <tr><td>7</td><td><b>Termo de Ciência de Antecipação</b> em modelo único, gerado pelo app.</td><td>falha 7</td><td>baixo</td></tr>
+    <tr><td>8</td><td><b>Atualizar o Anexo 01 e a proposta</b> com as séries 100 a 1000, a animação como bônus e o texto dos quantitativos. Idealmente, o Anexo sai do app a partir do cadastro do projeto.</td><td>falha 8</td><td>baixo</td></tr>
+    <tr><td>9</td><td><b>Registro de interferências no app</b> com relatório em PDF para engenharias e cliente (você já testa esse fluxo).</td><td>falha 9</td><td>app</td></tr>
+    <tr><td>10</td><td><b>Definir o pós-entrega incluso</b>: ex.: até X horas ou Y reuniões de esclarecimento em até Z meses; o que passar disso vira fiscalização.</td><td>falha 10</td><td>contrato</td></tr>
+    <tr><td>11</td><td><b>Aviso periódico ao cliente sobre esperas</b> (ex.: a cada 15 dias, "aguardando engenheiro X desde…"). O app lembra.</td><td>falha 11</td><td>baixo</td></tr>
+    <tr><td>12</td><td><b>Avaliar parte do pagamento ligada aos portões</b> (ex.: parcela extra na assinatura de cada termo), mantendo as mensais. Decisão comercial sua.</td><td>falha 12</td><td>contrato</td></tr>
+    <tr><td>13</td><td><b>Checklist de revisão interna por série</b> e biblioteca de padrões técnicos (alturas, medidas), abertos a partir de cada prancha no app.</td><td>falha 13</td><td>médio</td></tr>
+    <tr><td>14</td><td><b>Revisão do contrato em um só pacote</b> (capítulo 16), para não fazer várias versões.</td><td>falhas 2, 6, 7, 14, 15</td><td>contrato</td></tr>
+    <tr><td>15</td><td><b>Registro mínimo de propostas</b>: data, valor, resultado e motivo de perda. Base para um futuro módulo comercial.</td><td>falha 16</td><td>baixo</td></tr>
+    <tr><td>16</td><td><b>Proposta a partir de modelo</b>: programa de necessidades e Plano de Projeto gerados pelo cadastro (pavimentos, ambientes), reduzindo o tempo de montagem.</td><td>dor da proposta lenta</td><td>app (futuro)</td></tr>
+  </table>
+</section>
+
+<!-- 16 -->
+<section class="chap">
+  <h2><span class="num">16</span>Ajustes a fazer no contrato e na proposta</h2>
+  <p class="lead">Nove itens pedem mudança; seis já estão cobertos. A lista vai para a revisão do contrato em outro chat.</p>
+  <table>
+    <tr><th style="width:6mm">#</th><th style="width:28mm">Tema</th><th>Contrato hoje</th><th>Decisão da Trilha</th><th style="width:18mm">Ação</th></tr>
+    <tr><td>1</td><td>Marco zero</td><td>contrato + 1ª parcela + topográfico (3.3.1)</td><td>+ documentos; sem limite antes; revisar valor se atraso longo</td><td>mudar</td></tr>
+    <tr><td>2</td><td>Rodadas do EP</td><td>1 revisão total; pontuais sem limite (2.1.5, 3.3.1)</td><td>2 rodadas pontuais; excedente cobrada</td><td>mudar</td></tr>
+    <tr><td>3</td><td>Antecipação</td><td>não existe; PL após lançamento estrutural (3.3.3)</td><td>Termo de Ciência; retrabalho cobrado</td><td>criar</td></tr>
+    <tr><td>4</td><td>Alteração no PL aprovado</td><td>não coberto (9.1 depende de termo)</td><td>causa externa após aprovação = adicional</td><td>criar</td></tr>
+    <tr><td>5</td><td>Nomes dos termos</td><td>Encerramento de Etapa; Finalização de Projeto; "finalização de etapas" na 9.1</td><td>Encerramento de Etapa; Encerramento de Projeto</td><td>uniformizar</td></tr>
+    <tr><td>6</td><td>Quantitativos</td><td>proposta: "quantitativos gerais"</td><td>só revestimentos, pontos e iluminação</td><td>mudar proposta</td></tr>
+    <tr><td>7</td><td>Suspensão</td><td>20 d.u.; retomada em até 20 d.u. (3.4)</td><td>igual</td><td>ok</td></tr>
+    <tr><td>8</td><td>Alteração no Executivo</td><td>aditivo (2.4.2, 9.1)</td><td>ajuste fino interno sem cobrança</td><td>ok (opcional explicitar)</td></tr>
+    <tr><td>9</td><td>Lançamentos no AP</td><td>fase 1 (2.2.2)</td><td>igual</td><td>ok</td></tr>
+    <tr><td>10</td><td>Numeração repetida</td><td>2.3.3 e 2.4.5 duplicados</td><td>—</td><td>corrigir</td></tr>
+    <tr><td>11</td><td>Pranchas e formatos</td><td>Anexo com numeração antiga; só .pln/.ifc</td><td>séries 100 a 1000; também DWG</td><td>mudar</td></tr>
+    <tr><td>12</td><td>Papel da Elisa</td><td>diretora de projetos e RT (proposta)</td><td>igual</td><td>ok</td></tr>
+    <tr><td>13</td><td>Obra</td><td>recomenda administração (7.7); sem RRT de execução</td><td>contratos à parte</td><td>ok</td></tr>
+    <tr><td>14</td><td>Espera por terceiros</td><td>fora do prazo (3.2, 2.3.5)</td><td>sem limite; medir</td><td>ok</td></tr>
+    <tr><td>15</td><td>Anexo 01</td><td>10 imagens, 1 animação, numeração antiga</td><td>≈ 15 imagens; animação bônus; séries novas</td><td>mudar</td></tr>
+  </table>
+  <p class="small"><span class="tag t-sug">Sugestão</span> Incluir na mesma revisão: pós-entrega incluso (sugestão 10), limite de rodadas do Anteprojeto (sugestão 1) e, se decidir, parcela ligada aos portões (sugestão 12).</p>
+</section>
+
+<!-- 17 -->
+<section class="chap">
+  <h2><span class="num">17</span>Dados faltantes: perguntas para responder</h2>
+  <p class="lead">São 20 perguntas. As do grupo A travam o app; as demais podem vir com o tempo.</p>
+
+  <h3>A · Necessárias para começar o app</h3>
+  <div class="box falta"><ol>
+    <li>Programa de necessidades no app: quais campos por ambiente (tipo, área, pavimento, quantidade)?</li>
+    <li>Tarefas de projeto: ficam só dentro do projeto e aparecem na área da pessoa, ou também viram tarefas na agenda pessoal?</li>
+    <li>Registro de aceite pontual: basta data, canal, item e quem aprovou? Precisa anexar print ou arquivo?</li>
+    <li>Cronômetro: mede até a etapa/fase, até a prancha ou até o desenho?</li>
+    <li>Código do projeto: qual padrão (ex.: ano + sigla + número)?</li>
+  </ol></div>
+
+  <h3>B · Processo e regras</h3>
+  <div class="box falta"><ol start="6">
+    <li>Nome definitivo do Termo de Ciência de Antecipação.</li>
+    <li>Projeto Legal: alteração antes da aprovação é sempre gratuita?</li>
+    <li>Anteprojeto: vale limitar as rodadas? Qual limite faria sentido?</li>
+    <li>Pós-entrega: quanto esclarecimento está incluso depois do Termo de Encerramento de Projeto?</li>
+    <li>Pagamento: manter parcelas por data ou ligar parte aos portões?</li>
+    <li>Lighting design: serviço novo ou embutido nos projetos?</li>
+    <li>O que fica só com os sócios (adiado para as permissões do app).</li>
+  </ol></div>
+
+  <h3>C · Materiais</h3>
+  <div class="box falta"><ol start="13">
+    <li>Imagem da estrutura da pasta padrão.</li>
+    <li>Template ArchiCAD em PDF ou print das abas (informações, legislação, layouts, carimbo).</li>
+    <li>Apresentação de exemplo do EP e plantas de exemplo (EP e PE).</li>
+    <li>Estrutura de reforma e de interiores/marcenaria (quando decidir).</li>
+    <li>Checklists por série ou desenho, se já existirem em algum formato.</li>
+    <li>Padrões técnicos já anotados (alturas de pontos, medidas), mesmo soltos.</li>
+    <li>Texto atual dos termos de encerramento, se já existir um modelo.</li>
+    <li>Modelo da proposta em arquivo editável, para gerar o Plano de Projeto a partir do app no futuro.</li>
+  </ol></div>
+</section>
+
+<!-- 18 + 19 -->
+<section class="chap">
+  <h2><span class="num">18</span>Temas que talvez faltem abordar</h2>
+  <p class="lead">Temas que não apareceram no levantamento. Só entram se você achar que valem; não são propostas.</p>
+  <table>
+    <tr><th>Tema</th><th>Por que pode importar</th></tr>
+    <tr><td>Reunião de início do projeto (após o contrato)</td><td>Momento de alinhar expectativas, prazos e canais com o cliente</td></tr>
+    <tr><td>Canais e regras de comunicação com o cliente</td><td>Onde se decide (WhatsApp, e-mail, reunião) e como se registra</td></tr>
+    <tr><td>Controle das versões enviadas ao cliente</td><td>Saber qual PDF o cliente tem em mãos em cada momento</td></tr>
+    <tr><td>Armazenamento e backup dos arquivos</td><td>Drive, modelo BIM, arquivos de terceiros: onde ficam e por quanto tempo</td></tr>
+    <tr><td>Momento de emissão da RRT</td><td>Quando é emitida e quem acompanha a baixa</td></tr>
+    <tr><td>Pós-obra</td><td>Visita final, fotos para portfólio, depoimento do cliente</td></tr>
+    <tr><td>Dados pessoais dos clientes</td><td>Quem acessa contratos e documentos quando houver colaboradores</td></tr>
+    <tr><td>Indicadores do escritório</td><td>Quais 3 a 5 números vocês querem acompanhar (ex.: horas por m², dias parados, margem por projeto)</td></tr>
+  </table>
+
+  <h2 style="margin-top:10mm"><span class="num">19</span>O que vem depois</h2>
+  <ol>
+    <li><b>Sua leitura e revisão deste documento:</b> corrigir, completar e responder o capítulo 17, principalmente o grupo A.</li>
+    <li><b>Conversa sobre o app:</b> você traz as suas expectativas; eu trago a proposta de telas a partir deste mapeamento e de <code>processo-trilha.json</code>.</li>
+    <li><b>Revisão do contrato</b> em outro chat, com a lista do capítulo 16.</li>
+    <li><b>Manual do processo</b> e <b>Caminho do Projeto</b>, a partir do mesmo conteúdo.</li>
+  </ol>
+  <div class="box sug"><h4>Onde está tudo</h4>Repositório TrilhaArq---Processos, pasta <code>manual-trilha/</code>: <code>MAPEAMENTO.md</code> (texto-fonte deste PDF), <code>processo-trilha.json</code> (dados para o app) e <code>LEVANTAMENTO.md</code> (histórico da conversa).</div>
+</section>
+
+</body>
+</html>
