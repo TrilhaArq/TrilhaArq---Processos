@@ -101,12 +101,21 @@ Mantém os ajustes 3 e 4 (itens clicáveis com desenhos, situação com escolhas
 7.2 **Contagem de desenhos concluídos** visível no item (ex.: 1/4), com estética própria.
 7.3 **Prioridade** em cada item: botão pequeno com três níveis.
     - Nível 1 = mais urgente · nível 2 = intermediário · nível 3 = menos urgente.
-    - Cores: 1 vermelho · 2 laranja · 3 amarelo (a fala trocou os números; confirmar este mapeamento).
+    - Cores: 1 vermelho · 2 laranja · 3 amarelo (confirmado).
     - Sem nível = sem prioridade definida (padrão).
 7.4 **Na área da pessoa (aba Projetos / Meu trabalho):** escolher a visualização
     - **por projeto** (como hoje) ou
     - **por prioridade** (nível 1, depois 2, depois 3, depois sem prioridade; dentro de cada nível, por prazo).
     Os itens mostram a cor da prioridade.
-7.5 **Forma visual** (sugestão do Claude, a validar): selo curto "P1 / P2 / P3" na cor do nível + uma faixa fina
+7.5 **Forma visual** (sugestão do Claude, aprovada): selo curto "P1 / P2 / P3" na cor do nível + uma faixa fina
     da mesma cor na borda esquerda do item. Não pintar o item inteiro: pintar tudo compete com as cores de
     situação (em andamento, pronto) e de prazo, e dificulta a leitura.
+
+## 8. Séries repetidas no Executivo e complementares no Anteprojeto (28/09)
+
+8.1 **Séries 100, 200, 300 e 400 aparecem duas vezes:** no Anteprojeto (desenho criado, simplificado) e de novo no
+    Projeto Executivo (desenvolvido e finalizado: cotas e demais informações), como no Plano de Projeto da
+    proposta. O que muda entre as duas é o **checklist** de cada uma.
+8.2 **Complementares como itens do Anteprojeto**, por disciplina: envio ao complementar, reunião 1, reunião 2,
+    conclusão do complementar (lista completa virá do Luan).
+8.3 O Luan quer ver os ajustes funcionando no teste e depois terminar de definir o que aparece em cada etapa.
