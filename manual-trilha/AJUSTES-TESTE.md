@@ -291,3 +291,9 @@ Pedido do Luan (o app vai ficar aberto numa segunda tela; notificações chamam 
   5. **Todos os itens da etapa prontos · pronto para o termo** (verde): mantido.
   6. **Reunião amanhã**: um dia antes de cada reunião marcada.
   Outras notificações entram depois, conforme o uso.
+
+## 20. Arquivamento automático (recebido, não processado)
+
+- Projeto **suspenso há mais de 60 dias úteis** vai **automaticamente para Arquivados**.
+- Sequência completa: cliente sem retorno 15 d.u. → aviso · 20 d.u. → Suspenso · +60 d.u. suspenso → Arquivado.
+- O arquivamento fica registrado no Histórico. Arquivar à mão continua possível (botão na página do projeto, ajuste 10).
