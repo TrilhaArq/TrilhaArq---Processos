@@ -344,3 +344,23 @@ Dúvidas para o Luan:
       Se o EP da marcenaria não terminou, o Executivo dela não começa com o fim da arquitetura; o prazo conta a partir
       do último dos dois.
   - Pendente: prazos (dias úteis) do EP Marcenaria e do Executivo Marcenaria.
+
+## 22. Revisão geral celular + computador (recebido, não processado — fazer na próxima rodada)
+
+- Problema visto: aba **Projetos** da área pessoal (Meu trabalho) no celular (aberta pelo WhatsApp) com elementos
+  sobrepostos.
+- Pedido: revisão geral do app para ficar organizado e bonito nos dois modos (celular e computador), e criar
+  **regras fixas de layout** para os próximos módulos seguirem.
+- Regras a registrar no CONTRATO.md (e na skill do app), a conferir com prints em 390 px e 1280 px antes de publicar:
+  - nada com largura fixa que estoure a tela; linhas de item viram 2 linhas no celular (título em cima; prazo,
+    situação, prioridade e botões embaixo);
+  - botões e selects com área de toque de pelo menos 40 px; nada sobreposto nem cortado;
+  - barras, listas e cartões ocupando a largura toda do quadro;
+  - tabelas largas viram lista no celular (sem rolagem lateral da página);
+  - mesmo espaçamento, títulos e alinhamentos em todos os módulos.
+
+## 23. Abas Tarefas e Ficha do projeto (recebido, não processado)
+
+- As duas abas estão esquisitas na organização e na estética.
+- Revisar a organização dos elementos e a formatação: campos alinhados em grade, grupos com título, barras e listas
+  ocupando **toda a largura**, visual igual ao das outras abas (Visão geral, Plano).
