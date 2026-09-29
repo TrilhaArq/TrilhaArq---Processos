@@ -312,6 +312,21 @@ Quem vê: sócios veem tudo; colaborador vê os projetos em que tem item ou tare
   `id`, `pessoaId`, `tipo` ("projeto" | "area"), `alvoId`, `etapaId`, `descricao`, `inicio`, `fim` (ISO),
   `min`, `atividadeId`, `topicoId`, `motivo`, `paradoEm{id,nome,em}`, `origem` ("cronometro" | "manual"), `criadoEm`, `editadoEm`, `excluido`, `ajustes[]`.
 
+## Ajustes pendentes (pedidos para a próxima rodada)
+
+Registrados em 29/09/2026 a pedido do Luan, para fazer quando houver um novo ajuste no app:
+
+1. **Prazos padrão em Configurações:** Estudo Preliminar, Anteprojeto e Executivo da arquitetura (hoje fixos em 40,
+   70 e 60 d.u. no código) e EP e Executivo da marcenaria (sugestão: 30 e 40 d.u.), logo abaixo de "Peso das etapas".
+   Valem para projetos novos; cada projeto continua podendo ter o próprio prazo na Ficha.
+2. **Prazos da marcenaria não se ajustam de forma confiável.** Causas prováveis no código: a Ficha grava o prazo em
+   `etapas.<mep|mex>.prazo`, mas o cabeçalho de Plano › Marcenaria mostra `marc.prazos` (valor da ativação), que
+   não muda; e apagar o prazo na Ficha faz ele voltar ao valor da ativação. Unificar num lugar só.
+3. **Regra geral: tudo o que está na Ficha precisa ser editável**, porque os combinados mudam. Conferir campo a
+   campo, incluindo: dados do contrato da marcenaria (nº, data, valor, 1ª parcela), prazos e datas de todas as
+   etapas (hoje o fim da etapa em curso fica bloqueado), situação do Legal, pavimentos e categorias. Toda alteração
+   vai para o Histórico.
+
 ## Próximos passos previstos
 
 - Acesso por perfil quando houver funcionários: conta Claude separada para a equipe, artefato
