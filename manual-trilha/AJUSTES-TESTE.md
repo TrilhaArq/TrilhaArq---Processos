@@ -326,3 +326,21 @@ Dúvidas para o Luan:
 1. Prazos em dias úteis do EP Marcenaria e do Executivo Marcenaria?
 2. Se a marcenaria for contratada no fim do Executivo arquitetônico, o EP da marcenaria começa na contratação e o
    Executivo dela começa depois do EP aprovado (não dá para ser paralelo)? 
+- **Decidido (Luan, 29/09):** proposta aprovada (marcenaria fica dentro do mesmo projeto). Complementos:
+  - **Itens não são gerados automaticamente** (cada marcenaria é personalizada; cliente pode não fazer todos os
+    ambientes). A equipe lança os móveis na ativação e ao longo do projeto.
+  - O app traz um **modelo de móvel** já configurado (editável pelo Luan): desenhos padrão + checklist + link do PDF de
+    referência "Como fazer marcenaria na Trilha". "+ Adicionar móvel" cria o item a partir do modelo
+    (ex.: "902 · Armário da cozinha"; nome e ambiente escolhidos na hora).
+    Modelo inicial sugerido (Luan revisa no teste):
+    - Desenhos: Planta (vista superior) · Vistas frontais · Cortes · Detalhes (ferragens, puxadores, encaixes) ·
+      Tabela de materiais e acabamentos.
+    - Checklist: medidas conferidas com o projeto/obra · cotas totais e parciais · materiais, cores e fitas indicados ·
+      ferragens e puxadores especificados · eletros e equipamentos com medidas do fabricante · pontos elétricos e
+      hidráulicos compatibilizados · folgas, rodapés e tamponamentos · revisão interna.
+  - **Regras (portões):**
+    - Início do **EP Marcenaria**: contrato da marcenaria assinado + 1ª parcela paga.
+    - Início do **Executivo Marcenaria**: Executivo arquitetônico encerrado **e** EP Marcenaria encerrado (os dois).
+      Se o EP da marcenaria não terminou, o Executivo dela não começa com o fim da arquitetura; o prazo conta a partir
+      do último dos dois.
+  - Pendente: prazos (dias úteis) do EP Marcenaria e do Executivo Marcenaria.
