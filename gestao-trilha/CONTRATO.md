@@ -18,8 +18,10 @@ modulos/<id>.js     um arquivo por módulo
 
 **Cópia de teste:** https://claude.ai/artifact/V9bUhPfLyowX83XUz5Zeaw — mesmos arquivos, `<title>` "Gestão Trilha Teste",
 capacidades só `db` e `downloads` (sem Google Agenda) e banco próprio com dados fictícios (`fin_config/geral.teste = true`
-mostra o aviso na capa). Módulos novos são testados lá antes de ir para o link oficial. Ao levar uma mudança ao oficial, publicar os
-mesmos arquivos nos dois links (na cópia de teste só muda o `<title>`). A antiga cópia de teste do Gestor de Projetos
+mostra o aviso na capa). **Decisão do Luan (29/09/2026):** a cópia de teste fica parada e
+desatualizada; ajustes do dia a dia vão direto ao oficial. Quando houver um **grande ajuste** (módulo novo ou mudança
+estrutural), atualizar a cópia de teste primeiro com todos os arquivos do oficial (só muda o `<title>`), testar lá e
+depois levar ao oficial. Não excluir a cópia: o banco dela guarda os dados fictícios de teste. A antiga cópia de teste do Gestor de Projetos
 (https://claude.ai/artifact/MCRcCpLbCTKURD3qUb6Wmx, com projetos de exemplo) ficou superada pelo oficial e não é mais atualizada.
 
 Publicar sempre com `url` = link acima, `file_path` = `index.html`, `root` = esta pasta e `files` listando
