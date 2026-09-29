@@ -283,7 +283,7 @@ Pedido do Luan (o app vai ficar aberto numa segunda tela; notificações chamam 
      (etapa concluída ou prazo ajustado), mostrando "vencido há X dias" depois do vencimento. Substitui o de ≤5 d.u.
      Contagem em dias úteis (padrão do prazo; o Luan não se opôs).
   2. **Cliente sem retorno há 15 d.u.** (amarelo): fica nos 5 dias seguintes. O aviso de 20 d.u. **sai**: no 20º dia o
-     projeto vai **automaticamente para Suspensos** (cláusula 3.4), sai do fluxo principal e fica no Histórico.
+     projeto vai **automaticamente para Suspensos** (cláusula 3.4; confirmado pelo Luan), sai do fluxo principal e fica no Histórico.
   3. **Contrato e 1ª parcela ok · pronto para iniciar** (verde): mantido. Nasce de fato com o Comercial; até lá o
      projeto já entra no Gestor pela Abertura.
   4. **Abertura concluída · liberado para a concepção** (novo): quando o checklist da Abertura fica todo pronto, aviso
