@@ -62,7 +62,9 @@ Dentro de um app do escritório, a barra do topo tem **só "← Início"**: não
 Na área da pessoa continuam as abas Tempo, Tarefas e Projetos (Meu trabalho).
 
 Adicionar um módulo = criar o arquivo + uma linha `<script src="modulos/<id>.js">` no `index.html` antes de
-`Trilha.start()`. Ao ficar pronto, remover o botão "Em breve" correspondente (`FUTUROS` em `nucleo.js`).
+`Trilha.start()`. Ao ficar pronto, o botão "Em breve" com o mesmo id (`FUTUROS` em `nucleo.js`) some sozinho; use o
+id previsto (`obras`, `comercial`). A ordem dos botões do Escritório está em `ORDEM_CAPA` (`nucleo.js`): gestor,
+obras, comercial, financeiro, relatorios, config, cadastros; módulo fora da lista vai para o fim.
 
 Um módulo **não** mexe no HTML nem no estado de outro módulo. Para ler dados de outro módulo, use o objeto que
 ele expõe (ex.: `Trilha.tempo.lancAtivos()`, `Trilha.tempo.custoLanc(l)`, `Trilha.tempo.lancar(l)`,
@@ -75,6 +77,7 @@ ele expõe (ex.: `Trilha.tempo.lancAtivos()`, `Trilha.tempo.custoLanc(l)`, `Tril
   `T.state.view` (`home` | `pessoa` | `admin`), `T.state.sub` (módulo aberto).
 - Dados comuns: `T.pessoa(id)`, `T.pessoasAtivas()`, `T.projeto(id)`, `T.cfg()` (config com padrões),
   `T.etapaNome`, `T.areaNome`, `T.topicoNome`, `T.tipoNome`, `T.custoHoraTotal(pid)`, `T.rateioHora()`,
+  `T.DEFAULT_CONFIG.pesosEtapas` (pesos do % concluído; `T.gestor.pct(pid)` e `T.gestor.pctMarc(pid)`),
   `T.saveConfig(patch)`.
 - Banco e capacidades: `T.db`, `T.downloads`, `T.mcp` (podem ser `null`: esconder o recurso).
 - Navegação e desenho: `T.go(view, sub, pid)`, `T.render()`, `T.scheduleRender()`.
@@ -133,8 +136,8 @@ ele expõe (ex.: `Trilha.tempo.lancAtivos()`, `Trilha.tempo.custoLanc(l)`, `Tril
 | Gestor de Projetos | `modulos/gestor.js` | admin | em uso (oficial desde 29/09/2026) |
 | Cadastros | `modulos/cadastros.js` | admin | em uso (único lugar para excluir projetos, pessoas e contatos) |
 | Financeiro | `modulos/financeiro.js` | admin | em uso (v1 no app oficial desde set/2026) |
-| Horas e custos (antigo "Projetos") | `modulos/projetos.js` | admin | em uso |
+| Horas e custos (antigo "Projetos") | `modulos/projetos.js` | aba de Relatórios | em uso — não se registra como módulo: expõe `T.horasCustos {html, init, render}` e Relatórios o mostra na aba "Horas e custos por projeto" |
 | Relatórios | `modulos/relatorios.js` | admin | em uso |
 | Configurações | `modulos/config.js` | admin | em uso |
-| Gestor Comercial (oportunidades, briefing) | — | admin | aprovado, para depois (ver REGRAS.md) |
+| Gestor Comercial (oportunidades, briefing) | — | admin | "Em breve" na capa; aprovado, para depois (ver REGRAS.md) |
 | Gestor de obras (orçamento de obras) | — | admin | "Em breve" na capa — portar o app de orçamento (skill orcamento-obra-trilha), itens agrupados por obra |

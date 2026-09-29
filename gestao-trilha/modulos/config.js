@@ -10,6 +10,16 @@
     { k: "tipos", t: "Tipos de projeto", add: "+ Tipo" }
   ];
 
+  var PESOS_ARQ = [["ep", "Estudo Preliminar"], ["ap", "Anteprojeto"], ["pl", "Projeto Legal"], ["pe", "Projeto Executivo"]];
+  var PESOS_MARC = [["mep", "Estudo Preliminar"], ["mex", "Executivo"]];
+  function campoPeso(o) { return '<div class="field col-3"><label for="pw-' + o[0] + '">' + o[1] + ' (%)</label><input type="number" min="0" max="100" step="1" id="pw-' + o[0] + '" data-peso="' + o[0] + '"></div>'; }
+  function pesosAtuais() { return Object.assign({}, T.DEFAULT_CONFIG.pesosEtapas, T.cfg().pesosEtapas || {}); }
+  function somaPesos() {
+    function soma(l) { return l.reduce(function (s, o) { return s + (T.numOrNull($("pw-" + o[0]).value) || 0); }, 0); }
+    var a = soma(PESOS_ARQ), m = soma(PESOS_MARC);
+    $("cfg-pesos-soma").textContent = "Arquitetônico soma " + a + "% · marcenaria soma " + m + "%" + (a !== 100 || m !== 100 ? " (o app ajusta a proporção para 100%)" : "");
+  }
+
   var html =
     '<div><div class="section-head"><h2 class="section-title">Pessoas</h2><span class="section-meta">Valores usados nos custos e no fechamento</span></div>' +
       '<div class="card" style="display:flex;flex-direction:column;gap:14px"><div id="cfg-people" style="display:flex;flex-direction:column;gap:14px"></div>' +
@@ -21,6 +31,13 @@
         '<div class="field col-4"><label for="c-horas">Horas produtivas por pessoa / mês</label><input type="number" id="c-horas" min="1" step="1" placeholder="112"></div>' +
         '<div class="col-4 form-actions"><button class="btn btn-primary" id="btn-save-office">Salvar</button></div>' +
         '<div class="col-12 hint">Referência de mercado: de 160 h disponíveis, cerca de 70% (112 h) são produtivas. O custo fixo é dividido pelas horas produtivas e somado ao custo-hora de cada pessoa.</div>' +
+      "</div></div>" +
+    '<div><div class="section-head"><h2 class="section-title">Peso das etapas</h2><span class="section-meta">% concluído dos projetos no Gestor</span></div>' +
+      '<div class="card grid-form" id="cfg-pesos">' +
+        '<div class="col-12 cfg-pesos-t">Projeto arquitetônico</div>' + PESOS_ARQ.map(campoPeso).join("") +
+        '<div class="col-12 cfg-pesos-t">Projeto de marcenaria</div>' + PESOS_MARC.map(campoPeso).join("") +
+        '<div class="col-12 form-actions"><button class="btn btn-primary" id="btn-save-pesos">Salvar pesos</button><span class="hint" id="cfg-pesos-soma"></span></div>' +
+        '<div class="col-12 hint">A Abertura não conta. Etapa encerrada vale o peso inteiro; etapa em curso vale a parte dos itens prontos. Quando o projeto não tem uma etapa (Reforma e Interiores não têm Anteprojeto nem Legal), os pesos das outras são redistribuídos na mesma proporção. Ajuste quando houver horas reais registradas.</div>' +
       "</div></div>" +
     '<div class="grid-form" style="gap:28px">' + LISTAS.map(function (l) {
       return '<div class="col-6"><div class="section-head"><h2 class="section-title">' + l.t + '</h2></div><div class="card"><div class="list-edit" id="cfg-' + l.k + '"></div>' +
@@ -48,11 +65,13 @@
     if (document.activeElement !== $("c-fixos")) $("c-fixos").value = c.custosFixosMensais != null ? c.custosFixosMensais : "";
     if (document.activeElement !== $("c-horas")) $("c-horas").value = c.horasProdutivasMes || "";
     $("cfg-office-meta").innerHTML = r != null ? "Rateio dos custos fixos: <b>" + fmtBRL(r) + "</b> por hora" : "Preencha para calcular o custo fixo por hora";
+    var pw = pesosAtuais();
+    if (!$("cfg-pesos").contains(document.activeElement) && $("cfg-pesos").dataset.dirty !== "1") { T.each("[data-peso]", function (i) { i.value = pw[i.dataset.peso] != null ? pw[i.dataset.peso] : ""; }); somaPesos(); }
     LISTAS.forEach(function (l) { var box = $("cfg-" + l.k); if (box.dataset.dirty !== "1") box.innerHTML = (c[l.k] || []).map(listRow).join(""); });
   }
   function init() {
     var view = $("view-config");
-    view.addEventListener("input", function (e) { var le = e.target.closest(".list-edit"); if (le) marcarAlterado(le); });
+    view.addEventListener("input", function (e) { var le = e.target.closest(".list-edit"); if (le) marcarAlterado(le); if (e.target.dataset.peso) { $("cfg-pesos").dataset.dirty = "1"; somaPesos(); } });
     view.addEventListener("click", async function (e) {
       var t = e.target.closest("button"); if (!t) return;
       if (t.dataset.rm) { var le = t.closest(".list-edit"); t.closest(".list-edit-row").remove(); marcarAlterado(le); return; }
@@ -80,6 +99,12 @@
       }
       if (t.id === "btn-add-person") {
         await T.saveWith(t, function () { return T.db.doc("pessoas/pessoa-" + Date.now().toString(36)).set({ nome: "Nova pessoa", perfil: "colaborador", custoHora: null, valorHora: null, ativo: true, ordem: T.state.pessoas.length + 1 }); });
+        return;
+      }
+      if (t.id === "btn-save-pesos") {
+        var pw = {}; T.each("[data-peso]", function (i) { pw[i.dataset.peso] = Math.max(0, T.numOrNull(i.value) || 0); });
+        var okp = await T.saveWith(t, function () { return T.saveConfig({ pesosEtapas: pw }); });
+        if (okp) $("cfg-pesos").dataset.dirty = "";
         return;
       }
       if (t.id === "btn-save-office") {

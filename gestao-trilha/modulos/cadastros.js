@@ -152,7 +152,7 @@
       if ((b = t.closest("[data-novo]"))) { var k = b.dataset.novo; if (k === "projeto") { T.gestor.novo(); return; } if (k === "obra") S.editObra = "novo"; else S.edit = "novo"; render(); return; }
       if (t.closest("[data-cancel]")) { S.edit = S.editObra = null; render(); return; }
       if ((b = t.closest("[data-ed]"))) { S.edit = b.dataset.ed; render(); window.scrollTo(0, 0); return; }
-      if ((b = t.closest("[data-proj]"))) { T.gestor.gp(b.dataset.proj) ? T.gestor.abrir(b.dataset.proj) : T.go("admin", "projetos"); return; }
+      if ((b = t.closest("[data-proj]"))) { T.gestor.gp(b.dataset.proj) ? T.gestor.abrir(b.dataset.proj) : T.relatorios.abrirCustos(); return; }
       if ((b = t.closest("[data-obra]"))) { S.editObra = b.dataset.obra; render(); return; }
       if ((b = t.closest("[data-del]"))) {
         var ct = contato(b.dataset.del);

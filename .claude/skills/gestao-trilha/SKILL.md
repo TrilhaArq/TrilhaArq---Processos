@@ -20,8 +20,9 @@ Um único Artifact, organizado em **módulos**, com um único banco de dados com
 1. Tudo fica **num único app, no mesmo link**, para que os módulos compartilhem dados (pessoas, projetos,
    custos). Um módulo novo nasce como `modulos/<id>.js` deste app, não como outro Artifact.
 2. **Capa** = hub: notificações no topo (só as do Gestor de Projetos, via `notes()`), botões das pessoas (área
-   "pessoa": Tempo, Tarefas, Projetos) e botões do Escritório (área "admin": Gestor de Projetos, Cadastros,
-   Financeiro, Horas e custos, Relatórios, Configurações). Cada app do escritório abre sozinho, só com "← Início".
+   "pessoa": Tempo, Tarefas, Projetos) e botões do Escritório nesta ordem: Gestor de Projetos, Gestor de obras
+   (em breve), Gestor Comercial (em breve), Financeiro, Relatórios (com a aba Horas e custos), Configurações,
+   Cadastros. Cada app do escritório abre sozinho, só com "← Início".
 3. **Banco:** limite de 5.000 documentos por Artifact → registros numerosos agrupados em um documento por
    pessoa/mês ou por mês/obra, com `itens[]`. Gravações pelo chat usam `if_version`.
 4. **Identidade visual Trilha:** verde-sálvia #88AC67, neutros oklch esverdeados, Comfortaa + Work Sans,

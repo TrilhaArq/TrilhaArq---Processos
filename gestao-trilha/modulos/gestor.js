@@ -170,7 +170,31 @@
   function itensDe(g, etapa) { return (g.itens || []).filter(function (x) { return !etapa || x.etapa === etapa; }); }
   function feito(x) { return x.sit === "pronto" || x.sit === "entregue"; }
   function prontos(list) { return list.filter(feito).length; }
-  function pctProjeto(g) { var it = itensDe(g); return it.length ? Math.round(prontos(it) / it.length * 100) : 0; }
+  // % concluído com peso por etapa (Configurações › Peso das etapas). Abertura não conta. Etapa já encerrada = 100%;
+  // etapa em curso ou futura = itens prontos ÷ itens da etapa. Etapas que o projeto não tem (REF/INT sem Anteprojeto e
+  // Legal; Legal "não se aplica") saem da conta e os pesos restantes são redistribuídos na mesma proporção.
+  function pesos() { return Object.assign({}, T.DEFAULT_CONFIG.pesosEtapas, T.cfg().pesosEtapas || {}); }
+  function progEtapa(g, e) {
+    if (ETAPAS[e].marc) {
+      var mi = ["aguardando", "mep", "espera", "mex", "fim"].indexOf((g.marc || {}).etapa);
+      if (e === "mep" ? mi >= 2 : mi >= 4) return 1;
+    } else {
+      if (g.etapa === "encerrado") return 1;
+      if (e === "pl") { if (g.legal === "aprovado") return 1; }
+      else { var f = fluxo(g.sigla); if (f.indexOf(e) < f.indexOf(g.etapa)) return 1; }
+    }
+    var it = itensDe(g, e); return it.length ? prontos(it) / it.length : 0;
+  }
+  function pctPonderado(g, ets) {
+    var w = pesos(), tot = 0, soma = 0;
+    ets.forEach(function (e) { var p = +w[e] || 0; tot += p; soma += p * progEtapa(g, e); });
+    return tot ? Math.round(soma / tot * 100) : 0;
+  }
+  function etapasArq(g) { var e = ["ep"]; if (doZero(g.sigla)) e.push("ap"); if (doZero(g.sigla) && temLegal(g)) e.push("pl"); e.push("pe"); return e; }
+  function pctProjeto(g) { return pctPonderado(g, etapasArq(g)); }
+  function pctMarc(g) { return marcAtiva(g) ? pctPonderado(g, ["mep", "mex"]) : null; }
+  function prazoMarc(g) { return marcAberta(g) && (g.marc.etapa === "mep" || g.marc.etapa === "mex") ? calcPrazo(g, g.marc.etapa) : null; }
+  function prazoArq(g) { return ETAPAS[g.etapa] && ETAPAS[g.etapa].prazo ? calcPrazo(g, g.etapa) : null; }
   function marco(g, k) { if (k === "topografico" || k === "documentos") { var it = itensDe(g, "abertura").filter(function (x) { return x.chave === k; })[0]; if (it) return feito(it); } return !!(g.marco || {})[k]; }
   function lancDoProj(pid) { return T.tempo ? T.tempo.lancAtivos().filter(function (l) { return l.tipo === "projeto" && l.alvoId === pid; }) : []; }
   function horasProj(pid) { return lancDoProj(pid).reduce(function (s, l) { return s + l.min; }, 0); }
@@ -367,17 +391,20 @@
 
   // ---------- lista (visão geral de todos) ----------
   function cardProjeto(p) {
-    var g = G(p.id), it = itensDe(g), pz = prazoInfo(g), h = horasProj(p.id), pct = pctProjeto(g);
+    var g = G(p.id), it = itensDe(g), pz = prazoInfo(g), h = horasProj(p.id), pct = pctProjeto(g), pm = pctMarc(g);
+    var pa = prazoArq(g), pzm = prazoMarc(g), dois = marcAtiva(g);
+    function vbar(v, rot, tit, cls) { return '<div class="gp-vbar' + (cls || "") + '" title="' + tit + " " + v + '% concluído"><i style="height:' + v + '%"></i><b>' + v + "%</b>" + (rot ? "<small>" + rot + "</small>" : "") + "</div>"; }
+    function linhaPrazo(z, rot) { return '<div class="gp-prazo-row">' + (rot ? '<span class="gp-prazo-rot">' + rot + "</span>" : "") + '<span class="num">' + (z ? T.fmtYmd(T.ymd(z.fim)) : "sem prazo") + "</span>" + barraPrazo(z) + "</div>"; }
     var legal = temLegal(g) && ["ap", "pe"].indexOf(g.etapa) >= 0 ? '<div class="gp-legal">Legal: ' + esc((LEGAL.filter(function (o) { return o[0] === g.legal; })[0] || ["", ""])[1]) + "</div>" : "";
     return '<button class="tile-btn gp-card" data-open="' + esc(p.id) + '">' +
-      '<div class="gp-vbar" title="Projeto ' + pct + '% concluído"><i style="height:' + pct + '%"></i><b>' + pct + "%</b></div>" +
+      (dois ? '<div class="gp-vbars">' + vbar(pct, "Arq.", "Projeto arquitetônico") + vbar(pm, "Marc.", "Projeto de marcenaria", " marc") + "</div>" : vbar(pct, "", "Projeto")) +
       '<div class="gp-card-main"><div class="gp-top"><span class="gp-sig">' + esc(g.sigla || "") + '</span><div class="gp-names"><div class="gp-name">' + esc(p.nome) + '</div><div class="gp-clients">' + esc(clientesNomes(p) || "Sem cliente") + "</div></div>" + avatares(p.id, g) + "</div>" +
       '<div class="gp-etapa">' + trilha(g) + "<span>" + etapaLinha(g) + "</span></div>" + sitPill(g) +
       '<div class="gp-next">' + (g.proximo ? "Próximo: " + esc(g.proximo) : '<span class="muted">Sem próximo passo definido</span>') + "</div>" + legal +
       '<div class="tile-stats"><div><small>Plano</small><b>' + (it.length ? prontos(it) + "/" + it.length : "—") + "</b></div>" +
       "<div><small>Prazo</small><b>" + (pz ? (pz.pausado ? "pausado" : pz.resta >= 0 ? pz.resta + " d.u." : "vencido") : "—") + "</b></div>" +
       "<div><small>Horas</small><b>" + (h ? T.fmtH(h) : "—") + "</b></div></div>" +
-      '<div class="gp-prazo-row"><span class="num">' + (pz ? T.fmtYmd(T.ymd(pz.fim)) : "sem prazo") + "</span>" + barraPrazo(pz) + "</div></div></button>";
+      (dois ? (g.etapa !== "encerrado" ? linhaPrazo(pa, "Arq.") : "") + (marcAberta(g) ? linhaPrazo(pzm, "Marc.") : "") : linhaPrazo(pz, "")) + "</div></button>";
   }
   var GRUPOS_LISTA = [["abertura", "Abertura"], ["ep", "Estudo Preliminar"], ["ap", "Anteprojeto"], ["pe", "Executivo"], ["marc", "Marcenaria"]];
   function renderLista() {
@@ -421,14 +448,18 @@
   function renderProjeto() {
     var p = proj(S.projId), g = G(S.projId);
     if (!g) { S.view = "lista"; return render(); }
-    var pct = pctProjeto(g);
+    var pct = pctProjeto(g), pm = pctMarc(g);
+    function hprog(v, rot, cls) { return '<div class="gp-hprog' + (cls || "") + '" title="Etapas com peso (Configurações › Peso das etapas)"><span>' + rot + '</span><div class="gp-hbar"><i style="width:' + v + '%"></i></div><b class="num">' + v + "%</b></div>"; }
     var acoes = g.arquivado ? '<button class="btn btn-small" data-act="desarquivar">Desarquivar</button>' :
       g.suspenso ? '<button class="btn btn-small btn-primary" data-act="reativar">Reativar</button><button class="btn btn-small" data-act="arquivar">Arquivar</button>' :
         '<button class="btn btn-small" data-act="suspender">Suspender</button><button class="btn btn-small" data-act="arquivar">Arquivar</button>';
     $("gp-p-head").innerHTML = '<div class="gp-p-nav"><button class="link" data-voltar="1">← Todos os projetos</button><div class="form-actions gp-p-acts">' + acoes + "</div></div>" +
       '<div class="gp-p-title"><span class="gp-sig">' + esc(g.sigla) + '</span><div><h2 class="gp-name gp-p-name">' + esc(p.nome) + '</h2><div class="section-meta">' + esc(p.codigo || "") + " · " + esc(clientesNomes(p) || "sem cliente") + "</div></div>" + sitPill(g) + "</div>" +
       '<div class="segmented gp-abas">' + ABAS.map(function (a) { return '<button class="seg-pill' + (S.tab === a[0] ? " is-selected" : "") + '" data-tab="' + a[0] + '">' + a[1] + "</button>"; }).join("") + "</div>" +
-      '<div class="gp-hprog" title="Itens do Plano de Projeto concluídos"><span>Projeto concluído</span><div class="gp-hbar"><i style="width:' + pct + '%"></i></div><b class="num">' + pct + "%</b></div>";
+      (pm != null ? '<div class="gp-hprogs">' + hprog(pct, "Projeto arquitetônico concluído") + hprog(pm, "Projeto de marcenaria concluído", " marc") + "</div>" : hprog(pct, "Projeto concluído"));
+    // Formulário com alterações ainda não salvas (Ficha, ambiente, inclusão): não redesenhar por baixo de quem digita.
+    if (S.sujo && S.sujo === S.projId + "|" + S.tab && document.querySelector("#gp-p-body form, #gp-p-body .amb-ed")) return;
+    S.sujo = null;
     $("gp-p-body").innerHTML = S.tab === "plano" ? abaPlano(g) : S.tab === "tarefas" ? abaTarefas(g) : S.tab === "historico" ? abaHistorico(g, p) : S.tab === "programa" ? abaPrograma(g, p) : S.tab === "ficha" ? abaFicha(g, p) : abaGeral(g, p);
   }
   function passos(g, pid) {
@@ -443,7 +474,8 @@
     }).join("") + "</div>";
   }
   function abaGeral(g, p) {
-    var et = ETAPAS[g.etapa] || {}, pz = prazoInfo(g), ie = itensDe(g, g.etapa === "encerrado" && marcAberta(g) ? g.marc.etapa : g.etapa);
+    // Com marcenaria, este quadro mostra só o prazo da arquitetura (a marcenaria tem o quadro próprio abaixo).
+    var et = ETAPAS[g.etapa] || {}, pz = marcAtiva(g) && g.etapa !== "encerrado" ? prazoArq(g) : prazoInfo(g), ie = itensDe(g, g.etapa === "encerrado" && marcAberta(g) ? g.marc.etapa : g.etapa);
     var numeros = '<div class="card gp-strip"><div><small>Prazo' + (pz ? " · " + esc(ETAPAS[pz.etapa].curto) : "") + "</small><b>" + (pz ? pz.usados + " / " + pz.prazo + " d.u." : "—") + "</b><span>" + (pz ? (pz.pausado ? "pausado" : pz.resta >= 0 ? "restam " + pz.resta : "vencido há " + (-pz.resta)) : "sem prazo nesta etapa") + "</span></div>" +
       "<div><small>Data final</small><b>" + (pz ? T.fmtYmd(T.ymd(pz.fim)) : "—") + "</b><span>" + (pz ? (pz.pausado ? "avança enquanto pausado" : "em dias úteis") : "") + "</span></div>" +
       "<div><small>Itens da etapa</small><b>" + (ie.length ? prontos(ie) + " / " + ie.length : "—") + "</b><span>prontos</span></div>" +
@@ -1019,6 +1051,7 @@
     v.addEventListener("click", async function (e) {
       var t = e.target, b, pid = S.projId;
       if (t.closest("#gp-overlay")) return;
+      if (!t.closest("input, select, textarea, label")) S.sujo = null;
       if ((b = t.closest("[data-f]"))) { S.filtro = b.dataset.f; S.foco = null; renderLista(); return; }
       if ((b = t.closest("[data-foco]"))) { S.foco = S.foco === b.dataset.foco ? null : b.dataset.foco; renderLista(); var gr = document.querySelector(".gp-group.is-foco"); if (gr) gr.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
       if ((b = t.closest("[data-open]"))) { api.abrir(b.dataset.open); return; }
@@ -1083,6 +1116,9 @@
       else if (t.id === "w-et") { S.wiz.etapaAtual = t.value; S.wiz.fase = 1; renderNovo(); }
       else if (t.dataset.w) S.wiz[t.dataset.w] = t.value;
     });
+    function marcaSujo(e) { var t = e.target; if (S.view === "projeto" && t.closest("#gp-p-body") && t.closest("form, .amb-ed")) S.sujo = S.projId + "|" + S.tab; }
+    v.addEventListener("input", marcaSujo);
+    v.addEventListener("change", marcaSujo);
     v.addEventListener("input", function (e) {
       var t = e.target; if (!S.wiz || t.closest("#gp-overlay")) return;
       if (t.dataset.w) { S.wiz[t.dataset.w] = t.value; if (t.dataset.w === "codigo") S.wiz.codManual = true; if (t.dataset.w === "nome" && !S.wiz.codManual) { S.wiz.codigo = codigoDe(S.wiz.sigla, t.value); var c = $("w-cod"); if (c) c.value = S.wiz.codigo; } }
@@ -1094,6 +1130,7 @@
     v.addEventListener("submit", function (e) {
       var f = e.target, pid = S.projId, a; e.preventDefault();
       if (f.closest("#gp-overlay")) return;
+      if (f.id !== "gp-ficha") S.sujo = null;
       if (f.dataset.addg) {
         var tit = f.querySelector("#gp-add-in").value.trim(); if (!tit) return; var gk = f.dataset.addg, et = f.dataset.adde, usaMod = $("gp-add-mod") && $("gp-add-mod").checked;
         salvar(pid, function (x) { var n = x.itens.filter(function (y) { return y.etapa === et && y.grupo === gk; }).length; x.itens.push(usaMod ? novoMovel(et, gk, tit, { ord: 1000 + n }) : novoItem(et, gk, tit, { ord: 1000 + n })); if (ETAPAS[et].marc || ["briefing", "abertura"].indexOf(x.etapa) < 0) evento(x, "Item incluído no Plano: " + tit + " (" + ETAPAS[et].curto + ")", hojeIso(), { tipo: "plano" }); });
@@ -1132,21 +1169,30 @@
     });
     S.openAmb = null; T.toast("Ambiente salvo");
   }
+  // Ficha: todos os campos são lidos ANTES de gravar (a primeira gravação redesenha a tela e voltaria os valores antigos).
   async function salvarFicha() {
     var pid = S.projId, cli = []; T.each("[data-fcli]", function (i) { if (i.checked) cli.push(i.dataset.fcli); });
     var g0 = G(pid), sig = $("f-sig").value || g0.sigla, nomes = cli.map(function (id) { var c = T.cadastros && T.cadastros.contato(id); return c ? c.nome : ""; }).filter(Boolean);
-    await T.saveWith($("f-save"), async function () {
-      var body = { nome: $("f-nome").value.trim(), codigo: $("f-cod").value.trim(), sigla: sig, tipo: TIPO_ANTIGO[sig], clienteIds: cli, endereco: $("f-end").value.trim(), categorias: { padrao: $("f-pad").value || null, dimensao: $("f-dim").value || null, dificuldade: $("f-dif").value || null },
-        contrato: { numero: $("f-cnum").value.trim(), data: $("f-cdata").value || null, cidade: $("f-cid").value.trim() } };
-      if (nomes.length) body.cliente = nomes.join(" e ");
+    var body = { nome: $("f-nome").value.trim(), codigo: $("f-cod").value.trim(), sigla: sig, tipo: TIPO_ANTIGO[sig], clienteIds: cli, endereco: $("f-end").value.trim(), categorias: { padrao: $("f-pad").value || null, dimensao: $("f-dim").value || null, dificuldade: $("f-dif").value || null },
+      contrato: { numero: $("f-cnum").value.trim(), data: $("f-cdata").value || null, cidade: $("f-cid").value.trim() } };
+    if (nomes.length) body.cliente = nomes.join(" e ");
+    var pavs = $("f-pavs").value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean), dir = {};
+    ["uso", "expectativas", "estetica", "relacao", "sistemas", "execucao"].forEach(function (k) { dir[k] = $("fd-" + k).value.trim(); });
+    var datas = {}; T.each("[data-fet]", function (i) { var a = split(i.dataset.fet); datas[a[0]] = datas[a[0]] || {}; datas[a[0]][a[1]] = i.value; });
+    var legalNovo = $("f-leg").value, pasta = $("f-pasta").value.trim(), bimx = $("f-bimx").value.trim();
+    var mcontrato = $("f-mnum") ? { numero: $("f-mnum").value.trim(), data: $("f-mdata").value || null } : null;
+    var btn = $("f-save");
+    // Pavimentos: o Plano acompanha (inclui, renomeia e, com confirmação, retira itens ainda não iniciados).
+    var mud = pavs.length ? mudancaPavs(g0, g0.pavs || [], pavs) : null;
+    if (mud && mud.remover.length && !(await T.confirmar({ titulo: "Retirar pavimento?", texto: "Sai(em) do Plano " + mud.remover.length + " item(ns) ainda não iniciado(s) de <b>" + esc(mud.saem.join(", ")) + "</b>." + (mud.ficam ? " " + mud.ficam + " item(ns) já iniciado(s) ou pronto(s) continuam no Plano." : "") + " Não dá para desfazer.", ok: "Salvar e retirar", perigo: true }))) return;
+    S.sujo = null;
+    var ok = await T.saveWith(btn, async function () {
       await T.db.doc("projetos/" + pid).update(body);
-      var pavs = $("f-pavs").value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean), dir = {};
-      ["uso", "expectativas", "estetica", "relacao", "sistemas", "execucao"].forEach(function (k) { dir[k] = $("fd-" + k).value.trim(); });
-      var datas = {}; T.each("[data-fet]", function (i) { var a = split(i.dataset.fet); datas[a[0]] = datas[a[0]] || {}; datas[a[0]][a[1]] = i.value; });
       await salvar(pid, function (x) {
-        x.sigla = sig; x.pavs = pavs.length ? pavs : x.pavs; x.pasta = $("f-pasta").value.trim(); x.bimx = $("f-bimx").value.trim(); x.diretrizes = dir;
-        if ($("f-leg").value && $("f-leg").value !== x.legal) { x.legal = $("f-leg").value; evento(x, "Projeto Legal: " + (LEGAL.filter(function (o) { return o[0] === x.legal; })[0] || [0, x.legal])[1], hojeIso(), { tipo: "etapa" }); }
-        if (x.marc && $("f-mnum")) x.marc.contrato = { numero: $("f-mnum").value.trim(), data: $("f-mdata").value || null };
+        x.sigla = sig; x.pasta = pasta; x.bimx = bimx; x.diretrizes = dir;
+        if (pavs.length) aplicarPavs(x, x.pavs || [], pavs);
+        if (legalNovo && legalNovo !== x.legal) { x.legal = legalNovo; evento(x, "Projeto Legal: " + (LEGAL.filter(function (o) { return o[0] === x.legal; })[0] || [0, x.legal])[1], hojeIso(), { tipo: "etapa" }); }
+        if (x.marc && mcontrato) x.marc.contrato = mcontrato;
         x.etapas = x.etapas || {}; var mud = [];
         Object.keys(datas).forEach(function (e) {
           var d = datas[e], cur = x.etapas[e] = x.etapas[e] || {}, ini = d.inicio ? isoDeData(d.inicio) : null, fim = d.fim ? isoDeData(d.fim) : null, pz = T.numOrNull(d.prazo);
@@ -1158,6 +1204,75 @@
         if (mud.length) evento(x, "Datas/prazos ajustados na Ficha: " + mud.join("; "), hojeIso(), { tipo: "etapa" });
       });
     });
+    if (ok) T.toast("Ficha salva ✓");
+  }
+
+  // ---------- pavimentos × Plano ----------
+  // Itens que dependem do pavimento (título terminando em " – <pavimento>") e onde nascem.
+  var PAV_MODELOS = [
+    { e: "ep", gr: "ep-apres", t: "Planta – ", depois: /^Implantação|^Planta – / },
+    { e: "ap", gr: "s100", t: "Planta baixa – ", depois: /^Implantação|^Planta baixa – / },
+    { e: "ap", gr: "s400", t: "Piso e acabamento – ", depois: /^Topografia|^Piso e acabamento – / },
+    { e: "ap", gr: "s400", t: "Hidrossanitário – ", depois: /^Piso e acabamento – |^Hidrossanitário – / },
+    { e: "ap", gr: "s400", t: "Elétrica – ", depois: /^Hidrossanitário – |^Elétrica – / },
+    { e: "ap", gr: "s400", t: "Forro e iluminação – ", depois: /^Elétrica – |^Forro e iluminação – / },
+    { e: "pl", gr: "pl-pranchas", t: "Planta – ", depois: /^Situação|^Planta de cobertura|^Planta – / },
+    { e: "pe", gr: "s100", t: "Planta baixa – ", depois: /^Implantação|^Planta baixa – / },
+    { e: "pe", gr: "s400", t: "Piso e acabamento – ", depois: /^Topografia|^Piso e acabamento – / },
+    { e: "pe", gr: "s400", t: "Hidrossanitário – ", depois: /^Piso e acabamento – |^Hidrossanitário – / },
+    { e: "pe", gr: "s400", t: "Elétrica – ", depois: /^Hidrossanitário – |^Elétrica – / },
+    { e: "pe", gr: "s400", t: "Forro e iluminação – ", depois: /^Elétrica – |^Forro e iluminação – / },
+    { e: "pe", gr: "s700", t: "Planta de marmoraria – ", depois: /^Planta de marmoraria – /, soComGrupo: true }
+  ];
+  function etapaAberta(x, e) {
+    if (x.etapa === "encerrado") return false;
+    if (e === "pl") return temLegal(x) && ["aprovado"].indexOf(x.legal) < 0;
+    var f = fluxo(x.sigla); return f.indexOf(e) >= f.indexOf(x.etapa) && f.indexOf(e) >= 0;
+  }
+  function doPav(it, pav) { return it.titulo.slice(-(pav.length + 3)) === " – " + pav; }
+  function iniciado(it) { return it.sit !== "a_fazer" || (it.desenhos || []).some(function (d) { return d.feito || (d.checklist || []).some(function (c) { return c.ok; }); }); }
+  // Pavimentos comparados pela posição: nome diferente = renomear; a mais = incluir; a menos = retirar.
+  function mudancaPavs(g, antes, depois) {
+    var saem = antes.slice(depois.length), remover = [], ficam = 0;
+    saem.forEach(function (pv) { (g.itens || []).forEach(function (it) { if (doPav(it, pv)) { if (iniciado(it)) ficam++; else remover.push(it.id); } }); });
+    return { saem: saem, remover: remover, ficam: ficam };
+  }
+  function aplicarPavs(x, antes, depois) {
+    var mudou = [], i;
+    for (i = 0; i < Math.min(antes.length, depois.length); i++) if (antes[i] !== depois[i]) {
+      var de = antes[i], para = depois[i];
+      (x.itens || []).forEach(function (it) {
+        if (doPav(it, de)) it.titulo = it.titulo.slice(0, -de.length) + para;
+        (it.desenhos || []).forEach(function (d) { if (d.nome.slice(-(de.length + 3)) === " – " + de) d.nome = d.nome.slice(0, -de.length) + para; });
+      });
+      (x.ambientes || []).forEach(function (a) { if (a.pav === de) a.pav = para; });
+      mudou.push(de + " → " + para);
+    }
+    var novos = depois.slice(antes.length), saem = antes.slice(depois.length), incl = 0, tirados = 0;
+    novos.forEach(function (pv) {
+      PAV_MODELOS.forEach(function (m) {
+        if (!etapaAberta(x, m.e)) return;
+        var irmaos = ordenar((x.itens || []).filter(function (it) { return it.etapa === m.e && it.grupo === m.gr; }));
+        if (m.soComGrupo && !irmaos.length) return;
+        if (m.e === "pl" && !irmaos.length) return;
+        var ultimo = null; irmaos.forEach(function (it) { if (m.depois.test(it.titulo)) ultimo = it; });
+        var novo = novoItem(m.e, m.gr, m.t + pv), pos = ultimo ? irmaos.indexOf(ultimo) + 1 : irmaos.length;
+        irmaos.splice(pos, 0, novo); irmaos.forEach(function (it, k) { it.ord = k + 1; });
+        x.itens.push(novo); incl++;
+      });
+    });
+    saem.forEach(function (pv) {
+      var antesN = x.itens.length;
+      x.itens = x.itens.filter(function (it) { return !(doPav(it, pv) && !iniciado(it)); });
+      tirados += antesN - x.itens.length;
+      (x.ambientes || []).forEach(function (a) { if (a.pav === pv) a.pav = null; });
+    });
+    x.pavs = depois.slice();
+    var txt = [];
+    if (mudou.length) txt.push("renomeado(s): " + mudou.join(", "));
+    if (novos.length) txt.push("incluído(s): " + novos.join(", ") + " (" + incl + " itens no Plano)");
+    if (saem.length) txt.push("retirado(s): " + saem.join(", ") + " (" + tirados + " itens saíram do Plano)");
+    if (txt.length) evento(x, "Pavimentos " + txt.join("; "), hojeIso(), { tipo: "plano" });
   }
 
   var api = T.gestor = {
@@ -1165,6 +1280,7 @@
     novo: function (pj) { if (T.state.view !== "admin" || T.state.sub !== "gestor") T.go("admin", "gestor"); S.wiz = wizInicial(pj); S.view = "novo"; render(); window.scrollTo(0, 0); },
     // Excluir: só pelo Cadastros (com confirmação lá). Remove o processo do Gestor; as horas continuam no Tempo.
     excluir: async function (pid) { await T.db.doc("gp/" + pid).delete(); delete S.gp[pid]; if (S.projId === pid) { S.view = "lista"; S.projId = null; } },
+    pct: function (pid) { var g = G(pid); return g ? pctProjeto(g) : null; }, pctMarc: function (pid) { var g = G(pid); return g ? pctMarc(g) : null; },
     gp: G, etapaNome: function (pid) { var g = G(pid); return g ? etapaLinha(g) : ""; }, situacao: function (pid) { var g = G(pid); return g ? situacao(g) : null; },
     codigos: codigos, ordenar: ordenar, sitNome: sitNome, SIT: SIT, feito: feito, mudarItem: mudarItem, salvar: salvar, etapas: ETAPAS, etapasPlano: etapasPlano, grupos: grupos, desenhosProg: desenhosProg, ativo: ativo,
     itensParaTempo: function (pid, etapaTempo) {

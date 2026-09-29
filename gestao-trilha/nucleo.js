@@ -30,6 +30,8 @@
       { id: "res", nome: "Residencial" }, { id: "comr", nome: "Comercial" },
       { id: "hot", nome: "Hotelaria" }, { id: "int", nome: "Interiores" }, { id: "ref", nome: "Reforma" }, { id: "out", nome: "Outro" }
     ],
+    // Peso de cada etapa no % concluído do Gestor (Abertura não conta). Marcenaria: EP e Executivo.
+    pesosEtapas: { ep: 30, ap: 30, pl: 10, pe: 30, mep: 50, mex: 50 },
     custosFixosMensais: null, horasProdutivasMes: 112
   };
   T.MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
@@ -138,9 +140,13 @@
   };
 
   // ---------- capa ----------
+  // Botões "Em breve" e ordem dos botões do Escritório na capa (da esquerda para a direita, de cima para baixo).
+  // Módulo que não estiver na lista entra no fim.
   var FUTUROS = [
-    { t: "Gestor de obras", d: "Orçamentos, execução e custo real das obras", icon: '<path d="M3 20h18"/><path d="M5 20v-6a7 7 0 0 1 14 0v6"/><path d="M12 7V4"/><path d="M9 14h6"/>' }
+    { id: "obras", t: "Gestor de obras", d: "Orçamentos, execução e custo real das obras", icon: '<path d="M3 20h18"/><path d="M5 20v-6a7 7 0 0 1 14 0v6"/><path d="M12 7V4"/><path d="M9 14h6"/>' },
+    { id: "comercial", t: "Gestor Comercial", d: "Oportunidades, briefing e propostas", icon: '<path d="M4 7h16v12H4z"/><path d="M9 7V5h6v2"/><path d="M4 12h16"/><path d="M11 12v2h2v-2"/>' }
   ];
+  var ORDEM_CAPA = ["gestor", "obras", "comercial", "financeiro", "relatorios", "config", "cadastros"];
   function renderHome() {
     var s = T.state;
     $("cover-date").textContent = T.fmtDia(new Date()).replace(/^./, function (c) { return c.toUpperCase(); });
@@ -150,9 +156,11 @@
       return '<button class="tile-btn" data-user="' + T.esc(p.id) + '"><div class="tile-top"><span class="avatar">' + T.esc(p.nome.charAt(0)) + '</span><div><div class="tile-name">' + T.esc(p.nome) + "</div>" + st + "</div></div>" +
         '<div class="tile-stats">' + stats.map(function (x) { return "<div><small>" + T.esc(x.label) + '</small><b class="' + (x.alert ? "alert" : "") + '">' + T.esc(x.value) + "</b></div>"; }).join("") + "</div></button>";
     }).join("") || '<div class="empty">Carregando pessoas…</div>';
-    $("admin-tiles").innerHTML = modsDaArea("admin").map(function (m) {
-      return '<button class="tile-btn admin-tile" data-go="' + m.id + '"><svg viewBox="0 0 24 24" aria-hidden="true">' + m.icon + '</svg><span><span class="t">' + T.esc(m.label) + '</span><span class="d">' + T.esc(m.desc ? m.desc() : "") + "</span></span></button>";
-    }).join("") + FUTUROS.map(function (f) {
+    var botoes = modsDaArea("admin").map(function (m) { return { id: m.id, m: m }; }).concat(FUTUROS.filter(function (f) { return !T.mod(f.id); }).map(function (f) { return { id: f.id, f: f }; }));
+    function pos(b) { var i = ORDEM_CAPA.indexOf(b.id); return i < 0 ? 99 : i; }
+    $("admin-tiles").innerHTML = botoes.sort(function (a, b) { return pos(a) - pos(b); }).map(function (b) {
+      var m = b.m, f = b.f;
+      if (m) return '<button class="tile-btn admin-tile" data-go="' + m.id + '"><svg viewBox="0 0 24 24" aria-hidden="true">' + m.icon + '</svg><span><span class="t">' + T.esc(m.label) + '</span><span class="d">' + T.esc(m.desc ? m.desc() : "") + "</span></span></button>";
       return '<div class="tile-btn admin-tile soon" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true">' + f.icon + '</svg><span><span class="t">' + f.t + '<span class="soon-pill">Em breve</span></span><span class="d">' + f.d + "</span></span></div>";
     }).join("");
     if ($("notes")) $("notes").innerHTML = call("notes", [null]).join("");

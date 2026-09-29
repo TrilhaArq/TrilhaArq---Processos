@@ -16,11 +16,15 @@ Mapear tempo e custo de cada projeto para precificar com base em dados, não em 
 ## Navegação (v3)
 
 - **Capa (página inicial):** botões das pessoas (Luan, Elisa…) com horas do mês, tarefas a fazer e atrasadas, um
-  botão por app do escritório com descrição fixa e, acima deles, as **notificações** do Gestor de Projetos
+  botão por app do escritório com descrição fixa — na ordem (esquerda → direita, de cima para baixo): Gestor de
+  Projetos, Gestor de obras (em breve), Gestor Comercial (em breve), Financeiro, Relatórios, Configurações e
+  Cadastros (decisão do Luan em 29/09/2026) — e, acima deles, as **notificações** do Gestor de Projetos
   (decisão do Luan em 29/09/2026: o app fica aberto numa segunda tela e as notificações chamam a atenção).
 - **Área da pessoa:** abas **Tempo**, **Tarefas** e **Projetos** (Meu trabalho), mais "← Início"; as notificações
   da pessoa aparecem acima das abas.
-- **Apps do escritório** (Gestor de Projetos, Cadastros, Financeiro, Horas e custos, Relatórios, Configurações):
+- **Horas e custos** deixou de ser botão da capa (29/09/2026): é a aba "Horas e custos por projeto" dentro de
+  Relatórios. "+ Novo projeto" ali abre o assistente do Gestor de Projetos.
+- **Apps do escritório** (Gestor de Projetos, Cadastros, Financeiro, Relatórios, Configurações):
   cada um abre como um app próprio, com o título e só o botão "← Início" no topo; para ir a outro app, volta-se à capa.
 - O app sempre abre na capa.
 
@@ -188,12 +192,30 @@ de `manual-trilha/AJUSTES-TESTE.md`. Tudo é padrão editável; poucos cliques.
 - `projetos.status` acompanha: suspenso/arquivado → `pausado`; encerrado (sem marcenaria aberta) → `concluido`.
 - **Excluir** projeto, pessoa, contato ou obra: **só em Cadastros**, com confirmação. As horas continuam no Tempo.
 
+### Ficha e pavimentos
+- A Ficha lê todos os campos antes de gravar e não é redesenhada enquanto há alterações não salvas (antes, dados
+  que chegavam do banco — por exemplo o cronômetro de outra pessoa — voltavam os campos ao valor antigo). Ao salvar:
+  "Salvando…" → "Salvo ✓" e o aviso "Ficha salva ✓". A mesma proteção vale para o editor de ambiente e as inclusões.
+- **Pavimentos editáveis a qualquer momento** (um por linha, comparados pela posição): nome diferente = renomeia nos
+  itens, desenhos e ambientes; pavimento a mais = inclui no Plano, nas etapas ainda abertas, os itens por pavimento
+  (EP: Planta; AP e Executivo: Planta baixa e os 4 mapeamentos; Legal não aprovado: Planta; Executivo: planta de
+  marmoraria, se houver bancadas), cada um na posição certa da série; pavimento a menos = retira, com confirmação,
+  só os itens ainda não iniciados (os iniciados ficam). Tudo vai para o Histórico.
+
 ### Plano de Projeto
 - Itens por etapa e grupo; códigos pela posição (série 100…, AP01…, PL01…, EM01… na marcenaria). Cada item tem
   desenhos/subitens com checklist e link do PDF-guia, prazo, responsável, situação e prioridade P1/P2/P3.
 - Termos **não** são itens: são botões no fim da etapa que geram o PDF.
 - O cronômetro mede a **prancha (item)**, não cada desenho. Concluir no Meu trabalho manda o item para "Revisão interna".
-- % do projeto = itens prontos / total de itens.
+- **% concluído com peso por etapa** (29/09/2026; editável em Configurações › Peso das etapas, a revisar quando
+  houver horas reais): arquitetônico = Estudo Preliminar 30%, Anteprojeto 30%, Projeto Legal 10%, Executivo 30%;
+  Abertura não conta. Etapa encerrada vale o peso inteiro; etapa em curso ou futura vale itens prontos ÷ itens da
+  etapa (Legal aprovado = inteiro). Etapa que o projeto não tem sai da conta e os pesos restantes são redistribuídos
+  na mesma proporção (REF/INT: EP 50% e Executivo 50%; sem Legal: 33% cada).
+- **Duas barras quando há marcenaria:** "Projeto arquitetônico concluído" e "Projeto de marcenaria concluído"
+  (EP da marcenaria 50%, Executivo da marcenaria 50%), no cabeçalho do projeto e no cartão (barras Arq. e Marc.).
+  O cartão mostra também uma barra de prazo para cada trilha (Arq. e Marc.); o quadro de prazo da Visão geral
+  mostra só a arquitetura e o quadro Marcenaria mostra o prazo da marcenaria.
 
 ### Marcenaria (Interiores) — segunda trilha do mesmo projeto
 - Contratada à parte (junto ou depois); fica **dentro do projeto**, aba Plano › Marcenaria, botão verde
@@ -254,10 +276,19 @@ Quem vê: sócios veem tudo; colaborador vê os projetos em que tem item ou tare
 - `obras/<id>`: `nome, projetoId, endereco, situacao, observacao`.
 - Lançamentos do Tempo podem ter `pranchaId` (item do Plano) e `origem: "reuniao"` + `reuniaoId`.
 
+### Situação dos dados (29/09/2026)
+- Residência Paula e Bruno: marcenaria montada pela proposta 140526 (R$ 12.000, EP até 30 d.u., Executivo 40 d.u.):
+  20 móveis MOB01–MOB20 (1º pav.: 01–12; 2º pav.: 13–20; MOB20 Roupeiro ainda fora do mapeamento) no EP da
+  marcenaria (desenhos Fase 1 · modelo básico e Fase 2 · estudo para apresentação) e no Executivo da marcenaria
+  (série 901–920, com o modelo de móvel), mais bônus de iluminação, apresentação, revisão, caderno técnico e
+  pré-obra/orçamento. Itens de móvel guardam `mob` e `pav`.
+- As 7h20 da Elisa no antigo "Interior - Res Paula e Bruno" (Escritório Bruno) foram para o EP da marcenaria, item
+  MOB19, com ajuste registrado em cada lançamento. Excluídos os projetos fora do Gestor (Interior - Res Paula e Bruno,
+  Área de Lazer + Piscina - Nara e Márcio, Churrasqueira Rio, Filhos da Fruta, Reforma Guima, Residência Gustavo
+  James). **AP001 - Flipping House** continua (fora do Gestor) com as horas de obra, até ser organizado.
+
 ### Próximos passos do Gestor
-- Ativar a marcenaria da Casa Motta com o contrato de marcenaria (e decidir o destino do projeto separado
-  "Interior - Res Paula e Bruno", que tem horas lançadas).
-- Levar ao Gestor os demais projetos em andamento (Cadastros › Projetos › "Levar ao Gestor").
+- Luan traz os demais projetos aos poucos pelo "+ Novo projeto" do Gestor.
 - Gestor Comercial (oportunidades, briefing, captação), área restrita quando houver colaboradores.
 - Revisar o contrato (MAPEAMENTO §11) e completar materiais: pasta padrão, template ArchiCAD, guias em PDF.
 
@@ -265,7 +296,7 @@ Quem vê: sócios veem tudo; colaborador vê os projetos em que tem item ou tare
 
 - `pessoas/{id}`: `nome`, `perfil` ("socio" | "colaborador"), `custoHora`, `valorHora`, `ativo`, `ordem`.
 - `config/escritorio`: `etapas[{id,nome}]`, `areas[{id,nome}]`, `obraTopicos[{id,nome}]`, `tipos[{id,nome}]`,
-  `custosFixosMensais`, `horasProdutivasMes`.
+  `custosFixosMensais`, `horasProdutivasMes`, `pesosEtapas{ep, ap, pl, pe, mep, mex}` (% concluído do Gestor).
 - `projetos/{id}`: `nome`, `cliente`, `tipo`, `area`, `honorario`, `status`, `horasPrevistas{etapaId: h}`, `criadoEm`.
 - `timers/{pessoaId}`: `pessoaId`, `atividadeId`, `tipo`, `alvoId`, `etapaId`, `topicoId`, `descricao`, `inicio`, `dispositivo{id,nome}`.
 - `atividades/{pessoaId}`: `itens[]` com `id`, `tipo`, `alvoId`, `etapaId`, `descricao`, `status`
