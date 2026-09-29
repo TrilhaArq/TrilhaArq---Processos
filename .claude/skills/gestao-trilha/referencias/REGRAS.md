@@ -353,6 +353,10 @@ Anotadas quando a Elisa (Lili) pede. Não são processadas até o Luan confirmar
    (ex.: MOB01 › "Planta baixa", "Perspectiva frontal"…), hoje não dá para renomear o desenho nem mudar a ordem:
    fica fixa na ordem em que foram criados. Ela quer poder renomear cada desenho, renomear cada item do checklist
    (ex.: "Cota") e mudar a ordem dos desenhos dentro do item.
+7. **Proteção contra apagar sem querer.** Ter como voltar atrás quando algo é apagado por engano, ou pelo menos uma
+   pergunta "Quer mesmo apagar?" antes de apagar. Situação hoje no Plano (levantada pelo Claude): remover um item
+   (✕) não pergunta, mas mostra "Desfazer" por 10 segundos; remover um desenho/subitem (✕) não pergunta nem tem
+   "Desfazer"; remover um ambiente já pede confirmação.
 
 ## Próximos passos previstos
 
