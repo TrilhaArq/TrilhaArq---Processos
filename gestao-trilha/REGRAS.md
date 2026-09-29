@@ -331,7 +331,24 @@ Registrados em 29/09/2026 a pedido do Luan, para fazer quando houver um novo aju
 
 Anotadas quando a Elisa (Lili) pede. Não são processadas até o Luan confirmar e analisar cada uma.
 
-_(nenhuma sugestão anotada ainda)_
+### 29/09/2026 — Plano de Projeto › Marcenaria e área da pessoa
+
+1. **Móvel vinculado entre EP e Executivo da marcenaria.** O mesmo mobiliário aparece no Estudo Preliminar da
+   marcenaria e no Executivo (pranchas 900). Os dois precisam estar ligados: ao renomear o título no EP, o nome
+   muda também no Executivo (hoje não muda).
+2. **Móvel modelo a partir de um móvel já configurado.** A Elisa configurou o MOB01 no EP da marcenaria com os
+   desenhos, subitens e checklists. Ela quer usar o MOB01 como modelo e aplicar o mesmo padrão a todos os outros
+   mobiliários, **só aos móveis**: ficam de fora "Apresentação ao cliente", "Revisão total da proposta" e o bônus de
+   iluminação.
+3. **Nova situação "Em revisão pelo cliente".** Além de A fazer, Em andamento, Revisão interna, Pronto e Entregue,
+   uma etiqueta para quando o material foi enviado ao cliente e está com ele para revisão.
+4. **Responsável por etapa inteira.** Hoje o responsável (Elisa ou Luan) é escolhido item a item. Ela quer um
+   botão para atribuir a etapa inteira a uma pessoa de uma vez. Depois, se precisar, muda um item ou desenho
+   específico individualmente.
+5. **Checklist dentro da área pessoal (aba Projetos / Meu trabalho).** O item atribuído aparece na aba Projetos
+   da Elisa (ex.: "MOB01 – Chapelaria · Elisa · em andamento"), mas sem acesso aos desenhos e checklists. Ela quer
+   abrir o item ali, ver o que já foi cumprido e o que falta em cada desenho, marcar o checklist e iniciar o
+   cronômetro do móvel inteiro ou da etapa.
 
 ## Próximos passos previstos
 
