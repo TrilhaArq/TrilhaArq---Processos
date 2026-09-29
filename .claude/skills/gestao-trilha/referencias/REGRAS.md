@@ -349,6 +349,10 @@ Anotadas quando a Elisa (Lili) pede. Não são processadas até o Luan confirmar
    da Elisa (ex.: "MOB01 – Chapelaria · Elisa · em andamento"), mas sem acesso aos desenhos e checklists. Ela quer
    abrir o item ali, ver o que já foi cumprido e o que falta em cada desenho, marcar o checklist e iniciar o
    cronômetro do móvel inteiro ou da etapa.
+6. **Editar e reordenar desenhos e checklists dentro do item.** Nos desenhos/subitens criados dentro de um móvel
+   (ex.: MOB01 › "Planta baixa", "Perspectiva frontal"…), hoje não dá para renomear o desenho nem mudar a ordem:
+   fica fixa na ordem em que foram criados. Ela quer poder renomear cada desenho, renomear cada item do checklist
+   (ex.: "Cota") e mudar a ordem dos desenhos dentro do item.
 
 ## Próximos passos previstos
 
