@@ -243,4 +243,12 @@ Ideia do Luan: tirar do Gestor de Projetos o que ainda é captação.
 - **13 · Termos:** textos escritos em `TERMOS.md` (para revisão do Luan). Ao clicar no botão, abre um quadro de
   **anotações opcional** (Encerramento de Etapa do EP e do AP e Termo de Ciência); o Encerramento de Projeto não tem
   anotação. Gera o PDF com ou sem a anotação. Precisa de **nº e data do contrato** na Ficha do projeto.
-- **17 · Comercial e Briefing:** ainda sem resposta.
+- **17 · Comercial e Briefing: aprovado**, mas o módulo Comercial fica para depois. Agora vale a parte provisória:
+  tirar a etapa Briefing do Gestor (projeto nasce na Abertura) e horas de captação na área "Comercial e captação" do Tempo.
+
+## Ordem de trabalho (Luan, 29/09)
+
+1. Terminar os ajustes do Gestor de Projetos (este chat).
+2. Integrar no app oficial (versão com Financeiro) e publicar.
+3. Usar de verdade (cadastrar projetos, custos…) e levantar ajustes gerais do app.
+4. Depois: Gestor Comercial (e, quando houver colaboradores, a área restrita).
