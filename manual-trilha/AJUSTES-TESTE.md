@@ -374,3 +374,19 @@ Dúvidas para o Luan:
 - Reorganizar os códigos e entregar **pacote completo de arquivos** para o Luan guardar no computador (app inteiro,
   sem alteração) e na pasta de regras do Claude, para continuar o desenvolvimento em outro chat se precisar.
 - Antes de processar: aguardando o **último ajuste** que o Luan vai mandar.
+
+## 24. Linhas do Plano de Projeto: títulos com mais destaque (processar na rodada oficial)
+
+- O "P" da prioridade aparece cortado.
+- Data grande demais; títulos ficaram pequenos e a linha apertada.
+- **Títulos dos entregáveis maiores** (mais peso); data, situação, prioridade, contagem de desenhos e botões
+  **menores** (compactos, sem exagero).
+- Regra geral: em listas (Plano, Meu trabalho, Tarefas) usar um padrão de **botão compacto**; os botões principais das
+  páginas continuam como estão.
+
+## 25. Projetos em andamento: entrar no app já na etapa real (processar na rodada oficial)
+
+- Projetos que já estão rodando entram com as etapas anteriores **concluídas** até onde estão; os novos começam do zero.
+- Primeiro: **Casa Motta (RES-CASAMOTTA)**, dados da proposta, do contrato e do briefing. Hoje: **Anteprojeto, fase 2
+  (compatibilização)**; Abertura, Estudo Preliminar e Projeto Legal concluídos. Marcenaria contratada no AP e com o EP
+  da marcenaria quase no fim: o Luan manda depois a proposta e o contrato da marcenaria para ativá-la.
