@@ -6,6 +6,7 @@
   var S = { fech: {}, sel: null, running: false };
 
   var html =
+    '<div class="notes" id="r-notes"></div>' +
     '<div class="card grid-form">' +
       '<div class="field col-4"><label for="r-periodo">Período</label><select id="r-periodo"><option value="semana">Esta semana</option><option value="mes" selected>Este mês</option><option value="mesant">Mês anterior</option><option value="ano">Este ano</option><option value="custom">Personalizado</option></select></div>' +
       '<div class="field col-3 keep" id="r-de-wrap" hidden><label for="r-de">De</label><input type="date" id="r-de"></div>' +
@@ -104,6 +105,7 @@
       { t: "Atividade", name: 1, f: function (r) { return esc(nomeAtiv[r.key]); } }, H(),
       { t: "Vezes", r: 1, f: function (r) { return r.n; } }, BAR
     ]);
+    renderAvisos();
     renderFechamento();
   }
 
@@ -142,6 +144,13 @@
     S.running = false; T.scheduleRender();
   }
   async function conferir(id) { try { await T.db.doc("fechamentos/" + id).update({ conferido: true, conferidoEm: new Date().toISOString() }); T.toast("Fechamento marcado como conferido"); } catch (e) { T.showError(e); } }
+  // Fechamentos ainda não conferidos: aviso no topo de Relatórios (a capa não recebe avisos).
+  function renderAvisos() {
+    $("r-notes").innerHTML = Object.keys(S.fech).map(function (k) { return S.fech[k]; }).filter(function (f) { return !f.conferido; }).sort(function (a, b) { return a.mes < b.mes ? -1 : 1; }).map(function (f) {
+      var p = T.pessoa(f.pessoaId);
+      return '<div class="note"><div><div class="note-title">Fechamento de ' + esc(T.mesNome(f.mes)) + " · " + esc(p ? p.nome : f.pessoaId) + '</div><div class="note-body"><b>' + fmtH(f.min) + "</b> em " + f.dias + (f.dias === 1 ? " dia" : " dias") + " · média <b>" + fmtH(f.mediaMin) + "</b> por dia · a pagar <b>" + (f.valor != null ? T.fmtBRL(f.valor) : "defina o valor-hora") + '</b></div></div><div class="form-actions"><button class="btn btn-small" data-verfech="' + esc(f.id) + '">Ver detalhes</button><button class="btn btn-small btn-primary" data-conferir="' + esc(f.id) + '">Conferido</button></div></div>';
+    }).join("");
+  }
   function renderFechamento() {
     var fp = $("f-pessoa");
     if (S.sel) { fp.dataset.v = S.sel.pid; $("f-mes").value = S.sel.mes; S.sel = null; }
@@ -178,6 +187,11 @@
     ["r-periodo", "r-de", "r-ate", "r-pessoa"].forEach(function (id) {
       $(id).addEventListener("change", function () { var c = $("r-periodo").value === "custom"; $("r-de-wrap").hidden = !c; $("r-ate-wrap").hidden = !c; render(); });
     });
+    $("r-notes").addEventListener("click", function (e) {
+      var v = e.target.closest("[data-verfech]");
+      if (v) { var f = S.fech[v.dataset.verfech]; S.sel = { pid: f.pessoaId, mes: f.mes }; renderFechamento(); $("r-fech").scrollIntoView({ block: "center", behavior: "smooth" }); return; }
+      var c = e.target.closest("[data-conferir]"); if (c) conferir(c.dataset.conferir);
+    });
     $("f-pessoa").addEventListener("change", renderFechamento);
     $("f-mes").addEventListener("change", renderFechamento);
     $("f-status").addEventListener("click", async function (e) {
@@ -206,6 +220,9 @@
     if (!T.downloads) { /* verificado de novo depois da conexão */ }
   }
 
+  // Leitura para outros módulos (Financeiro): fechamentos gravados e cálculo do mês.
+  T.relatorios = { fechamentos: function () { return S.fech; }, calcFechamento: calcFechamento };
+
   T.register({
     id: "relatorios", label: "Relatórios", area: "admin", html: html, init: init, render: render,
     icon: '<path d="M4 20h16"/><path d="M7 16V10"/><path d="M12 16V5"/><path d="M17 16v-3"/>',
@@ -213,16 +230,6 @@
     connect: function (db) {
       db.collection("fechamentos").onSnapshot(function (s) { var m = {}; T.snapList(s).forEach(function (f) { m[f.id] = f; }); S.fech = m; T.loaded("fech", s); T.scheduleRender(); }, T.onErr);
     },
-    onLoaded: function () { ensureFechamentos(); },
-    notes: function () {
-      return Object.keys(S.fech).map(function (k) { return S.fech[k]; }).filter(function (f) { return !f.conferido; }).sort(function (a, b) { return a.mes < b.mes ? -1 : 1; }).map(function (f) {
-        var p = T.pessoa(f.pessoaId);
-        return '<div class="note"><div><div class="note-title">Fechamento de ' + esc(T.mesNome(f.mes)) + " · " + esc(p ? p.nome : f.pessoaId) + '</div><div class="note-body"><b>' + fmtH(f.min) + "</b> em " + f.dias + (f.dias === 1 ? " dia" : " dias") + " · média <b>" + fmtH(f.mediaMin) + "</b> por dia · a pagar <b>" + (f.valor != null ? T.fmtBRL(f.valor) : "defina o valor-hora") + '</b></div></div><div class="form-actions"><button class="btn btn-small" data-verfech="' + esc(f.id) + '">Ver detalhes</button><button class="btn btn-small btn-primary" data-conferir="' + esc(f.id) + '">Conferido</button></div></div>';
-      });
-    },
-    onHomeClick: function (e) {
-      var v = e.target.closest("[data-verfech]"); if (v) { var f = S.fech[v.dataset.verfech]; S.sel = { pid: f.pessoaId, mes: f.mes }; T.go("admin", "relatorios"); return; }
-      var c = e.target.closest("[data-conferir]"); if (c) conferir(c.dataset.conferir);
-    }
+    onLoaded: function () { ensureFechamentos(); }
   });
 })();

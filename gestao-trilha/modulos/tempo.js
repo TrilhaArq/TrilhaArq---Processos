@@ -16,7 +16,8 @@
     if (c === "obra") return alvoNome(l) + " · Obra" + (l.topicoId ? " · " + T.topicoNome(l.topicoId) : "");
     return alvoNome(l) + (l.etapaId ? " · " + T.etapaNome(l.etapaId) : "");
   }
-  function custoLanc(l) { var ch = T.custoHoraTotal(l.pessoaId); return ch == null ? null : ch * l.min / 60; }
+  // custo-hora gravado no lançamento (congelado); lançamentos antigos, sem o campo, usam o valor atual
+  function custoLanc(l) { var ch = l.custoHora != null ? l.custoHora : T.custoHoraTotal(l.pessoaId); return ch == null ? null : ch * l.min / 60; }
   function doMes(l, mes) { return ymd(new Date(l.inicio)).slice(0, 7) === mes; }
   function isLocked(iniIso) { return new Date(iniIso) < T.weekStart(new Date()); }
   function ativs(pid) { return S.ativDocs[pid] || []; }
@@ -35,7 +36,7 @@
     S.lancDocs[docId] = itens; flattenLanc();
     await T.db.doc("lancamentos/" + docId).set({ pessoaId: pid, mes: docId.slice(-7), itens: itens });
   }
-  async function addLanc(l) { l.id = T.novoId(); var docId = mesDoc(l.pessoaId, l.inicio), itens = itensDoc(docId); itens.push(l); await gravarDoc(docId, l.pessoaId, itens); return l.id; }
+  async function addLanc(l) { l.id = T.novoId(); if (l.custoHora == null) l.custoHora = T.custoHoraTotal(l.pessoaId); var docId = mesDoc(l.pessoaId, l.inicio), itens = itensDoc(docId); itens.push(l); await gravarDoc(docId, l.pessoaId, itens); return l.id; }
   async function updateLanc(id, patch) {
     var old = T.byId(S.lanc, id); if (!old) return;
     var novo = Object.assign({}, old, patch); delete novo._doc;

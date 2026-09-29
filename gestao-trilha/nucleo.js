@@ -109,7 +109,8 @@
 
   // ---------- módulos ----------
   // register({ id, label, area: "pessoa"|"admin", icon, desc(), html, init(T), connect(db), render(),
-  //            homeStats(pid), homeState(pid), notes(), onHomeClick(e) })
+  //            homeStats(pid), homeState(pid) })
+  // A capa só tem botões: pessoas (com o resumo de Tempo/Tarefas) e os apps do escritório. Nenhum app manda avisos ou dados para ela.
   T.register = function (m) { T.modules.push(m); };
   T.mod = function (id) { return T.byId(T.modules, id); };
   function modsDaArea(area) { return T.modules.filter(function (m) { return m.area === area; }); }
@@ -121,8 +122,10 @@
     if (view !== "home") { var mods = modsDaArea(view); if (!sub || !T.mod(sub) || T.mod(sub).area !== view) sub = mods[0].id; s.sub = sub; }
     $("home").hidden = view !== "home"; $("app").hidden = view === "home";
     if (view !== "home") {
+      // Área da pessoa: abas Tempo e Tarefas. Apps do escritório: cada um é "um app dentro do app" — só o botão de voltar;
+      // os outros apps se abrem pela capa.
       $("tabs").innerHTML = '<button class="tab back" data-home="1" aria-label="Voltar ao início">← Início</button>' +
-        modsDaArea(view).map(function (m) { return '<button class="tab' + (m.id === s.sub ? " is-selected" : "") + '" data-sub="' + m.id + '">' + T.esc(m.label) + "</button>"; }).join("");
+        (view === "pessoa" ? modsDaArea(view).map(function (m) { return '<button class="tab' + (m.id === s.sub ? " is-selected" : "") + '" data-sub="' + m.id + '">' + T.esc(m.label) + "</button>"; }).join("") : "");
       var p = T.pessoa(s.pessoaId);
       $("app-title").textContent = view === "pessoa" ? (p ? p.nome : "") : T.mod(s.sub).label;
     }
@@ -133,7 +136,6 @@
 
   // ---------- capa ----------
   var FUTUROS = [
-    { t: "Financeiro", d: "Fluxo de caixa, contas e resultados", icon: '<path d="M3 7h18v12H3z"/><path d="M3 11h18"/><path d="M7 15h3"/>' },
     { t: "Gestor de obras", d: "Orçamentos, execução e custo real das obras", icon: '<path d="M3 20h18"/><path d="M5 20v-6a7 7 0 0 1 14 0v6"/><path d="M12 7V4"/><path d="M9 14h6"/>' }
   ];
   function renderHome() {
@@ -150,13 +152,11 @@
     }).join("") + FUTUROS.map(function (f) {
       return '<div class="tile-btn admin-tile soon" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true">' + f.icon + '</svg><span><span class="t">' + f.t + '<span class="soon-pill">Em breve</span></span><span class="d">' + f.d + "</span></span></div>";
     }).join("");
-    $("notes").innerHTML = call("notes").join("");
   }
   $("home") && document.addEventListener("click", function (e) {
     if (T.state.view === "home" && e.target.closest("#home")) {
       var u = e.target.closest("[data-user]"); if (u) { T.go("pessoa", null, u.dataset.user); return; }
       var a = e.target.closest("[data-go]"); if (a) { T.go("admin", a.dataset.go); return; }
-      call("onHomeClick", [e]);
       return;
     }
     if (e.target.closest("[data-home]")) { T.go("home"); return; }
