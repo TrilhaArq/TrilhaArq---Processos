@@ -252,3 +252,29 @@ Ideia do Luan: tirar do Gestor de Projetos o que ainda é captação.
 2. Integrar no app oficial (versão com Financeiro) e publicar.
 3. Usar de verdade (cadastrar projetos, custos…) e levantar ajustes gerais do app.
 4. Depois: Gestor Comercial (e, quando houver colaboradores, a área restrita).
+
+## 18. Notificações (recebido, não processado)
+
+Hoje o app já gera 5 avisos do Gestor (no teste, só o do cliente aparecia porque só o exemplo Casa se enquadrava):
+cliente sem retorno há 15 d.u. (amarelo) · há 20 d.u. = suspensão (vermelho) · contrato e 1ª parcela ok (verde) ·
+faltam ≤5 d.u. no prazo da etapa (amarelo) · todos os itens da etapa prontos, pronto para o termo (verde).
+Os amarelos e vermelhos também aparecem na página inicial do app; todos aparecem no topo do Gestor.
+
+Pedido do Luan (o app vai ficar aberto numa segunda tela; notificações chamam a atenção):
+- **Prazo esgotando:** a partir de **10 dias antes do prazo final** da etapa, notificação **vermelha**; continua depois
+  de vencido ("vencido há X dias"), até a etapa mudar. Substitui o aviso atual de ≤5 d.u.
+  (Contagem: dias úteis, como o prazo — confirmar com o Luan.)
+- **Reunião amanhã:** um dia antes de cada reunião marcada no projeto (ver 14), notificação com projeto, hora e pauta.
+  Para isso a reunião pode ser **marcada antes** (data, hora, participantes) e depois confirmada com a duração, que vai
+  para o Histórico e para o Tempo. Marcar a reunião cria o compromisso na agenda dos participantes (como os
+  compromissos de projeto de hoje).
+- **Quem vê:** Luan, Elisa e quem trabalha no projeto (tem item do Plano ou tarefa pendente nele). Vale para todas as
+  notificações de projeto. Não é segurança (ainda não há restrição no app): é filtro pela pessoa escolhida no app.
+- Onde: página inicial do app, página da pessoa e topo do Gestor (como hoje).
+- Outras notificações o Luan acrescenta depois, conforme o uso.
+
+## 19. Bolinha com a inicial no cartão do projeto (recebido, não processado)
+
+- Hoje: é o **responsável pelo projeto** escolhido na criação (quase sempre o Luan). Não informa nada.
+- Pedido: mostrar **quem tem trabalho pendente no projeto** (item do Plano ou tarefa não concluídos), com as
+  bolinhas menores, lado a lado (ex.: L e E; mais de 3 = "+n").
