@@ -343,12 +343,13 @@ Dúvidas para o Luan:
     - Início do **Executivo Marcenaria**: Executivo arquitetônico encerrado **e** EP Marcenaria encerrado (os dois).
       Se o EP da marcenaria não terminou, o Executivo dela não começa com o fim da arquitetura; o prazo conta a partir
       do último dos dois.
-  - Pendente: prazos (dias úteis) do EP Marcenaria e do Executivo Marcenaria.
+  - **Prazos da marcenaria: digitados pela equipe** na ativação (variam conforme o combinado: pode haver entrega por
+    ambiente ou da casa toda). Campo de prazo por etapa e, quando combinado, prazo por móvel/ambiente.
 
 ## 22. Revisão geral celular + computador (recebido, não processado — fazer na próxima rodada)
 
 - Problema visto: aba **Projetos** da área pessoal (Meu trabalho) no celular (aberta pelo WhatsApp) com elementos
-  sobrepostos.
+  sobrepostos. (Correção do Luan: não tem relação com WhatsApp; é só celular x computador.)
 - Pedido: revisão geral do app para ficar organizado e bonito nos dois modos (celular e computador), e criar
   **regras fixas de layout** para os próximos módulos seguirem.
 - Regras a registrar no CONTRATO.md (e na skill do app), a conferir com prints em 390 px e 1280 px antes de publicar:
@@ -364,3 +365,12 @@ Dúvidas para o Luan:
 - As duas abas estão esquisitas na organização e na estética.
 - Revisar a organização dos elementos e a formatação: campos alinhados em grade, grupos com título, barras e listas
   ocupando **toda a largura**, visual igual ao das outras abas (Visão geral, Plano).
+
+## Próxima rodada = versão oficial (Luan, 29/09)
+
+- Aplicar todos os ajustes (10 a 23) e **integrar ao app oficial** (link N5fGJZBumZy7dyN57w7e8o), por cima da versão
+  publicada com o **Financeiro** (ler os arquivos publicados antes e juntar; não sobrescrever).
+- Deixa de ser teste: passa a ser usado de verdade.
+- Reorganizar os códigos e entregar **pacote completo de arquivos** para o Luan guardar no computador (app inteiro,
+  sem alteração) e na pasta de regras do Claude, para continuar o desenvolvimento em outro chat se precisar.
+- Antes de processar: aguardando o **último ajuste** que o Luan vai mandar.
