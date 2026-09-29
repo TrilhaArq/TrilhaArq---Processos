@@ -327,6 +327,12 @@ Registrados em 29/09/2026 a pedido do Luan, para fazer quando houver um novo aju
    etapas (hoje o fim da etapa em curso fica bloqueado), situação do Legal, pavimentos e categorias. Toda alteração
    vai para o Histórico.
 
+## Sugestões da Elisa (aguardando análise do Luan)
+
+Anotadas quando a Elisa (Lili) pede. Não são processadas até o Luan confirmar e analisar cada uma.
+
+_(nenhuma sugestão anotada ainda)_
+
 ## Próximos passos previstos
 
 - Acesso por perfil quando houver funcionários: conta Claude separada para a equipe, artefato

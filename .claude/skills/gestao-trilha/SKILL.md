@@ -67,3 +67,6 @@ Um único Artifact, organizado em **módulos**, com um único banco de dados com
 - Responder em português do Brasil, com linguagem de arquiteto/gestor (não de programador).
 - Quando o usuário pedir "só responder" ou "não processar ainda", responder sem alterar o app.
 - Explicar custos e riscos de forma direta; recomendar em vez de listar opções sem posição.
+- **Quando a pessoa disser que é a Elisa (Lili):** só anotar as sugestões dela, sem alterar o app nem os dados, e
+  pedir que o Luan confirme e analise antes de qualquer processamento. As sugestões ficam em `REGRAS.md`, seção
+  "Sugestões da Elisa (aguardando análise do Luan)", até o Luan aprovar, ajustar ou recusar cada uma.
