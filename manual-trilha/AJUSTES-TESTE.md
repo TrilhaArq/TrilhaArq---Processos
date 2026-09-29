@@ -297,3 +297,32 @@ Pedido do Luan (o app vai ficar aberto numa segunda tela; notificações chamam 
 - Projeto **suspenso há mais de 60 dias úteis** vai **automaticamente para Arquivados**.
 - Sequência completa: cliente sem retorno 15 d.u. → aviso · 20 d.u. → Suspenso · +60 d.u. suspenso → Arquivado.
 - O arquivamento fica registrado no Histórico. Arquivar à mão continua possível (botão na página do projeto, ajuste 10).
+
+## 21. Marcenaria (Interiores) como etapa própria (recebido — proposta aguardando ok)
+
+Como funciona na Trilha (Luan, 29/09):
+- Serviço à parte: nem sempre contratado; pode ser contratado junto com a arquitetura ou depois (ex.: o exemplo Casa,
+  contratado no Anteprojeto, com contrato novo).
+- Duas etapas: **Estudo Preliminar da marcenaria** (desenhos, discussão dos móveis) → aprovado → **Executivo da marcenaria**.
+- O EP da marcenaria corre **em paralelo** à arquitetura, a partir da contratação.
+- O Executivo da marcenaria é entregue **depois** do Executivo arquitetônico: o prazo dele começa na entrega do
+  Executivo arquitetônico. Assinado o termo de encerramento da arquitetura, o projeto continua aberto pela marcenaria.
+- Série 900 continua sendo a marcenaria no ArchiCAD; no Gestor ela **sai do Projeto Executivo**.
+
+Proposta:
+- Nova aba de etapa **Marcenaria**, depois do Executivo, com dois grupos: **EP Marcenaria** e **Executivo Marcenaria**
+  (códigos 901 mapa de marcenaria, 902… cada móvel, como no ArchiCAD).
+- Botão de ativar no mesmo lugar, com destaque: **botão verde "Marcenaria contratada"**. Ao ativar, pede data da
+  contratação e nº/data do contrato da marcenaria; gera as listas das duas etapas.
+- Mesmo projeto, "dois projetos em um": mesmo cliente, código, ambientes e Histórico; cada trilha com seu prazo e termos.
+- Depois do termo da arquitetura, o cartão mostra "Arquitetura entregue · Marcenaria em andamento" e o projeto só
+  vai para Encerrado quando a marcenaria termina.
+- Termos: EP Marcenaria → Termo de Encerramento de Etapa; Executivo Marcenaria → Termo de Encerramento de Projeto
+  (marcenaria). O termo final da arquitetura passa a dizer "projeto arquitetônico" para não encerrar a marcenaria.
+- Tempo: etapas "Marcenaria – EP" e "Marcenaria – Executivo", para saber quanto a marcenaria custou.
+- Regras de espera do cliente, avisos de prazo e suspensão valem igual para a marcenaria.
+
+Dúvidas para o Luan:
+1. Prazos em dias úteis do EP Marcenaria e do Executivo Marcenaria?
+2. Se a marcenaria for contratada no fim do Executivo arquitetônico, o EP da marcenaria começa na contratação e o
+   Executivo dela começa depois do EP aprovado (não dá para ser paralelo)? 

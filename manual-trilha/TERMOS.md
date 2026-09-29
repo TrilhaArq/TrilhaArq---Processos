@@ -67,6 +67,10 @@ Cláusulas: EP → 2.1.7 · AP → 2.2.9.
 
 Sem quadro de anotações.
 
+Marcenaria (ajuste 21, se aprovado): o termo final da arquitetura cita "projeto arquitetônico", para não encerrar
+a marcenaria contratada à parte. A marcenaria usa os mesmos modelos: Encerramento de Etapa (EP Marcenaria) e
+Encerramento de Projeto (Executivo Marcenaria), com o nº do contrato da marcenaria.
+
 Nome: o contrato atual chama este termo de "Termo de **Finalização** de Projeto" (2.4.8). O novo nome já está na
 lista de ajustes do contrato (MAPEAMENTO §11). Até a revisão, o PDF pode citar os dois: "Termo de Encerramento de
 Projeto (Termo de Finalização de Projeto, cláusula 2.4.8)".
