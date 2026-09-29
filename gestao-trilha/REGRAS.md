@@ -1,4 +1,4 @@
-# Gestão Trilha — regras dos módulos Tempo, Tarefas, Projetos, Relatórios e Configurações
+# Gestão Trilha — regras dos módulos Tempo, Tarefas, Gestor de Projetos, Cadastros, Financeiro, Relatórios e Configurações
 
 Artefato: https://claude.ai/artifact/N5fGJZBumZy7dyN57w7e8o
 Código-fonte: pasta `gestao-trilha/` (estrutura em módulos — ver `CONTRATO.md`).
@@ -15,10 +15,13 @@ Mapear tempo e custo de cada projeto para precificar com base em dados, não em 
 
 ## Navegação (v3)
 
-- **Capa (página inicial):** avisos (fechamentos mensais a conferir), botões das pessoas (Luan, Elisa) com
-  horas do mês, tarefas a fazer e atrasadas, e botões administrativos: Projetos, Relatórios, Configurações.
-- **Área da pessoa:** abas **Tempo** e **Tarefas**, mais "← Início". Cabeçalho padrão com o nome da pessoa.
-- **Área administrativa:** abas Projetos, Relatórios e Configurações.
+- **Capa (página inicial):** botões das pessoas (Luan, Elisa…) com horas do mês, tarefas a fazer e atrasadas, um
+  botão por app do escritório com descrição fixa e, acima deles, as **notificações** do Gestor de Projetos
+  (decisão do Luan em 29/09/2026: o app fica aberto numa segunda tela e as notificações chamam a atenção).
+- **Área da pessoa:** abas **Tempo**, **Tarefas** e **Projetos** (Meu trabalho), mais "← Início"; as notificações
+  da pessoa aparecem acima das abas.
+- **Apps do escritório** (Gestor de Projetos, Cadastros, Financeiro, Horas e custos, Relatórios, Configurações):
+  cada um abre como um app próprio, com o título e só o botão "← Início" no topo; para ir a outro app, volta-se à capa.
 - O app sempre abre na capa.
 
 ## Regras de negócio
@@ -61,8 +64,8 @@ Mapear tempo e custo de cada projeto para precificar com base em dados, não em 
    Duração, Lembrete e Repetir (só na criação) e é enviado à Agenda Google (calendário
    trilha@trilhaarq.com.br) com o nome da pessoa no título. Excluir a tarefa não apaga o evento da agenda.
 8c. **Fechamento mensal automático:** no primeiro acesso de cada mês o app grava em `fechamentos` o resumo do
-   mês anterior de cada pessoa (horas, dias, média por dia, valor-hora, valor a pagar) e mostra um aviso na
-   capa até alguém clicar em "Conferido". Se houver ajustes depois, Relatórios avisa e permite atualizar.
+   mês anterior de cada pessoa (horas, dias, média por dia, valor-hora, valor a pagar) e mostra um aviso no
+   topo de Relatórios até alguém clicar em "Conferido". Se houver ajustes depois, Relatórios avisa e permite atualizar.
 9. **Lançamento manual:** data, início, fim, onde, etapa, descrição. Fim menor que início = passou da meia-noite.
    Limite de 16 h por lançamento.
 10. **Semana fechada:** a semana vai de segunda a domingo. Incluir, editar ou excluir lançamento de semana
@@ -72,11 +75,14 @@ Mapear tempo e custo de cada projeto para precificar com base em dados, não em 
     - custo-hora da pessoa (opcional) = quanto a hora custa ao escritório;
     - rateio = custos fixos mensais ÷ (horas produtivas por pessoa × nº de pessoas ativas); padrão 112 h;
     - custo-hora total = custo-hora da pessoa + rateio;
-    - custo do lançamento = horas × custo-hora total (calculado com os valores **atuais**; mudar o
-      custo-hora recalcula o histórico — ponto a evoluir).
+    - custo do lançamento = horas × custo-hora total. Desde a v4 cada lançamento novo grava o `custoHora`
+      vigente (congelado); lançamentos antigos, sem o campo, usam o valor atual.
     Sem custo-hora preenchido, o app mostra "—" e pede o dado, nunca zero.
-12. **Projetos:** nome, cliente, tipo, área (m²), honorário, situação (ativo/pausado/concluído) e horas
-    previstas por etapa (opcional). Card mostra horas, custo, horas/m², custo/m², margem e barras de
+12. **Projetos:** nome, cliente, tipo, área (m²), honorário, situação (ativo/pausado/concluído), horas
+    previstas por etapa (opcional) e **perfil do projeto** (base da precificação por horas): padrão de acabamento,
+    pavimentos, ambientes complexos (cozinhas, banheiros, gourmet), terreno/existente simples ou complexo,
+    escopo contratado (etapas), complementos (marcenaria, interiores, luminotécnico, paisagismo, aprovação,
+    acompanhamento de obra), exigência do cliente e nº de revisões (preenchidos no fim). O card mostra o resumo. Card mostra horas, custo, horas/m², custo/m², margem e barras de
     previsto × realizado (âmbar a partir de 80%, vermelho acima de 100%).
 13. **Relatórios** (filtro por período e pessoa): resumo, por pessoa (horas, dias, média/dia, % em projetos,
     valor a pagar), por projeto, por etapa, áreas internas, por atividade (15 mais frequentes) e
@@ -85,6 +91,175 @@ Mapear tempo e custo de cada projeto para precificar com base em dados, não em 
 14. **Identidade visual:** a mesma do gestor de tarefas — verde-sálvia #88AC67, neutros oklch levemente
     esverdeados, Comfortaa em títulos e rótulos, Work Sans no texto, cards com borda de 1px e raio de 10px,
     pills, logo preta no canto superior direito invertida no tema escuro.
+
+## Financeiro (v1 — em uso desde setembro de 2026)
+
+Objetivo: controle simples do dinheiro do escritório, mesmo sem CNPJ e com conta misturada ("caixa do escritório"):
+tudo que os clientes pagam é receita do escritório; tudo que é gasto do trabalho é despesa; gasto pessoal não entra.
+
+1. **Páginas:** Painel (início), Receitas, Despesas, Contratos, Ajustes, com seletor de mês e botão "+ Lançar" sempre visível.
+2. **Painel:** um **quadro de resumo do mês** (borda verde) lido como conta: Entrou − Saiu (despesas pagas + equipe)
+   = Resultado do mês, com o **Resultado no ano** (jan até o mês) em destaque à direita e a variação das entradas
+   sobre o mês anterior no cabeçalho; gráfico de 12 meses (entrou × saiu, verde e azul); quadro **Próximos 90 dias**
+   com A receber, A pagar (com a equipe), Saldo previsto (a receber − a pagar) e Reserva guardada (com o imposto a
+   separar no ano); lista **A receber** (atrasadas + mês; filtro "Todas em
+   aberto") com "Recebido ✓", "Recebidas no mês" recolhível e **A pagar** recolhível ("x de y resolvidas · faltam R$").
+   Na cópia de teste, uma faixa no topo do Financeiro avisa que os dados são fictícios.
+3. **Receber/pagar em dois cliques:** "Recebido ✓"/"Pago ✓" abre data (hoje), valor, forma e conta já preenchidos →
+   Confirmar. Toast com "Desfazer". Parcela recebida mostra "Recibo" e "Desfazer". Nada do Financeiro aparece na capa.
+4. **Equipe = todos que trabalham** (sócios ou colaboradores, Luan incluído): remuneração = horas do mês × valor-hora
+   (fechamento mensal do Relatórios). No painel entra por competência (horas do mês; mês em andamento calculado ao vivo).
+   Cada fechamento gravado vira "Remuneração · Pessoa" a pagar no dia configurado do mês seguinte (padrão 5);
+   o pagamento não soma de novo em "Saiu". O que sobra depois da equipe é o resultado (lucro) do escritório.
+5. **Contratos:** projeto (ou "+ Novo projeto", criado em Projetos), cliente, CPF/CNPJ (opcional, sai no recibo),
+   serviço, valor total, situação (ativo/encerrado) e parcelas: gerar N parcelas mensais/quinzenais a partir do 1º
+   vencimento (última absorve o arredondamento) e editar descrição (etapa), vencimento e valor de cada uma.
+   "Já recebida" marca parcelas pagas antes do app (`anterior: true`). Soma diferente do total aparece em vermelho.
+   Se o projeto não tem honorário, o valor total do contrato é gravado nele.
+6. **Despesas fixas (recorrentes):** descrição, categoria, valor cheio, % do escritório (gastos divididos com a casa),
+   mensal ou anual (mês), dia, início. Aparecem sozinhas como "a pagar" em cada mês (não gravam nada até pagar);
+   "Não houve" registra que não ocorreu no mês; "Encerrar" para de repetir. "Mapear despesas" = checklist de gastos
+   típicos de escritório de arquitetura com valor e %. Custo fixo mapeado = mensais + anuais ÷ 12, com botão para
+   levá-lo a Configurações (rateio do custo-hora).
+7. **Lançamento avulso:** Entrada, Saída ou Guardar na reserva; valor, data, descrição, categoria, projeto, "recebido de"
+   (entrada), situação (já pago/previsto), forma, conta, "repete todo mês" (saída → cria despesa fixa).
+8. **Categorias** (editáveis em Ajustes): entradas (honorários, acompanhamento de obra, consultoria, reembolso, outras)
+   e saídas (softwares, espaço de trabalho, telefone, plotagem, deslocamento, terceiros, taxas CAU/RRT, marketing,
+   equipamentos, capacitação, impostos, outras). Fixas: Remuneração da equipe (grupo equipe), Retirada de lucro
+   (grupo lucro), Guardado na reserva / Resgate da reserva (grupo reserva) — esses grupos não contam como despesa
+   nem receita. Contas padrão: Conta Luan e Dinheiro em espécie. Formas: Pix, Dinheiro, Transferência, Boleto, Cartão.
+9. **Recibo:** numerado (0001…), gerado ao confirmar (opção "Gerar recibo") ou depois pelo botão "Recibo"; mostra a
+   prévia com a logo e baixa PDF A4 (jsPDF 2.5.1 do cdnjs + capacidade `downloads`). Texto: recebi de, CPF/CNPJ,
+   valor e valor por extenso, referente a (parcela n de N, etapa, serviço e projeto), forma, data, cidade e data por
+   extenso, assinatura (nome e CPF de Ajustes) e rodapé com contato. O número fica gravado no item.
+10. **Ajustes:** pessoas e valor-hora (edição em Configurações), dados do recibo, próximo número, dia de pagar a
+    equipe, conta e forma padrão, % de reserva de imposto (opcional), contas e categorias.
+11. **Cálculos:** caixa para entradas e despesas (data do pagamento); listas de abertos pela data de vencimento;
+    atrasado = aberto com vencimento antes de hoje.
+12. **Mês de início** (`fin_config/geral.inicio`, oficial = 2026-09): meses anteriores ficam zerados no painel e no
+    gráfico, e remunerações de fechamentos anteriores não aparecem a pagar (evita prejuízo fictício de meses sem
+    registro). Se o documento não existir, vale o mês atual e ele é gravado na primeira configuração salva.
+13. **Receitas e Despesas** abrem com um quadro de resumo único (mesmo estilo do Painel): Receitas = recebido no
+    mês, ainda a receber no mês, atrasado, recebido no ano; Despesas = despesas pagas, equipe no mês, ainda a pagar,
+    custo fixo mapeado.
+
+### Modelo de dados do Financeiro
+
+- `fin_config/geral`: `inicio` (AAAA-MM), `contas[]`, `categorias[{id,nome,tipo,grupo?,fixa?}]`, `impostoPct`, `diaPagamentoEquipe`,
+  `contaPadrao`, `formaPadrao`, `recibo{nome,doc,cidade,contato}`, `proximoRecibo`, `teste` (só na cópia de teste).
+- `fin_contratos/{id}`: `projetoId`, `cliente`, `clienteDoc`, `servico`, `valorTotal`, `status` ("ativo" | "encerrado"),
+  `criadoEm`, `parcelas[]` com `id`, `descricao`, `vencimento`, `valor`, `recebidoEm`, `valorRecebido`, `forma`,
+  `conta`, `anterior`, `recibo{n,emitidoEm}`.
+- `fin_mov/{AAAA-MM}` (mês do vencimento): `itens[]` com `id`, `tipo` ("entrada" | "saida"), `categoriaId`, `valor`,
+  `descricao`, `projetoId`, `cliente`, `vencimento`, `status` ("prevista" | "paga" | "pulada"), `pagoEm`, `forma`,
+  `conta`, `origem` ("manual" | "recorrente" | "fechamento"), `recId` + `refMes` (despesa fixa), `fechId` + `refMes`
+  (remuneração), `recibo`, `criadoEm`.
+- `fin_recorrentes/lista`: `itens[]` com `id`, `descricao`, `categoriaId`, `valor`, `pct`, `freq` ("mensal" | "anual"),
+  `mesAnual`, `dia`, `inicio`, `fim` (AAAA-MM).
+
+### Próximas versões do Financeiro
+
+- Rentabilidade por projeto (contrato recebido × horas × custo-hora × despesas do projeto).
+- Calculadora de proposta (perfil do projeto → horas parecidas → preço), previsto × realizado.
+- Termômetro de formalização (autônomo × Simples Nacional, validar com contador).
+
+## Gestor de Projetos, Cadastros e Meu trabalho (oficial desde 29/09/2026)
+
+Base: mapeamento do processo da Trilha (`manual-trilha/MAPEAMENTO.md`, `processo-trilha.json`) e os ajustes 1–25
+de `manual-trilha/AJUSTES-TESTE.md`. Tudo é padrão editável; poucos cliques.
+
+### Etapas e portões
+- Fluxo: **Abertura → Estudo Preliminar → Anteprojeto → Executivo → Encerrado**. Projeto Legal corre em paralelo ao
+  Anteprojeto. REF e INT pulam Anteprojeto e Legal. O Briefing **não** é etapa do Gestor: fica para o futuro Gestor
+  Comercial (oportunidades); até lá, horas de captação vão para a área "Comercial e captação" do Tempo.
+- Abertura → EP (marco zero): contrato + 1ª parcela + topográfico + itens da Abertura. Exceção: antecipação com
+  Termo de Ciência. AP → Executivo: Legal aprovado, **sem exceção**.
+- Prazos em dias úteis (padrão EP 40, AP 70, Executivo 60; editáveis por projeto na Ficha). O prazo pausa enquanto o
+  projeto aguarda alguém de fora (cliente, engenheiro, condomínio, prefeitura).
+- Projeto já em andamento entra na etapa real (assistente "Já em andamento"): etapas anteriores concluídas, itens
+  prontos, datas reais ajustadas depois na Ficha (Datas e prazos das etapas).
+- Horas por etapa na Visão geral (etapas do Tempo: `ab` Abertura, `ep`, `ap` + `comp`, `pl`, `ex`, `mc-ep`, `mc-ex`).
+
+### Situação do projeto
+- Cliente sem retorno: aviso aos **15 d.u.**; aos **20 d.u.** o projeto vai **sozinho para Suspensos** (cláusula 3.4).
+- Suspenso há **mais de 60 d.u.** vai sozinho para **Arquivados**.
+- Suspender, arquivar, reativar e desarquivar: botões na página do projeto, sempre com confirmação. Suspenso ou
+  arquivado sai da lista principal (quadro de indicadores com filtros: Em andamento, Aguardando, Suspensos, Arquivados).
+- `projetos.status` acompanha: suspenso/arquivado → `pausado`; encerrado (sem marcenaria aberta) → `concluido`.
+- **Excluir** projeto, pessoa, contato ou obra: **só em Cadastros**, com confirmação. As horas continuam no Tempo.
+
+### Plano de Projeto
+- Itens por etapa e grupo; códigos pela posição (série 100…, AP01…, PL01…, EM01… na marcenaria). Cada item tem
+  desenhos/subitens com checklist e link do PDF-guia, prazo, responsável, situação e prioridade P1/P2/P3.
+- Termos **não** são itens: são botões no fim da etapa que geram o PDF.
+- O cronômetro mede a **prancha (item)**, não cada desenho. Concluir no Meu trabalho manda o item para "Revisão interna".
+- % do projeto = itens prontos / total de itens.
+
+### Marcenaria (Interiores) — segunda trilha do mesmo projeto
+- Contratada à parte (junto ou depois); fica **dentro do projeto**, aba Plano › Marcenaria, botão verde
+  "Marcenaria contratada" (nº/data do contrato, 1ª parcela, prazos digitados pela equipe).
+- EP da marcenaria: começa com contrato + 1ª parcela, em paralelo à arquitetura.
+- Executivo da marcenaria: começa só com o **Executivo arquitetônico encerrado e o EP da marcenaria encerrado**.
+- Itens **não** são gerados sozinhos: "+ Adicionar móvel" usa o **modelo de móvel** (desenhos, checklist e guia),
+  editável e guardado em `gp_config/geral`. Série 900 = marcenaria (como no ArchiCAD).
+- Depois do termo da arquitetura, o cartão mostra "Arquitetura entregue · marcenaria em andamento"; o projeto só
+  encerra quando a marcenaria termina.
+
+### Reuniões, Histórico e termos
+- Reunião: marcar antes (vai para a agenda dos participantes; aviso na véspera) ou registrar depois. Ao registrar,
+  a duração entra no **Tempo de cada participante** (projeto + etapa) e a reunião vai para o Histórico.
+- Histórico: registro fiel com **dia e hora** (etapas, termos, reuniões, itens concluídos, esperas, suspensões,
+  alterações). Não se edita nem se apaga; correção é um novo registro. Mostra também horas por etapa, por pessoa e
+  por item. Gráficos e comparações entre projetos ficam em Relatórios.
+- Termos em PDF (textos em `manual-trilha/TERMOS.md`): Encerramento de Etapa (EP, AP, EP da marcenaria) com quadro
+  de anotações opcional; Encerramento de Projeto (Executivo; Executivo da marcenaria) sem anotações; Ciência de
+  Antecipação com "o que será antecipado" e anotações. Usam nº/data/cidade do contrato (Ficha) e nome/CPF dos
+  clientes (Cadastros). Gerar o PDF fica no Histórico; o termo **assinado** é registrado no botão "Termo assinado".
+
+### Notificações (capa, área da pessoa e topo do Gestor)
+1. Prazo chegando ao fim (vermelho): a partir de 10 d.u. antes do fim; depois, "vencido há X d.u.", até resolver.
+2. Cliente sem retorno há 15 d.u. (amarelo), até a suspensão automática.
+3. Contrato e 1ª parcela ok · pronto para iniciar (verde).
+4. Abertura concluída · liberado para a concepção (verde, sócios).
+5. Itens da etapa prontos · pronto para o termo (verde).
+6. Reunião amanhã / hoje.
+Quem vê: sócios veem tudo; colaborador vê os projetos em que tem item ou tarefa pendente e as reuniões de que participa.
+
+### Lista e cartões
+- Quadro único de indicadores (também filtra) e botões de etapa com a contagem, que trazem a etapa para o topo.
+- Cartão: barra vertical de % do projeto, data final e barra de prazo (verde < 30%, amarela 30–60%, vermelha > 60%;
+  listrada quando pausado), bolinhas de **quem tem trabalho pendente** no projeto.
+
+### Programa de necessidades e categorias
+- Nomes do briefing; áreas de referência da dimensão Confortável (garagem 18 m²/vaga), editáveis já na criação.
+- Categorias: padrão (5 faixas do briefing), dimensão (Compacta/Confortável/Espaçosa), dificuldade do terreno.
+- Código do projeto: RES / COM / HOT / REF / INT + nome curto, sem acento e sem número.
+
+### Tarefas de projeto
+- Moram na agenda da pessoa (Tarefa, Demanda, Prioridade, Compromisso → Agenda Google), com `projetoId`/`itemId`.
+  Trocar o responsável move a tarefa. P1/P2/P3 são dos itens do Plano; Tarefa/Demanda/Prioridade, da agenda.
+
+### Modelo de dados (Gestor e Cadastros)
+- `gp/<projetoId>`: `sigla, etapa, fase, etapas{<etapa>: {inicio, fim, termoEm, prazo}}, legal, marco{}, esperas[],
+  suspenso{desde, auto}, arquivado{desde, auto}, pavs[], ambientes[], itens[], reunioes[], eventos[], marc{},
+  diretrizes{}, proximo, pasta, bimx`.
+  - item: `id, etapa, grupo, titulo, sit, resp, prazo, prio, rev, ord, desenhos[{id, nome, feito, checklist[{t, ok}],
+    guia}], concluidoEm, ambId, banc, chave, movel`.
+  - reunião: `id, tipo, etapa, data, hora, duracao, participantes[], pauta, decisoes, status (marcada|realizada)`.
+  - evento: `data, em (ISO), por, txt, tipo (etapa|reuniao|termo|plano|espera|suspensao|arquivamento)`.
+  - marc: `ativo, contrato{numero, data}, contratoOk, parcela, prazos{mep, mex}, etapa (aguardando|mep|espera|mex|fim)`.
+- `gp_config/geral`: `modeloMovel{guia, desenhos[{nome, checklist[]}], checklist[]}`.
+- `projetos/<id>` ganha: `codigo, sigla, clienteIds[], categorias{}, endereco, contrato{numero, data, cidade}`.
+- `contatos/<id>`: `tipos[], categoria, nome, contato, empresa, email, doc, razaoSocial, endereco, descricao, observacao`.
+- `obras/<id>`: `nome, projetoId, endereco, situacao, observacao`.
+- Lançamentos do Tempo podem ter `pranchaId` (item do Plano) e `origem: "reuniao"` + `reuniaoId`.
+
+### Próximos passos do Gestor
+- Ativar a marcenaria da Casa Motta com o contrato de marcenaria (e decidir o destino do projeto separado
+  "Interior - Res Paula e Bruno", que tem horas lançadas).
+- Levar ao Gestor os demais projetos em andamento (Cadastros › Projetos › "Levar ao Gestor").
+- Gestor Comercial (oportunidades, briefing, captação), área restrita quando houver colaboradores.
+- Revisar o contrato (MAPEAMENTO §11) e completar materiais: pasta padrão, template ArchiCAD, guias em PDF.
 
 ## Modelo de dados
 
@@ -111,6 +286,5 @@ Mapear tempo e custo de cada projeto para precificar com base em dados, não em 
 - Acesso por perfil quando houver funcionários: conta Claude separada para a equipe, artefato
   compartilhado com "Pode interagir" e regras de acesso no banco (cada colaborador vê só as próprias
   horas; custos e relatórios só para sócios). Os lançamentos já guardam `pessoaId` para isso.
-- Guardar o custo-hora vigente em cada lançamento, para o histórico não mudar quando o valor mudar.
 - Integração com o sistema de orçamento de obra (honorários e etapas).
 - Base de precificação: média de horas por etapa e por m², por tipo de projeto.

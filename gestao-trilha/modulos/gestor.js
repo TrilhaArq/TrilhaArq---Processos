@@ -704,7 +704,7 @@
     var ets = etapasPlano(g).filter(function (e) { return e !== "pl" && (!ETAPAS[e].marc || marcAtiva(g)); });
     var datas = ets.map(function (e) {
       var info = (g.etapas || {})[e] || {};
-      return '<div class="ficha-et"><b>' + esc(ETAPAS[e].curto) + '</b><label>Início<input type="date" data-fet="' + e + '|inicio" value="' + (info.inicio ? T.ymd(new Date(info.inicio)) : "") + '"></label><label>Fim / termo<input type="date" data-fet="' + e + '|fim" value="' + (info.fim ? T.ymd(new Date(info.fim)) : "") + '"></label>' +
+      return '<div class="ficha-et"><b>' + esc(ETAPAS[e].curto) + '</b><label>Início<input type="date" data-fet="' + e + '|inicio" value="' + (info.inicio ? T.ymd(new Date(info.inicio)) : "") + '"></label><label>Fim / termo<input type="date" data-fet="' + e + '|fim" value="' + (info.fim ? T.ymd(new Date(info.fim)) : "") + '"' + (e === g.etapa || (g.marc && g.marc.etapa === e) ? ' disabled title="Etapa em curso: o fim é registrado pelo botão do termo"' : "") + '></label>' +
         (ETAPAS[e].prazo || ETAPAS[e].marc ? '<label>Prazo (d.u.)<input type="number" min="1" data-fet="' + e + '|prazo" value="' + (prazoEtapa(g, e) || "") + '"></label>' : "<span></span>") + "</div>";
     }).join("");
     return '<form id="gp-ficha" class="ficha">' +
@@ -883,7 +883,7 @@
     if (o.inicio === "andamento") {
       var f = fluxo(o.sigla), alvo = f.indexOf(o.etapaAtual), ini = isoDeData(o.dataEtapa || hojeIso());
       g.etapa = o.etapaAtual; g.fase = ETAPAS[o.etapaAtual].fases ? +o.fase || 1 : null; g.marco = { contrato: true, parcela: true }; g.etapas = {};
-      f.slice(0, alvo).forEach(function (e) { g.etapas[e] = { inicio: null, fim: ini, termoEm: ETAPAS[e].termo ? o.dataEtapa : null }; });
+      f.slice(0, alvo).forEach(function (e) { g.etapas[e] = { inicio: null, fim: null, termoEm: null }; }); // datas reais anteriores ao app: ajustar na Ficha
       g.etapas[o.etapaAtual] = { inicio: ini };
       var feitas = f.slice(0, alvo); if (legal === "aprovado") feitas.push("pl");
       itens.forEach(function (x) { if (feitas.indexOf(x.etapa) >= 0) { x.sit = "pronto"; x.desenhos.forEach(function (d) { d.feito = true; }); } });
@@ -1151,7 +1151,8 @@
         Object.keys(datas).forEach(function (e) {
           var d = datas[e], cur = x.etapas[e] = x.etapas[e] || {}, ini = d.inicio ? isoDeData(d.inicio) : null, fim = d.fim ? isoDeData(d.fim) : null, pz = T.numOrNull(d.prazo);
           if ((cur.inicio ? T.ymd(new Date(cur.inicio)) : "") !== (d.inicio || "")) { cur.inicio = ini; mud.push(ETAPAS[e].curto + " início " + (d.inicio ? T.fmtYmd(d.inicio) : "—")); }
-          if (cur.fim && (T.ymd(new Date(cur.fim)) !== (d.fim || ""))) { cur.fim = fim; if (cur.termoEm) cur.termoEm = d.fim || null; mud.push(ETAPAS[e].curto + " fim " + (d.fim ? T.fmtYmd(d.fim) : "—")); }
+          var atual = e === x.etapa || (x.marc && x.marc.etapa === e);
+          if (!atual && (cur.fim ? T.ymd(new Date(cur.fim)) : "") !== (d.fim || "")) { cur.fim = fim; cur.termoEm = ETAPAS[e].termo ? d.fim || null : null; mud.push(ETAPAS[e].curto + " fim " + (d.fim ? T.fmtYmd(d.fim) : "—")); }
           if (d.prazo !== undefined && pz !== prazoEtapa(x, e)) { cur.prazo = pz; mud.push(ETAPAS[e].curto + " prazo " + (pz || "—") + " d.u."); }
         });
         if (mud.length) evento(x, "Datas/prazos ajustados na Ficha: " + mud.join("; "), hojeIso(), { tipo: "etapa" });
