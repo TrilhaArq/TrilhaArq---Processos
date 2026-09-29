@@ -6,7 +6,7 @@
   var T = window.Trilha, $ = T.$, esc = T.esc;
   var TIPOS = [["cliente", "Cliente", "Clientes"], ["fornecedor", "Fornecedor", "Fornecedores"], ["maodeobra", "Mão de obra", "Mão de obra"], ["parceiro", "Parceiro", "Parceiros"]];
   var OBRA_SIT = [["planejamento", "Planejamento"], ["andamento", "Em andamento"], ["pausada", "Pausada"], ["concluida", "Concluída"]];
-  var S = { contatos: [], obras: [], sec: "contatos", filtro: "todos", busca: "", edit: null, editObra: null, confirm: null };
+  var S = { contatos: [], obras: [], sec: "contatos", filtro: "todos", busca: "", edit: null, editObra: null };
 
   function tipoNome(k) { var t = TIPOS.filter(function (x) { return x[0] === k; })[0]; return t ? t[1] : k; }
   function contato(id) { return T.byId(S.contatos, id); }
@@ -33,9 +33,9 @@
     var head = '<div class="section-head"><div class="segmented" id="cad-filtro">' + [["todos", "Todos", S.contatos.length]].concat(TIPOS.map(function (t) { return [t[0], t[2], cont[t[0]] || 0]; })).map(function (f) {
       return '<button class="seg-pill' + (S.filtro === f[0] ? " is-selected" : "") + '" data-cf="' + f[0] + '">' + f[1] + " · " + f[2] + "</button>"; }).join("") + '</div><div class="form-actions"><input id="cad-busca" class="gp-busca" placeholder="Buscar" value="' + esc(S.busca) + '" aria-label="Buscar contato"><button class="btn btn-small btn-primary" data-novo="contato">+ Novo contato</button></div></div>';
     var form = S.edit ? formContato(S.edit === "novo" ? null : contato(S.edit)) : "";
-    var rows = list.length ? '<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Tipo</th><th>Empresa</th><th>Contato</th><th>E-mail</th><th>Projetos</th></tr></thead><tbody>' + list.map(function (c) {
+    var rows = list.length ? '<div class="table-wrap as-list"><table><thead><tr><th>Nome</th><th>Tipo</th><th>Empresa</th><th>Contato</th><th>E-mail</th><th>Projetos</th></tr></thead><tbody>' + list.map(function (c) {
       var pj = (c.tipos || []).indexOf("cliente") >= 0 ? projetosDoCliente(c.id).map(function (p) { return p.codigo || p.nome; }).join(", ") : "";
-      return '<tr class="cad-row" data-ed="' + esc(c.id) + '"><td class="name"><b>' + esc(c.nome) + "</b>" + (c.categoria ? '<div class="hint">' + esc(c.categoria) + "</div>" : "") + "</td><td>" + (c.tipos || []).map(function (t) { return '<span class="pill">' + esc(tipoNome(t)) + "</span>"; }).join(" ") + "</td><td>" + esc(c.empresa || "") + '</td><td class="num">' + esc(c.contato || "") + "</td><td>" + esc(c.email || "") + "</td><td>" + esc(pj) + "</td></tr>";
+      return '<tr class="cad-row" data-ed="' + esc(c.id) + '"><td class="name"><b>' + esc(c.nome) + "</b>" + (c.categoria ? '<div class="hint">' + esc(c.categoria) + "</div>" : "") + "</td><td>" + (c.tipos || []).map(function (t) { return '<span class="pill">' + esc(tipoNome(t)) + "</span>"; }).join(" ") + '</td><td data-l="Empresa">' + esc(c.empresa || "") + '</td><td class="num" data-l="Contato">' + esc(c.contato || "") + '</td><td data-l="E-mail">' + esc(c.email || "") + '</td><td data-l="Projetos">' + esc(pj) + "</td></tr>";
     }).join("") + "</tbody></table></div>" : '<div class="empty">Nenhum contato ' + (S.filtro === "todos" ? "cadastrado" : "deste tipo") + ".</div>";
     return head + form + rows;
   }
@@ -53,16 +53,16 @@
       '<div class="field col-6"><label for="ct-obs">Observação</label><textarea id="ct-obs" rows="2">' + esc(c.observacao || "") + "</textarea></div>" +
       '<div class="field col-12" id="ct-proj-wrap"' + (ehCli ? "" : " hidden") + '><span class="label">Projetos deste cliente</span><div class="gp-multi">' + (pj.length ? pj.map(function (p) { return '<label class="gp-check"><input type="checkbox" data-cproj="' + esc(p.id) + '"' + (c.id && (p.clienteIds || []).indexOf(c.id) >= 0 ? " checked" : "") + "> " + esc(p.codigo || p.nome) + "</label>"; }).join("") : '<span class="hint">Nenhum projeto cadastrado.</span>') + "</div></div>" +
       '<div class="col-12 form-actions"><button class="btn btn-primary" id="ct-save">Salvar contato</button><button type="button" class="btn" data-cancel="1">Cancelar</button>' +
-      (c.id ? (S.confirm === c.id ? '<span class="confirm-box">Excluir este contato? <button type="button" class="btn btn-small btn-stop" data-delok="' + esc(c.id) + '">Excluir</button></span>' : '<button type="button" class="link danger" data-del="' + esc(c.id) + '">Excluir contato</button>') : "") +
+      (c.id ? '<button type="button" class="link danger" data-del="' + esc(c.id) + '">Excluir contato</button>' : "") +
       '</div><p class="hint col-12">CPF, CNPJ e endereço são dados pessoais: quando houver colaboradores, ficam visíveis só para os sócios.</p></form>';
   }
   function secProjetos() {
     var list = T.state.projetos.slice().sort(function (a, b) { return (a.codigo || a.nome).localeCompare(b.codigo || b.nome); });
-    var head = '<div class="section-head"><div class="section-meta">Cada projeto tem um ou mais clientes. O processo de cada um fica no Gestor de Projetos.</div><button class="btn btn-small btn-primary" data-novo="projeto">+ Novo projeto</button></div>';
-    return head + (list.length ? '<div class="table-wrap"><table><thead><tr><th>Código</th><th>Projeto</th><th>Clientes</th><th>Etapa</th><th>Situação</th></tr></thead><tbody>' + list.map(function (p) {
+    var head = '<div class="section-head"><div class="section-meta">Cada projeto tem um ou mais clientes. O processo fica no Gestor de Projetos. Excluir um projeto só por aqui.</div><button class="btn btn-small btn-primary" data-novo="projeto">+ Novo projeto</button></div>';
+    return head + (list.length ? '<div class="table-wrap as-list"><table><thead><tr><th>Código</th><th>Projeto</th><th>Clientes</th><th>Etapa</th><th>Situação</th><th></th></tr></thead><tbody>' + list.map(function (p) {
       var cl = (p.clienteIds || []).map(function (id) { var c = contato(id); return c ? c.nome : null; }).filter(Boolean).join(", ") || p.cliente || "";
       var g = T.gestor && T.gestor.gp(p.id), s = g ? T.gestor.situacao(p.id) : null;
-      return '<tr class="cad-row" data-proj="' + esc(p.id) + '"><td class="num"><b>' + esc(p.codigo || "—") + '</b></td><td class="name">' + esc(p.nome) + "</td><td>" + esc(cl) + "</td><td>" + (g ? T.gestor.etapaNome(p.id) : '<span class="hint">fora do Gestor</span>') + "</td><td>" + (s ? '<span class="gp-sit ' + s.k + '">' + esc(s.txt) + "</span>" : "") + "</td></tr>";
+      return '<tr class="cad-row" data-proj="' + esc(p.id) + '"><td class="num" data-l="Código"><b>' + esc(p.codigo || "—") + '</b></td><td class="name">' + esc(p.nome) + '</td><td data-l="Clientes">' + esc(cl) + '</td><td data-l="Etapa">' + (g ? T.gestor.etapaNome(p.id) : '<span class="hint">fora do Gestor</span>') + '</td><td data-l="Situação">' + (s ? '<span class="gp-sit ' + s.k + '">' + esc(s.txt) + "</span>" : "") + '</td><td class="acts">' + (g ? "" : '<button class="btn btn-small" data-levar="' + esc(p.id) + '">Levar ao Gestor</button>') + '<button class="link danger" data-pdel="' + esc(p.id) + '">Excluir</button></td></tr>';
     }).join("") + "</tbody></table></div>" : '<div class="empty">Nenhum projeto cadastrado.</div>');
   }
   function secObras() {
@@ -76,17 +76,17 @@
         '<div class="field col-8"><label for="ob-end">Endereço</label><input id="ob-end" value="' + esc(o.endereco || "") + '"></div>' +
         '<div class="field col-4"><label for="ob-sit">Situação</label><select id="ob-sit">' + T.optHtml(OBRA_SIT, o.situacao || "planejamento") + "</select></div>" +
         '<div class="field col-12"><label for="ob-obs">Observação</label><textarea id="ob-obs" rows="2">' + esc(o.observacao || "") + "</textarea></div>" +
-        '<div class="col-12 form-actions"><button class="btn btn-primary" id="ob-save">Salvar obra</button><button type="button" class="btn" data-cancel="1">Cancelar</button></div></form>';
+        '<div class="col-12 form-actions"><button class="btn btn-primary" id="ob-save">Salvar obra</button><button type="button" class="btn" data-cancel="1">Cancelar</button>' + (o.id ? '<button type="button" class="link danger" data-odel="' + esc(o.id) + '">Excluir obra</button>' : "") + "</div></form>";
     }
-    return head + form + (S.obras.length ? '<div class="table-wrap"><table><thead><tr><th>Obra</th><th>Projeto</th><th>Clientes</th><th>Situação</th></tr></thead><tbody>' + S.obras.map(function (o) {
+    return head + form + (S.obras.length ? '<div class="table-wrap as-list"><table><thead><tr><th>Obra</th><th>Projeto</th><th>Clientes</th><th>Situação</th></tr></thead><tbody>' + S.obras.map(function (o) {
       var p = T.projeto(o.projetoId), cl = p ? (p.clienteIds || []).map(function (id) { var c = contato(id); return c ? c.nome : null; }).filter(Boolean).join(", ") : "";
       return '<tr class="cad-row" data-obra="' + esc(o.id) + '"><td class="name"><b>' + esc(o.nome) + "</b></td><td>" + esc(p ? p.codigo || p.nome : "—") + "</td><td>" + esc(cl) + "</td><td>" + esc((OBRA_SIT.filter(function (s) { return s[0] === o.situacao; })[0] || ["", ""])[1]) + "</td></tr>";
     }).join("") + "</tbody></table></div>" : '<div class="empty">Nenhuma obra cadastrada.</div>');
   }
   function secColab() {
-    return '<div class="section-head"><div class="section-meta">Equipe do escritório. Cadastro, valores e custo-hora ficam em Configurações.</div><button class="btn btn-small" data-cfg="1">Abrir Configurações</button></div>' +
-      '<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Perfil</th><th>Situação</th></tr></thead><tbody>' + T.state.pessoas.map(function (p) {
-        return '<tr><td class="name"><b>' + esc(p.nome) + "</b></td><td>" + (p.perfil === "socio" ? "Sócio(a)" : "Colaborador(a)") + "</td><td>" + (p.ativo === false ? "Inativo" : "Ativo") + "</td></tr>";
+    return '<div class="section-head"><div class="section-meta">Equipe do escritório. Cadastro, valores e custo-hora ficam em Configurações. Excluir uma pessoa só por aqui.</div><button class="btn btn-small" data-cfg="1">Abrir Configurações</button></div>' +
+      '<div class="table-wrap as-list"><table><thead><tr><th>Nome</th><th>Perfil</th><th>Situação</th><th></th></tr></thead><tbody>' + T.state.pessoas.map(function (p) {
+        return '<tr><td class="name"><b>' + esc(p.nome) + '</b></td><td data-l="Perfil">' + (p.perfil === "colaborador" ? "Colaborador(a)" : "Sócio(a)") + '</td><td data-l="Situação">' + (p.ativo === false ? "Inativo" : "Ativo") + '</td><td class="acts"><button class="link danger" data-pesdel="' + esc(p.id) + '">Excluir</button></td></tr>';
       }).join("") + "</tbody></table></div>";
   }
 
@@ -127,17 +127,38 @@
     '<div id="cad-body"></div>';
   function init() {
     var v = $("view-cadastros");
-    v.addEventListener("click", function (e) {
+    v.addEventListener("click", async function (e) {
       var t = e.target, b;
+      if ((b = t.closest("[data-levar]"))) { T.gestor.novo(T.projeto(b.dataset.levar)); return; }
+      if ((b = t.closest("[data-pdel]"))) {
+        var pj = T.projeto(b.dataset.pdel);
+        if (!(await T.confirmar({ titulo: "Excluir o projeto?", texto: "<b>" + esc(pj.nome) + "</b> sai de Cadastros, do Gestor de Projetos e de Horas e custos. As horas já lançadas continuam no Tempo, como “projeto removido”. Não dá para desfazer.", ok: "Excluir projeto", perigo: true }))) return;
+        try { if (T.gestor && T.gestor.gp(pj.id)) await T.gestor.excluir(pj.id); await T.db.doc("projetos/" + pj.id).delete(); T.toast("Projeto excluído"); } catch (err) { T.showError(err); }
+        return;
+      }
+      if ((b = t.closest("[data-pesdel]"))) {
+        var pe = T.pessoa(b.dataset.pesdel);
+        if (!(await T.confirmar({ titulo: "Excluir " + esc(pe.nome) + "?", texto: "A pessoa sai do app. As horas e tarefas dela continuam registradas, mas aparecem como “pessoa removida”. Para só tirar da equipe sem apagar, marque como inativa em Configurações.", ok: "Excluir pessoa", perigo: true }))) return;
+        try { await T.db.doc("pessoas/" + pe.id).delete(); T.toast("Pessoa excluída"); } catch (err) { T.showError(err); }
+        return;
+      }
+      if ((b = t.closest("[data-odel]"))) {
+        if (!(await T.confirmar({ titulo: "Excluir a obra?", ok: "Excluir obra", perigo: true }))) return;
+        try { await T.db.doc("obras/" + b.dataset.odel).delete(); S.editObra = null; render(); T.toast("Obra excluída"); } catch (err) { T.showError(err); }
+        return;
+      }
       if ((b = t.closest("[data-sec]"))) { S.sec = b.dataset.sec; S.edit = S.editObra = null; render(); return; }
       if ((b = t.closest("[data-cf]"))) { S.filtro = b.dataset.cf; render(); return; }
-      if ((b = t.closest("[data-novo]"))) { var k = b.dataset.novo; if (k === "projeto") { T.gestor.novo(); return; } if (k === "obra") S.editObra = "novo"; else { S.edit = "novo"; S.confirm = null; } render(); return; }
+      if ((b = t.closest("[data-novo]"))) { var k = b.dataset.novo; if (k === "projeto") { T.gestor.novo(); return; } if (k === "obra") S.editObra = "novo"; else S.edit = "novo"; render(); return; }
       if (t.closest("[data-cancel]")) { S.edit = S.editObra = null; render(); return; }
-      if ((b = t.closest("[data-ed]"))) { S.edit = b.dataset.ed; S.confirm = null; render(); window.scrollTo(0, 0); return; }
+      if ((b = t.closest("[data-ed]"))) { S.edit = b.dataset.ed; render(); window.scrollTo(0, 0); return; }
       if ((b = t.closest("[data-proj]"))) { T.gestor.gp(b.dataset.proj) ? T.gestor.abrir(b.dataset.proj) : T.go("admin", "projetos"); return; }
       if ((b = t.closest("[data-obra]"))) { S.editObra = b.dataset.obra; render(); return; }
-      if ((b = t.closest("[data-del]"))) { S.confirm = b.dataset.del; render(); return; }
-      if ((b = t.closest("[data-delok]"))) { var id = b.dataset.delok; T.db.doc("contatos/" + id).delete().then(function () { S.edit = null; S.confirm = null; T.toast("Contato excluído"); }, T.showError); return; }
+      if ((b = t.closest("[data-del]"))) {
+        var ct = contato(b.dataset.del);
+        if (!(await T.confirmar({ titulo: "Excluir o contato?", texto: "<b>" + esc(ct ? ct.nome : "") + "</b> sai dos Cadastros. Os projetos continuam, sem este cliente vinculado.", ok: "Excluir contato", perigo: true }))) return;
+        T.db.doc("contatos/" + b.dataset.del).delete().then(function () { S.edit = null; render(); T.toast("Contato excluído"); }, T.showError); return;
+      }
       if (t.closest("[data-cfg]")) { T.go("admin", "config"); }
     });
     v.addEventListener("change", function (e) { if (e.target.dataset.ctipo === "cliente") $("ct-proj-wrap").hidden = !e.target.checked; });

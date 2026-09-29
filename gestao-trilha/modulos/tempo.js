@@ -27,7 +27,7 @@
     lancAtivos().forEach(function (l) { if (l.pessoaId === pid && doMes(l, mes)) { min += l.min; dias[ymd(new Date(l.inicio))] = 1; } });
     return { min: min, dias: Object.keys(dias).length };
   }
-  T.tempo = { lancAtivos: lancAtivos, alvoNome: alvoNome, catDe: catDe, rotulo: rotulo, custoLanc: custoLanc, doMes: doMes, CAT_LABEL: CAT_LABEL, timers: function () { return S.timers; }, iniciar: function (combo) { return startAtividade(combo); }, parar: function (modo) { return stopTimer(modo); } };
+  T.tempo = { lancAtivos: lancAtivos, alvoNome: alvoNome, catDe: catDe, rotulo: rotulo, custoLanc: custoLanc, doMes: doMes, CAT_LABEL: CAT_LABEL, timers: function () { return S.timers; }, iniciar: function (combo) { return startAtividade(combo); }, parar: function (modo) { return stopTimer(modo); }, lancar: function (l) { return addLanc(l); } };
 
   // ---------- gravação agrupada ----------
   function mesDoc(pid, iniIso) { return pid + "_" + ymd(new Date(iniIso)).slice(0, 7); }

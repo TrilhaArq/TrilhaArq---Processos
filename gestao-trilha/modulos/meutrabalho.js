@@ -10,7 +10,7 @@
     var out = [];
     if (!T.gestor) return out;
     T.state.projetos.forEach(function (p) {
-      var g = T.gestor.gp(p.id); if (!g || g.etapa === "encerrado") return;
+      var g = T.gestor.gp(p.id); if (!g || !T.gestor.ativo(g)) return;
       var cod = T.gestor.codigos(g);
       (g.itens || []).forEach(function (x) {
         if (x.resp !== pid || (!S.verProntas && T.gestor.feito(x))) return;
@@ -23,13 +23,13 @@
   function linha(o, timer, mostrarProjeto) {
     var x = o.x, et = T.gestor.etapas[x.etapa] || {}, rodando = timer && timer.pranchaId === x.id, hoje = T.ymd(new Date()), atras = x.prazo && x.prazo < hoje && !T.gestor.feito(x);
     var chave = esc(o.p.id) + "|" + x.id;
-    var tempo = T.tempo && T.tempo.iniciar && et.tempo ? (rodando ? '<button class="btn btn-small btn-stop" data-pausar="1">❚❚ Pausar</button><button class="btn btn-small" data-concluir="' + chave + '">✓ Concluir</button>' : '<button class="btn btn-small btn-primary" data-play="' + chave + '">▶ Iniciar</button>') : "";
+    var tempo = T.tempo && T.tempo.iniciar && (et.tempo || []).length ? (rodando ? '<button class="btn btn-small btn-stop" data-pausar="1">❚❚ Pausar</button><button class="btn btn-small" data-concluir="' + chave + '">✓ Concluir</button>' : '<button class="btn btn-small btn-primary" data-play="' + chave + '">▶ Iniciar</button>') : "";
     return '<div class="it-row mt-row' + (x.prio ? " prio-" + x.prio : "") + (rodando ? " is-live" : "") + '">' +
       '<span class="it-cod num">' + esc(o.cod || "·") + "</span>" +
-      '<span class="it-tit static">' + (x.prio ? '<span class="prio-tag p' + x.prio + '">P' + x.prio + "</span>" : "") + esc(x.titulo) + ' <em class="pr-et">' + esc(et.nome || "") + (mostrarProjeto ? " · " + esc(o.p.codigo || o.p.nome) : "") + "</em>" + T.gestor.desenhosProg(x) + "</span>" +
-      (x.prazo ? '<span class="badge static' + (atras ? " is-overdue" : "") + '">' + T.fmtYmd(x.prazo) + "</span>" : '<span class="hint">sem prazo</span>') +
+      '<span class="it-tit static"><span class="it-nome">' + (x.prio ? '<span class="prio-tag p' + x.prio + '">P' + x.prio + "</span> " : "") + esc(x.titulo) + '</span><em class="pr-et">' + esc(et.curto || et.nome || "") + (mostrarProjeto ? " · " + esc(o.p.codigo || o.p.nome) : "") + "</em>" + T.gestor.desenhosProg(x) + "</span>" +
+      '<span class="it-ctl">' + (x.prazo ? '<span class="it-date static' + (atras ? " late" : "") + '">' + T.fmtYmd(x.prazo).slice(0, 5) + "</span>" : '<span class="it-date static empty">sem prazo</span>') +
       '<select class="sit-sel s-' + x.sit + '" data-msit="' + chave + '" aria-label="Situação">' + T.optHtml(T.gestor.SIT, x.sit) + "</select>" +
-      '<span class="mt-timer">' + tempo + "</span></div>";
+      '<span class="mt-timer">' + tempo + "</span></span></div>";
   }
   function render() {
     var pid = T.state.pessoaId, lista = itensDa(pid), timer = T.tempo && T.tempo.timers()[pid], html = "";
@@ -66,7 +66,7 @@
       }
       if ((b = e.target.closest("[data-play]"))) {
         var c = b.dataset.play.split("|"), g = T.gestor.gp(c[0]), x = T.byId(g.itens || [], c[1]), cod = T.gestor.codigos(g)[x.id];
-        T.tempo.iniciar({ tipo: "projeto", alvoId: c[0], etapaId: T.gestor.etapas[x.etapa].tempo, topicoId: null, descricao: (cod ? cod + " · " : "") + x.titulo, pranchaId: x.id });
+        T.tempo.iniciar({ tipo: "projeto", alvoId: c[0], etapaId: (T.gestor.etapas[x.etapa].tempo || [])[0] || null, topicoId: null, descricao: (cod ? cod + " · " : "") + x.titulo, pranchaId: x.id });
         if (x.sit === "a_fazer") T.gestor.mudarItem(c[0], x.id, function (it) { it.sit = "andamento"; });
         T.toast("Cronômetro iniciado", { label: "Ver no Tempo", fn: function () { T.go("pessoa", "tempo"); } });
       }

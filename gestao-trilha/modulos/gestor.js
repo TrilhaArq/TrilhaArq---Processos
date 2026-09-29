@@ -1,7 +1,9 @@
 /* Módulo Gestor de Projetos — processo de projeto: etapas e portões, Plano de Projeto (itens com desenhos,
- * checklists, prazo, prioridade e situação), tarefas ligadas à agenda das pessoas, programa de necessidades.
- * Dados: gp/<projetoId> (um documento por projeto). Dados básicos em projetos/<id> (núcleo).
- * Regras: manual-trilha/MAPEAMENTO.md, processo-trilha.json e AJUSTES-TESTE.md. Expõe Trilha.gestor. */
+ * checklists, prazo, prioridade e situação), marcenaria como segunda trilha do mesmo projeto, reuniões (lançadas no
+ * Tempo), histórico fiel, termos em PDF, notificações, suspensão e arquivamento automáticos.
+ * Dados: gp/<projetoId> (um documento por projeto) e gp_config/geral (modelo de móvel). Dados básicos em
+ * projetos/<id> (núcleo). Regras: manual-trilha/MAPEAMENTO.md, processo-trilha.json, AJUSTES-TESTE.md, TERMOS.md.
+ * Expõe Trilha.gestor. */
 (function () {
   "use strict";
   var T = window.Trilha, $ = T.$, esc = T.esc;
@@ -9,29 +11,35 @@
   // ---------- processo ----------
   var SIGLAS = [["RES", "Residencial"], ["COM", "Comercial"], ["HOT", "Hotelaria"], ["REF", "Reforma"], ["INT", "Interiores"]];
   var TIPO_ANTIGO = { RES: "res", COM: "comr", HOT: "hot", REF: "ref", INT: "int" };
+  // tempo: etapa da aba Tempo em que as horas são lançadas; prazo: dias úteis padrão (editável por projeto na Ficha)
   var ETAPAS = {
-    briefing: { nome: "Briefing" },
-    abertura: { nome: "Abertura", tempo: "ep" },
-    ep: { nome: "Estudo Preliminar", prazo: 40, tempo: "ep", termo: "Termo de Encerramento de Etapa" },
-    ap: { nome: "Anteprojeto", prazo: 70, tempo: "ap", termo: "Termo de Encerramento de Etapa", fases: ["Revisão e lançamentos", "Compatibilização", "Definições"] },
-    pl: { nome: "Projeto Legal", tempo: "pl" },
-    pe: { nome: "Projeto Executivo", prazo: 60, tempo: "ex", termo: "Termo de Encerramento de Projeto", fases: ["Desenhos base", "Mapeamentos e detalhamento"] },
-    encerrado: { nome: "Encerrado" }
+    abertura: { nome: "Abertura", curto: "Abertura", tempo: ["ab"] },
+    ep: { nome: "Estudo Preliminar", curto: "Estudo Preliminar", prazo: 40, tempo: ["ep"], termo: "etapa", clausula: "2.1.7" },
+    ap: { nome: "Anteprojeto", curto: "Anteprojeto", prazo: 70, tempo: ["ap", "comp"], termo: "etapa", clausula: "2.2.9", fases: ["Revisão e lançamentos", "Compatibilização", "Definições"] },
+    pl: { nome: "Projeto Legal", curto: "Projeto Legal", tempo: ["pl"] },
+    pe: { nome: "Projeto Executivo", curto: "Executivo", prazo: 60, tempo: ["ex"], termo: "projeto", clausula: "2.4.8", fases: ["Desenhos base", "Mapeamentos e detalhamento"] },
+    mep: { nome: "Estudo Preliminar da marcenaria", curto: "EP Marcenaria", tempo: ["mc-ep"], termo: "etapa", marc: true },
+    mex: { nome: "Executivo da marcenaria", curto: "Executivo Marcenaria", tempo: ["mc-ex"], termo: "projeto", marc: true },
+    encerrado: { nome: "Encerrado", curto: "Encerrado" }
   };
   function doZero(sigla) { return !(sigla === "REF" || sigla === "INT"); }
-  function fluxo(sigla) { return doZero(sigla) ? ["briefing", "abertura", "ep", "ap", "pe", "encerrado"] : ["briefing", "abertura", "ep", "pe", "encerrado"]; }
+  function fluxo(sigla) { return doZero(sigla) ? ["abertura", "ep", "ap", "pe", "encerrado"] : ["abertura", "ep", "pe", "encerrado"]; }
   function temLegal(g) { return g.legal && g.legal !== "nao_se_aplica"; }
-  function etapasPlano(g) { var e = ["abertura", "ep"]; if (doZero(g.sigla)) e.push("ap"); if (temLegal(g)) e.push("pl"); e.push("pe"); return e; }
+  function marcAtiva(g) { return !!(g.marc && g.marc.ativo); }
+  function marcAberta(g) { return marcAtiva(g) && g.marc.etapa !== "fim"; }
+  function etapasPlano(g) { var e = ["abertura", "ep"]; if (doZero(g.sigla)) e.push("ap"); if (temLegal(g)) e.push("pl"); e.push("pe"); if (marcAtiva(g)) e.push("mep", "mex"); return e; }
   var LEGAL = [["nao_iniciado", "Não iniciado"], ["em_preparo", "Em preparo"], ["protocolado", "Protocolado"], ["aprovado", "Aprovado"], ["nao_se_aplica", "Não se aplica"]];
   var SIT = [["a_fazer", "A fazer"], ["andamento", "Em andamento"], ["revisao", "Revisão interna"], ["pronto", "Pronto"], ["entregue", "Entregue"]];
   var QUEM = [["cliente", "cliente"], ["engenheiro", "engenheiro"], ["condominio", "condomínio"], ["prefeitura", "prefeitura"]];
   var TIPOS_TAREFA = [["tarefa", "Tarefa"], ["demanda", "Demanda"], ["prioridade", "Prioridade"], ["compromisso", "Compromisso"]];
+  var TIPOS_REUNIAO = ["Apresentação ao cliente", "Ajustes com o cliente", "Complementares / engenheiros", "Reunião interna", "Entrega", "Outra"];
   var PADRAO = [["medio", "Médio (R$ 3.000–3.500/m²)"], ["medio_alto", "Médio Alto (R$ 3.500–4.500/m²)"], ["alto_1", "Alto (R$ 4.500–5.500/m²)"], ["alto_2", "Alto (R$ 5.500–7.000/m²)"], ["luxo", "Luxo (acima de R$ 7.000/m²)"]];
   var DIMENSAO = [["compacta", "Compacta"], ["confortavel", "Confortável"], ["espacosa", "Espaçosa"]];
   var DIFICULDADE = [["baixa", "Baixa"], ["normal", "Normal"], ["dificil", "Difícil"], ["muito_dificil", "Muito difícil"]];
   var MARCO = [["contrato", "Contrato assinado"], ["parcela", "1ª parcela paga"], ["topografico", "Topográfico entregue"], ["documentos", "Documentos do cliente"]];
+  var ESPERA_AVISO = 15, ESPERA_SUSPENDE = 20, SUSPENSO_ARQUIVA = 60, PRAZO_AVISO = 10;
 
-  // Grupos do Plano de Projeto por etapa. cod: "serie" (série + posição), "AP"/"PL" (sigla + posição) ou nenhum.
+  // Grupos do Plano de Projeto por etapa. cod: "serie" (série + posição), sigla + posição, ou nenhum.
   var SERIES = { 100: "Implantação, plantas e cobertura", 200: "Cortes", 300: "Elevações", 400: "Mapeamentos", 500: "Ampliações", 600: "Esquadrias", 700: "Marmoraria", 800: "Detalhamentos construtivos", 900: "Marcenaria", 1000: "Documentos" };
   function grupos(etapa) {
     function serie(n) { return { k: "s" + n, n: n + " · " + SERIES[n], cod: "serie", serie: n }; }
@@ -39,7 +47,9 @@
     if (etapa === "ep") return [{ k: "ep-estudos", n: "Estudos e concepção" }, { k: "ep-apres", n: "Material da apresentação", cod: "AP" }, { k: "ep-entrega", n: "Apresentação e aprovação" }];
     if (etapa === "ap") return [100, 200, 300, 400].map(serie).concat([{ k: "ap-comp", n: "Complementares" }, { k: "ap-def", n: "Definições com o cliente" }, { k: "ap-fecha", n: "Encerramento do Anteprojeto" }]);
     if (etapa === "pl") return [{ k: "pl-pranchas", n: "Pranchas de aprovação", cod: "PL" }, { k: "pl-tramite", n: "Aprovação" }];
-    if (etapa === "pe") return [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000].map(serie).concat([{ k: "pe-fecha", n: "Fechamento e entrega" }]);
+    if (etapa === "pe") return [100, 200, 300, 400, 500, 600, 700, 800, 1000].map(serie).concat([{ k: "pe-fecha", n: "Fechamento e entrega" }]);
+    if (etapa === "mep") return [{ k: "mep", n: "Estudo Preliminar da marcenaria", cod: "EM" }];
+    if (etapa === "mex") return [serie(900)];
     return [];
   }
 
@@ -97,42 +107,64 @@
   var PADRAO_RES = { hall: 1, cozinha: 1, jantar: 1, estar: 1, lavabo: 1, suite_master: 1, banho_master: 1, closet: 1, quarto: 2, banho: 1, garagem: 2, lavanderia: 1 };
   function tipoAmb(id) { return T.byId(CATALOGO, id) || T.byId(CATALOGO, "outro"); }
 
+  // Modelo de móvel (marcenaria): editável em Plano › Marcenaria › "Modelo de móvel". Fica em gp_config/geral.
+  var MODELO_MOVEL = {
+    guia: "",
+    desenhos: [
+      { nome: "Planta (vista superior)", checklist: [] },
+      { nome: "Vistas frontais", checklist: [] },
+      { nome: "Cortes", checklist: [] },
+      { nome: "Detalhes (ferragens, puxadores, encaixes)", checklist: [] },
+      { nome: "Tabela de materiais e acabamentos", checklist: [] }
+    ],
+    checklist: ["Medidas conferidas com o projeto / a obra", "Cotas totais e parciais", "Materiais, cores e fitas indicados", "Ferragens e puxadores especificados", "Eletros e equipamentos com medidas do fabricante", "Pontos elétricos e hidráulicos compatibilizados", "Folgas, rodapés e tamponamentos", "Revisão interna"]
+  };
+
   // ---------- estado ----------
-  var S = { gp: {}, view: "lista", projId: null, tab: "geral", filtro: "todos", busca: "", planoEtapa: null, pendentes: false, open: {}, openDes: {}, addGrupo: null, openAmb: null, wiz: null, confirmDel: null };
+  var S = { gp: {}, cfg: null, fin: null, loaded: false, view: "lista", projId: null, tab: "geral", filtro: "ativos", foco: null, busca: "", planoEtapa: null, pendentes: false,
+    open: {}, openDes: {}, addGrupo: null, openAmb: null, wiz: null, auto: {}, modal: null, editModelo: false };
 
   // ---------- datas: dias úteis ----------
   function dia(d) { d = new Date(d); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
   function du(a, b) { var x = dia(a), y = dia(b), n = 0; while (x < y) { x.setDate(x.getDate() + 1); var w = x.getDay(); if (w && w < 6) n++; } return n; }
   function somaDu(n, base) { var x = dia(base || new Date()), passo = n < 0 ? -1 : 1; n = Math.abs(n); while (n > 0) { x.setDate(x.getDate() + passo); var w = x.getDay(); if (w && w < 6) n--; } return x; }
-  function voltaDu(n) { return somaDu(-n); }
   function hojeIso() { return T.ymd(new Date()); }
+  function amanhaIso() { return T.ymd(T.addDays(new Date(), 1)); }
+  function isoDeData(ymd) { return new Date(ymd + "T12:00:00").toISOString(); }
+  function dataExtenso(s) { var d = T.parseYmd(s); return d.getDate() + " de " + T.MESES[d.getMonth()] + " de " + d.getFullYear(); }
 
   // ---------- leitura ----------
-  function G(pid) { return S.gp[pid] || null; }
+  function G(pid) { var g = S.gp[pid]; if (g && g.etapa === "briefing") g.etapa = "abertura"; return g || null; }
   function proj(pid) { return T.projeto(pid) || { id: pid, nome: "Projeto removido" }; }
   function projetosGestor() { return T.state.projetos.filter(function (p) { return !!S.gp[p.id]; }); }
-  function clientesNomes(p) {
-    var nomes = (p.clienteIds || []).map(function (id) { var c = T.cadastros && T.cadastros.contato(id); return c ? c.nome : null; }).filter(Boolean);
-    return nomes.length ? nomes.join(" e ") : (p.cliente || "");
-  }
+  function clientes(p) { return (p.clienteIds || []).map(function (id) { return T.cadastros && T.cadastros.contato(id); }).filter(Boolean); }
+  function clientesNomes(p) { var c = clientes(p).map(function (x) { return x.nome; }); return c.length ? c.join(" e ") : (p.cliente || ""); }
   function esperaAberta(g) { var e = (g.esperas || []).filter(function (x) { return !x.fim; }); return e[e.length - 1] || null; }
-  function prazoInfo(g) {
-    var et = ETAPAS[g.etapa], info = g.etapas && g.etapas[g.etapa];
-    if (!et || !et.prazo || !info || !info.inicio) return null;
+  function ativo(g) { return !g.suspenso && !g.arquivado; }
+  function etapaLista(g) { return g.etapa === "encerrado" && marcAberta(g) ? "marc" : g.etapa; }
+  function prazoEtapa(g, e) { var info = (g.etapas || {})[e] || {}; if (ETAPAS[e].marc) return info.prazo || ((g.marc || {}).prazos || {})[e] || null; return info.prazo || ETAPAS[e].prazo || null; }
+  function calcPrazo(g, e) {
+    var info = (g.etapas || {})[e], prazo = prazoEtapa(g, e);
+    if (!prazo || !info || !info.inicio || info.fim) return null;
     var ini = new Date(info.inicio), agora = new Date(), pausa = 0;
-    (g.esperas || []).forEach(function (e) { var s = new Date(Math.max(ini, new Date(e.inicio))), f = e.fim ? new Date(e.fim) : agora; if (f > s) pausa += du(s, f); });
-    var usados = Math.max(0, du(ini, agora) - pausa), resta = et.prazo - usados;
-    return { usados: usados, prazo: et.prazo, resta: resta, pausado: !!esperaAberta(g), fim: somaDu(resta), pct: Math.min(100, Math.round(usados / et.prazo * 100)) };
+    (g.esperas || []).forEach(function (x) { var s = new Date(Math.max(ini, new Date(x.inicio))), f = x.fim ? new Date(x.fim) : agora; if (f > s) pausa += du(s, f); });
+    var usados = Math.max(0, du(ini, agora) - pausa), resta = prazo - usados;
+    return { etapa: e, usados: usados, prazo: prazo, resta: resta, pausado: !!esperaAberta(g), fim: somaDu(resta), pct: Math.min(100, Math.round(usados / prazo * 100)) };
   }
+  // Prazo mostrado no cartão: o da arquitetura; depois do Executivo, o da marcenaria.
+  function prazoInfo(g) { var a = ETAPAS[g.etapa] && ETAPAS[g.etapa].prazo ? calcPrazo(g, g.etapa) : null; if (a) return a; if (marcAberta(g) && (g.marc.etapa === "mep" || g.marc.etapa === "mex")) return calcPrazo(g, g.marc.etapa); return null; }
+  function prazosAbertos(g) { var out = []; if (ETAPAS[g.etapa] && ETAPAS[g.etapa].prazo) { var a = calcPrazo(g, g.etapa); if (a) out.push(a); } if (marcAberta(g) && (g.marc.etapa === "mep" || g.marc.etapa === "mex")) { var m = calcPrazo(g, g.marc.etapa); if (m) out.push(m); } return out; }
   function corPrazo(pct) { return pct < 30 ? "ok" : pct < 60 ? "mid" : "late"; }
   function nomeQuem(q) { var x = QUEM.filter(function (o) { return o[0] === q; })[0]; return x ? x[1] : q; }
   function situacao(g) {
-    if (g.etapa === "encerrado") return { k: "fim", txt: "Encerrado" };
+    if (g.arquivado) return { k: "fim", txt: "Arquivado desde " + T.fmtYmd(g.arquivado.desde) };
     if (g.suspenso) return { k: "bad", txt: "Suspenso desde " + T.fmtYmd(g.suspenso.desde) };
+    if (g.etapa === "encerrado" && !marcAberta(g)) return { k: "fim", txt: "Encerrado" };
     var e = esperaAberta(g);
-    if (e) { var d = du(e.inicio, new Date()); return { k: e.quem === "cliente" && d >= 15 ? "bad" : "wait", txt: "Aguardando " + nomeQuem(e.quem) + " · " + d + " d.u.", dias: d, quem: e.quem }; }
+    if (e) { var d = du(e.inicio, new Date()); return { k: e.quem === "cliente" && d >= ESPERA_AVISO ? "bad" : "wait", txt: "Aguardando " + nomeQuem(e.quem) + " · " + d + " d.u.", dias: d, quem: e.quem }; }
     var pz = prazoInfo(g);
     if (pz && pz.resta < 0) return { k: "bad", txt: "Prazo vencido há " + (-pz.resta) + " d.u." };
+    if (g.etapa === "encerrado") return { k: "ok", txt: "Arquitetura entregue · marcenaria em andamento" };
     return { k: "ok", txt: "Em dia" };
   }
   function itensDe(g, etapa) { return (g.itens || []).filter(function (x) { return !etapa || x.etapa === etapa; }); }
@@ -140,7 +172,9 @@
   function prontos(list) { return list.filter(feito).length; }
   function pctProjeto(g) { var it = itensDe(g); return it.length ? Math.round(prontos(it) / it.length * 100) : 0; }
   function marco(g, k) { if (k === "topografico" || k === "documentos") { var it = itensDe(g, "abertura").filter(function (x) { return x.chave === k; })[0]; if (it) return feito(it); } return !!(g.marco || {})[k]; }
-  function horasProj(pid) { if (!T.tempo) return 0; var min = 0; T.tempo.lancAtivos().forEach(function (l) { if (l.tipo === "projeto" && l.alvoId === pid) min += l.min; }); return min; }
+  function lancDoProj(pid) { return T.tempo ? T.tempo.lancAtivos().filter(function (l) { return l.tipo === "projeto" && l.alvoId === pid; }) : []; }
+  function horasProj(pid) { return lancDoProj(pid).reduce(function (s, l) { return s + l.min; }, 0); }
+  function horasEtapa(pid, e) { var ids = ETAPAS[e] && ETAPAS[e].tempo || []; return lancDoProj(pid).reduce(function (s, l) { return ids.indexOf(l.etapaId) >= 0 ? s + l.min : s; }, 0); }
   function ordenar(list) { return list.slice().sort(function (a, b) { return (a.ord || 0) - (b.ord || 0); }); }
   function codigos(g) {
     var out = {};
@@ -153,6 +187,20 @@
     return out;
   }
   function sitNome(k) { var x = SIT.filter(function (o) { return o[0] === k; })[0]; return x ? x[1] : k; }
+  function ehSocio(pid) { var p = T.pessoa(pid); return !p || p.perfil !== "colaborador"; }
+  function tarefasDoProjeto(pid) {
+    var out = [], docs = T.tarefas ? T.tarefas.todas() : {};
+    Object.keys(docs).forEach(function (pes) { (docs[pes] || []).forEach(function (t) { if (t.projetoId === pid) out.push({ pes: pes, t: t }); }); });
+    return out.sort(function (a, b) { return (a.t.status === "done") - (b.t.status === "done") || String(a.t.dueDate || "9").localeCompare(String(b.t.dueDate || "9")); });
+  }
+  // Quem tem trabalho pendente no projeto: item do Plano ou tarefa não concluídos.
+  function envolvidos(pid, g) {
+    var m = {};
+    (g.itens || []).forEach(function (x) { if (x.resp && !feito(x)) m[x.resp] = (m[x.resp] || 0) + 1; });
+    tarefasDoProjeto(pid).forEach(function (o) { if (o.t.status !== "done") m[o.pes] = (m[o.pes] || 0) + 1; });
+    return Object.keys(m).filter(function (id) { return T.pessoa(id); }).sort(function (a, b) { return m[b] - m[a]; });
+  }
+  function modelo() { var c = S.cfg && S.cfg.modeloMovel; return c && c.desenhos ? c : MODELO_MOVEL; }
 
   // ---------- Plano de Projeto: geração ----------
   function des(nomes, ck) { return (nomes || []).map(function (n) { return { id: T.novoId(), nome: n, feito: false, checklist: (ck && ck[n] || []).map(function (t) { return { t: t, ok: false }; }), guia: "" }; }); }
@@ -172,6 +220,12 @@
     return [];
   }
   function novoItem(etapa, grupo, titulo, extra) { return Object.assign({ id: T.novoId(), etapa: etapa, grupo: grupo, titulo: titulo, sit: "a_fazer", resp: null, prazo: null, prio: null, rev: grupo.charAt(0) === "s" ? "R00" : null, desenhos: desenhosDe(titulo) }, extra || {}); }
+  function novoMovel(etapa, grupo, titulo, extra) {
+    var md = modelo(), ck = md.checklist || [];
+    var d = (md.desenhos || []).map(function (z) { return { id: T.novoId(), nome: z.nome, feito: false, checklist: (z.checklist && z.checklist.length ? z.checklist : ck).map(function (t) { return { t: t, ok: false }; }), guia: md.guia || "" }; });
+    return novoItem(etapa, grupo, titulo, Object.assign({ desenhos: d, movel: true }, extra || {}));
+  }
+  // Termos não são itens: viram botão no fim da etapa (geram o PDF).
   function gerarPlano(o) {
     var pavs = o.pavs && o.pavs.length ? o.pavs : ["Térreo"], zero = doZero(o.sigla), legal = zero && o.legal !== "nao_se_aplica", out = [];
     function add(e, gr, t, x) { out.push(novoItem(e, gr, t, x)); }
@@ -185,7 +239,7 @@
       .concat(["Corte AA", "Perspectiva explodida", "Estudo de insolação", "Estudo de ventilação", "Estudo de visuais", "Perspectiva estrutural", "Perspectiva de terraplenagem", "Imagens fotorrealistas", "Animação (bônus)", "Modelo BIMx"])
       .forEach(function (t) { add("ep", "ep-apres", t); });
     add("ep", "ep-entrega", "Montar a apresentação (PDF widescreen)", { desenhos: des(["Capa", "Imagem impactante", "Análise do terreno", "Estudos esquemáticos de concepção", "Imagens", "Plantas e cortes", "Mais imagens", "Esquemas e diagramas", "Imagens finais"]) });
-    ["Revisão interna", "Reunião de apresentação", "Rodada de ajustes 1", "Rodada de ajustes 2", "Termo de Encerramento de Etapa assinado"].forEach(function (t) { add("ep", "ep-entrega", t); });
+    ["Revisão interna", "Reunião de apresentação", "Rodada de ajustes 1", "Rodada de ajustes 2"].forEach(function (t) { add("ep", "ep-entrega", t); });
     // Séries 100 a 400: criadas no Anteprojeto e desenvolvidas de novo no Executivo (muda o checklist)
     function base(e) {
       add(e, "s100", "Implantação"); pavs.forEach(function (p) { add(e, "s100", "Planta baixa – " + p); }); add(e, "s100", "Planta de cobertura");
@@ -199,7 +253,7 @@
       base("ap");
       ["Estrutural (fundação e estrutura)", "Hidrossanitário", "Elétrico (iluminação de apoio, rede, automação)", "SPDA", "Climatização"].forEach(function (t) { add("ap", "ap-comp", t, { desenhos: des(["Envio ao complementar", "Reunião 1", "Reunião 2", "Conclusão do complementar"]) }); });
       ["Acabamentos e revestimentos", "Louças e metais", "Equipamentos", "Forro e iluminação final", "Bancadas", "Esquadrias"].forEach(function (t) { add("ap", "ap-def", t); });
-      ["Revisão interna", "Reunião final com o cliente", "Termo de Encerramento de Etapa assinado"].forEach(function (t) { add("ap", "ap-fecha", t); });
+      ["Revisão interna", "Reunião final com o cliente"].forEach(function (t) { add("ap", "ap-fecha", t); });
     }
     if (legal) {
       ["Situação / implantação", "Planta de cobertura"].concat(pavs.map(function (p) { return "Planta – " + p; })).concat(["Plantas de áreas", "Corte longitudinal", "Corte transversal"]).forEach(function (t) { add("pl", "pl-pranchas", t); });
@@ -211,19 +265,19 @@
     ["Esquadrias de alumínio e vidro", "Esquadrias de madeira", "Guarda-corpo e corrimão"].forEach(function (t) { add("pe", "s600", t); });
     if (bancadas.length) { pavs.forEach(function (p) { add("pe", "s700", "Planta de marmoraria – " + p); }); bancadas.forEach(function (a) { add("pe", "s700", "Bancada – " + a.nome, { ambId: a.id, banc: true }); }); }
     add("pe", "s800", "Detalhe construtivo (exemplo)");
-    if (o.marcenaria) pavs.forEach(function (p) { add("pe", "s900", "Mapa de marcenaria – " + p); });
     ["Terraplenagem", "Revestimentos: especificação e quantitativo", "Louças e metais", "Equipamentos", "Tomadas e interruptores", "Iluminação"].forEach(function (t) { add("pe", "s1000", t); });
-    ["Revisão final das pranchas", "Guia de Projeto", "Imagens renderizadas atualizadas", "Modelo BIMx atualizado", "Reunião de entrega (abrir as pranchas)", "Termo de Encerramento de Projeto assinado", "Entrega física"].forEach(function (t) { add("pe", "pe-fecha", t); });
+    ["Revisão final das pranchas", "Guia de Projeto", "Imagens renderizadas atualizadas", "Modelo BIMx atualizado", "Reunião de entrega (abrir as pranchas)", "Entrega física"].forEach(function (t) { add("pe", "pe-fecha", t); });
     var ord = {}; out.forEach(function (x) { var k = x.etapa + x.grupo; ord[k] = (ord[k] || 0) + 1; x.ord = ord[k]; });
     return out;
   }
   function novoAmbiente(tipo, extra) { var t = tipoAmb(tipo); return Object.assign({ id: T.novoId(), tipo: t.id, nome: t.n, setor: t.s, pav: null, qtd: 1, area: t.a, cfg: {}, obs: "", origem: "cadastro" }, extra || {}); }
-  function ambientesDeQtd(qtd, pav0) {
+  function ambientesDeQtd(qtd, pav0, areas) {
     var out = [];
     CATALOGO.forEach(function (t) {
       var n = +qtd[t.id] || 0; if (!n) return;
-      if (t.id === "garagem") { out.push(novoAmbiente(t.id, { qtd: n, pav: pav0, nome: "Garagem" })); return; }
-      for (var i = 1; i <= n; i++) out.push(novoAmbiente(t.id, { pav: pav0, nome: n > 1 ? t.n + " " + i : t.n }));
+      var ar = areas && areas[t.id] != null && areas[t.id] !== "" ? +areas[t.id] : t.a;
+      if (t.id === "garagem") { out.push(novoAmbiente(t.id, { qtd: n, pav: pav0, nome: "Garagem", area: ar })); return; }
+      for (var i = 1; i <= n; i++) out.push(novoAmbiente(t.id, { pav: pav0, nome: n > 1 ? t.n + " " + i : t.n, area: ar }));
     });
     return out;
   }
@@ -234,15 +288,74 @@
     S.gp[pid] = cur; T.scheduleRender();
     try { await T.db.doc("gp/" + pid).set(cur); } catch (e) { T.showError(e); }
   }
-  function mudarItem(pid, id, fn) { return salvar(pid, function (x) { var it = T.byId(x.itens || [], id); if (it) fn(it, x); }); }
-  function evento(g, txt, data) { g.eventos = g.eventos || []; g.eventos.push({ data: data || hojeIso(), txt: txt }); }
+  function marcarConclusao(it, antes) { var ag = feito(it); if (ag && !antes) it.concluidoEm = new Date().toISOString(); if (!ag) delete it.concluidoEm; }
+  function mudarItem(pid, id, fn) { return salvar(pid, function (x) { var it = T.byId(x.itens || [], id); if (it) { var antes = feito(it); fn(it, x); marcarConclusao(it, antes); } }); }
+  // Histórico: registro fiel com dia e hora. Não se edita nem se apaga (correção = novo registro).
+  function evento(g, txt, data, extra) { g.eventos = g.eventos || []; g.eventos.push(Object.assign({ data: data || hojeIso(), em: new Date().toISOString(), por: T.state.pessoaId || null, txt: txt }, extra || {})); }
+  async function statusProjeto(pid, status) { try { await T.db.doc("projetos/" + pid).update({ status: status }); } catch (e) { T.showError(e); } }
+
+  // ---------- regras automáticas: suspensão (20 d.u. sem retorno do cliente) e arquivamento (60 d.u. suspenso) ----------
+  function autoRegras() {
+    if (!S.loaded || !T.db) return;
+    Object.keys(S.gp).forEach(function (pid) {
+      var g = S.gp[pid]; if (!g || S.auto[pid]) return;
+      var e = esperaAberta(g);
+      if (!g.suspenso && !g.arquivado && g.etapa !== "encerrado" && e && e.quem === "cliente" && du(e.inicio, new Date()) >= ESPERA_SUSPENDE) {
+        S.auto[pid] = 1; var desde = T.ymd(somaDu(ESPERA_SUSPENDE, e.inicio));
+        salvar(pid, function (x) { x.suspenso = { desde: desde, auto: true }; evento(x, "Projeto suspenso automaticamente: " + ESPERA_SUSPENDE + " dias úteis sem retorno do cliente (cláusula 3.4)", desde, { tipo: "suspensao" }); })
+          .then(function () { return statusProjeto(pid, "pausado"); }).then(function () { S.auto[pid] = 0; });
+      } else if (g.suspenso && !g.arquivado && du(g.suspenso.desde, new Date()) > SUSPENSO_ARQUIVA) {
+        S.auto[pid] = 1; var em = T.ymd(somaDu(SUSPENSO_ARQUIVA + 1, g.suspenso.desde));
+        salvar(pid, function (x) { x.arquivado = { desde: em, auto: true }; evento(x, "Projeto arquivado automaticamente: mais de " + SUSPENSO_ARQUIVA + " dias úteis suspenso", em, { tipo: "arquivamento" }); })
+          .then(function () { S.auto[pid] = 0; });
+      }
+    });
+  }
+
+  // ---------- notificações ----------
+  // [nível, texto, projetoId]. pessoaId = null: todas (capa e Gestor); senão, só o que a pessoa deve ver
+  // (sócios veem tudo; colaborador vê os projetos em que tem trabalho pendente ou reunião).
+  function avisos(pessoaId) {
+    autoRegras();
+    var out = [], hoje = hojeIso(), amanha = amanhaIso();
+    projetosGestor().forEach(function (p) {
+      var g = G(p.id); if (!ativo(g) || (g.etapa === "encerrado" && !marcAberta(g))) return;
+      var socio = !pessoaId || ehSocio(pessoaId), meu = socio || envolvidos(p.id, g).indexOf(pessoaId) >= 0;
+      var nome = "<b>" + esc(p.codigo || p.nome) + "</b>";
+      (g.reunioes || []).forEach(function (r) {
+        if (r.status !== "marcada" || (r.data !== amanha && r.data !== hoje)) return;
+        if (!socio && (r.participantes || []).indexOf(pessoaId) < 0) return;
+        out.push(["warn", nome + ": reunião " + (r.data === hoje ? "hoje" : "amanhã") + (r.hora ? " às " + esc(r.hora) : "") + " · " + esc(r.tipo || "Reunião") + (r.pauta ? " · " + esc(r.pauta) : ""), p.id]);
+      });
+      if (!meu) return;
+      prazosAbertos(g).forEach(function (pz) {
+        if (pz.pausado || pz.resta > PRAZO_AVISO) return;
+        out.push(["bad", nome + (pz.resta >= 0 ? ": faltam " + pz.resta + " d.u. para o fim do prazo de " + esc(ETAPAS[pz.etapa].curto) + " (" + T.fmtYmd(T.ymd(pz.fim)) + ")" : ": prazo de " + esc(ETAPAS[pz.etapa].curto) + " vencido há " + (-pz.resta) + " d.u."), p.id]);
+      });
+      var e = esperaAberta(g);
+      if (e && e.quem === "cliente") { var d = du(e.inicio, new Date()); if (d >= ESPERA_AVISO && d < ESPERA_SUSPENDE) out.push(["warn", nome + " aguarda o cliente há " + d + " dias úteis · vai para Suspensos em " + (ESPERA_SUSPENDE - d), p.id]); }
+      if (!socio) return;
+      var ab = itensDe(g, "abertura");
+      if (g.etapa === "abertura" && marco(g, "contrato") && marco(g, "parcela") && !ab.some(function (x) { return x.sit !== "a_fazer"; })) out.push(["ok", nome + ": contrato e 1ª parcela ok · pronto para iniciar", p.id]);
+      if (g.etapa === "abertura" && ab.length && prontos(ab) === ab.length) out.push(["ok", nome + ": Abertura concluída · liberado para a concepção", p.id]);
+      var ie = itensDe(g, g.etapa); if (ETAPAS[g.etapa] && ETAPAS[g.etapa].termo && ie.length && prontos(ie) === ie.length) out.push(["ok", nome + ": todos os itens de " + esc(ETAPAS[g.etapa].curto) + " prontos · pronto para o termo", p.id]);
+      if (marcAberta(g) && (g.marc.etapa === "mep" || g.marc.etapa === "mex")) { var im = itensDe(g, g.marc.etapa); if (im.length && prontos(im) === im.length) out.push(["ok", nome + ": itens de " + esc(ETAPAS[g.marc.etapa].curto) + " prontos · pronto para o termo", p.id]); }
+    });
+    var ordem = { bad: 0, warn: 1, ok: 2 };
+    return out.sort(function (a, b) { return ordem[a[0]] - ordem[b[0]]; });
+  }
+  function avisoHtml(a) { return '<button class="gp-aviso ' + a[0] + '" data-gpopen="' + esc(a[2]) + '">' + a[1] + "</button>"; }
 
   // ---------- componentes ----------
   function trilha(g) { var f = fluxo(g.sigla), i = f.indexOf(g.etapa); return '<span class="gp-trail">' + f.map(function (e, k) { return '<i class="' + (k < i ? "on" : k === i ? "cur" : "") + '"></i>'; }).join("") + "</span>"; }
   function sitPill(g) { var s = situacao(g); return '<span class="gp-sit ' + s.k + '">' + esc(s.txt) + "</span>"; }
   function avatarPessoa(id, small) { var p = T.pessoa(id); return p ? '<span class="avatar' + (small ? " av-s" : "") + '" title="' + esc(p.nome) + '">' + esc(p.nome.charAt(0)) + "</span>" : ""; }
+  function avatares(pid, g) { var ids = envolvidos(pid, g); if (!ids.length) return ""; return '<span class="gp-avs" title="Com trabalho pendente: ' + esc(ids.map(function (i) { return T.pessoa(i).nome; }).join(", ")) + '">' + ids.slice(0, 3).map(function (i) { return avatarPessoa(i, true); }).join("") + (ids.length > 3 ? '<span class="avatar av-s av-more">+' + (ids.length - 3) + "</span>" : "") + "</span>"; }
   function optPessoas(sel, vazio) { return (vazio != null ? '<option value="">' + esc(vazio) + "</option>" : "") + T.pessoasAtivas().map(function (p) { return '<option value="' + esc(p.id) + '"' + (p.id === sel ? " selected" : "") + ">" + esc(p.nome) + "</option>"; }).join(""); }
-  function etapaLinha(g) { var et = ETAPAS[g.etapa] || {}; return esc(et.nome || "") + (et.fases && g.fase ? " · fase " + g.fase : ""); }
+  function etapaLinha(g) {
+    if (g.etapa === "encerrado" && marcAberta(g)) return "Marcenaria · " + esc(ETAPAS[g.marc.etapa] ? ETAPAS[g.marc.etapa].curto : "aguardando");
+    var et = ETAPAS[g.etapa] || {}; return esc(et.nome || "") + (et.fases && g.fase ? " · fase " + g.fase : "") + (marcAberta(g) && g.marc.etapa === "mep" ? " + marcenaria" : "");
+  }
   function barraPrazo(pz) {
     if (!pz) return '<div class="gp-pbar none"><i style="width:0"></i></div>';
     return '<div class="gp-pbar ' + corPrazo(pz.pct) + (pz.pausado ? " paused" : "") + '" title="' + pz.usados + " de " + pz.prazo + " dias úteis" + (pz.pausado ? " · pausado" : "") + '"><i style="width:' + pz.pct + '%"></i></div>';
@@ -250,27 +363,15 @@
   function prioSel(it, attr) { return '<select class="prio-sel p' + (it.prio || 0) + '" ' + attr + '="' + it.id + '" aria-label="Prioridade" title="Prioridade">' + T.optHtml([["", "P–"], ["1", "P1"], ["2", "P2"], ["3", "P3"]], it.prio || "") + "</select>"; }
   function sitSel(it, attr) { return '<select class="sit-sel s-' + it.sit + '" ' + attr + '="' + it.id + '" aria-label="Situação">' + T.optHtml(SIT, it.sit) + "</select>"; }
   function desenhosProg(it) { var d = it.desenhos || []; if (!d.length) return ""; var f = d.filter(function (x) { return x.feito; }).length; return '<span class="it-prog" title="Desenhos concluídos"><span class="mini"><i style="width:' + Math.round(f / d.length * 100) + '%"></i></span>' + f + "/" + d.length + "</span>"; }
+  function fmtDataCurta(ymd) { if (!ymd) return ""; var p = ymd.split("-"); return p[2] + "/" + p[1]; }
 
   // ---------- lista (visão geral de todos) ----------
-  function avisos() {
-    var out = [];
-    projetosGestor().forEach(function (p) {
-      var g = G(p.id); if (g.etapa === "encerrado") return;
-      var s = situacao(g), nome = "<b>" + esc(p.codigo || p.nome) + "</b>";
-      if (s.quem === "cliente" && s.dias >= 20) out.push(["bad", nome + " aguarda o cliente há " + s.dias + " dias úteis. Pela regra, o projeto vai para suspenso.", p.id]);
-      else if (s.quem === "cliente" && s.dias >= 15) out.push(["warn", nome + " aguarda o cliente há " + s.dias + " dias úteis · suspende em " + (20 - s.dias), p.id]);
-      if (g.etapa === "briefing" && marco(g, "contrato") && marco(g, "parcela")) out.push(["ok", nome + ": contrato e 1ª parcela ok. Pronto para a Abertura", p.id]);
-      var pz = prazoInfo(g); if (pz && !pz.pausado && pz.resta >= 0 && pz.resta <= 5) out.push(["warn", nome + ": faltam " + pz.resta + " d.u. no prazo de " + ETAPAS[g.etapa].nome, p.id]);
-      var ie = itensDe(g, g.etapa); if (ie.length && prontos(ie) === ie.length && g.etapa !== "abertura") out.push(["ok", nome + ": todos os itens da etapa prontos. Pronto para o termo", p.id]);
-    });
-    return out;
-  }
   function cardProjeto(p) {
     var g = G(p.id), it = itensDe(g), pz = prazoInfo(g), h = horasProj(p.id), pct = pctProjeto(g);
     var legal = temLegal(g) && ["ap", "pe"].indexOf(g.etapa) >= 0 ? '<div class="gp-legal">Legal: ' + esc((LEGAL.filter(function (o) { return o[0] === g.legal; })[0] || ["", ""])[1]) + "</div>" : "";
     return '<button class="tile-btn gp-card" data-open="' + esc(p.id) + '">' +
       '<div class="gp-vbar" title="Projeto ' + pct + '% concluído"><i style="height:' + pct + '%"></i><b>' + pct + "%</b></div>" +
-      '<div class="gp-card-main"><div class="gp-top"><span class="gp-sig">' + esc(g.sigla || "") + '</span><div class="gp-names"><div class="gp-name">' + esc(p.nome) + '</div><div class="gp-clients">' + esc(clientesNomes(p) || "Sem cliente") + "</div></div>" + avatarPessoa(g.resp, true) + "</div>" +
+      '<div class="gp-card-main"><div class="gp-top"><span class="gp-sig">' + esc(g.sigla || "") + '</span><div class="gp-names"><div class="gp-name">' + esc(p.nome) + '</div><div class="gp-clients">' + esc(clientesNomes(p) || "Sem cliente") + "</div></div>" + avatares(p.id, g) + "</div>" +
       '<div class="gp-etapa">' + trilha(g) + "<span>" + etapaLinha(g) + "</span></div>" + sitPill(g) +
       '<div class="gp-next">' + (g.proximo ? "Próximo: " + esc(g.proximo) : '<span class="muted">Sem próximo passo definido</span>') + "</div>" + legal +
       '<div class="tile-stats"><div><small>Plano</small><b>' + (it.length ? prontos(it) + "/" + it.length : "—") + "</b></div>" +
@@ -278,107 +379,222 @@
       "<div><small>Horas</small><b>" + (h ? T.fmtH(h) : "—") + "</b></div></div>" +
       '<div class="gp-prazo-row"><span class="num">' + (pz ? T.fmtYmd(T.ymd(pz.fim)) : "sem prazo") + "</span>" + barraPrazo(pz) + "</div></div></button>";
   }
+  var GRUPOS_LISTA = [["abertura", "Abertura"], ["ep", "Estudo Preliminar"], ["ap", "Anteprojeto"], ["pe", "Executivo"], ["marc", "Marcenaria"]];
   function renderLista() {
-    var list = projetosGestor(), q = S.busca.trim().toLowerCase();
-    if (q) list = list.filter(function (p) { return (p.nome + " " + (p.codigo || "") + " " + clientesNomes(p)).toLowerCase().indexOf(q) >= 0; });
-    list = list.filter(function (p) { var g = G(p.id), s = situacao(g); if (S.filtro === "aguardando") return !!s.quem; if (S.filtro === "suspensos") return !!g.suspenso; return true; });
-    var todos = projetosGestor(), n = { and: 0, ag: 0, sus: 0, prop: 0 };
-    todos.forEach(function (p) { var g = G(p.id); if (g.etapa === "encerrado") return; if (g.etapa === "briefing") n.prop++; else n.and++; if (g.suspenso) n.sus++; else if (esperaAberta(g)) n.ag++; });
-    $("gp-resumo").innerHTML = [["Em andamento", n.and], ["Aguardando", n.ag], ["Suspensos", n.sus], ["Em proposta", n.prop]].map(function (x) { return '<div class="tile"><small>' + x[0] + "</small><b>" + x[1] + "</b></div>"; }).join("");
-    $("gp-avisos").innerHTML = avisos().map(function (a) { return '<button class="gp-aviso ' + a[0] + '" data-open="' + esc(a[2]) + '">' + a[1] + "</button>"; }).join("");
-    var gr = [["briefing", "Em proposta · Briefing"], ["abertura", "Abertura"], ["ep", "Estudo Preliminar"], ["ap", "Anteprojeto"], ["pe", "Projeto Executivo"]];
-    function urg(p) { var s = situacao(G(p.id)); return s.k === "bad" ? 0 : s.k === "wait" ? 1 : 2; }
-    var html = gr.map(function (x) {
-      var itens = list.filter(function (p) { return G(p.id).etapa === x[0]; }).sort(function (a, b) { return urg(a) - urg(b) || a.nome.localeCompare(b.nome); });
-      return itens.length ? '<div class="gp-group"><h3 class="cover-label">' + esc(x[1]) + " · " + itens.length + '</h3><div class="gp-cards">' + itens.map(cardProjeto).join("") + "</div></div>" : "";
+    var todos = projetosGestor(), q = S.busca.trim().toLowerCase();
+    var n = { ativos: 0, aguardando: 0, suspensos: 0, arquivados: 0 };
+    todos.forEach(function (p) { var g = G(p.id); if (g.arquivado) n.arquivados++; else if (g.suspenso) n.suspensos++; else { if (g.etapa !== "encerrado" || marcAberta(g)) n.ativos++; if (esperaAberta(g)) n.aguardando++; } });
+    $("gp-resumo").innerHTML = [["ativos", "Em andamento"], ["aguardando", "Aguardando"], ["suspensos", "Suspensos"], ["arquivados", "Arquivados"]].map(function (x) {
+      return '<button class="gp-kpi' + (S.filtro === x[0] ? " is-selected" : "") + '" data-f="' + x[0] + '"><small>' + x[1] + "</small><b>" + n[x[0]] + "</b></button>";
     }).join("");
-    var enc = list.filter(function (p) { return G(p.id).etapa === "encerrado"; });
-    if (enc.length) html += '<details class="gp-group"><summary class="cover-label">Encerrados · ' + enc.length + '</summary><div class="gp-cards">' + enc.map(cardProjeto).join("") + "</div></details>";
-    if (!todos.length) html = '<div class="card gp-empty"><h3 class="panel-title">Nenhum projeto no Gestor ainda</h3><p>Crie o primeiro projeto com “+ Novo projeto”, ou carregue os projetos de exemplo para ver o app funcionando.</p><div class="form-actions"><button class="btn btn-primary" id="gp-seed">Carregar projetos de exemplo</button></div></div>';
+    $("gp-avisos").innerHTML = avisos(null).map(avisoHtml).join("");
+    var list = todos.filter(function (p) {
+      var g = G(p.id);
+      if (S.filtro === "suspensos") return !!g.suspenso && !g.arquivado;
+      if (S.filtro === "arquivados") return !!g.arquivado;
+      if (!ativo(g)) return false;
+      if (S.filtro === "aguardando") return !!esperaAberta(g);
+      return true;
+    });
+    if (q) list = list.filter(function (p) { return (p.nome + " " + (p.codigo || "") + " " + clientesNomes(p)).toLowerCase().indexOf(q) >= 0; });
+    var cont = {}; list.forEach(function (p) { var k = etapaLista(G(p.id)); cont[k] = (cont[k] || 0) + 1; });
+    var mostraEtapas = S.filtro === "ativos" || S.filtro === "aguardando";
+    $("gp-etapas").innerHTML = mostraEtapas ? GRUPOS_LISTA.map(function (x) { return '<button class="gp-ebtn' + (S.foco === x[0] ? " is-selected" : "") + '" data-foco="' + x[0] + '"' + (cont[x[0]] ? "" : " disabled") + ">" + x[1] + ' <b class="num">' + (cont[x[0]] || 0) + "</b></button>"; }).join("") : "";
+    function urg(p) { var s = situacao(G(p.id)); return s.k === "bad" ? 0 : s.k === "wait" ? 1 : 2; }
+    var ordem = GRUPOS_LISTA.slice(); if (S.foco) ordem.sort(function (a, b) { return (b[0] === S.foco) - (a[0] === S.foco); });
+    var html;
+    if (mostraEtapas) {
+      html = ordem.map(function (x) {
+        var itens = list.filter(function (p) { return etapaLista(G(p.id)) === x[0]; }).sort(function (a, b) { return urg(a) - urg(b) || a.nome.localeCompare(b.nome); });
+        return itens.length ? '<div class="gp-group' + (S.foco === x[0] ? " is-foco" : "") + '"><h3 class="cover-label">' + esc(x[1]) + " · " + itens.length + '</h3><div class="gp-cards">' + itens.map(cardProjeto).join("") + "</div></div>" : "";
+      }).join("");
+      var enc = list.filter(function (p) { return etapaLista(G(p.id)) === "encerrado"; });
+      if (enc.length) html += '<details class="gp-group"><summary class="cover-label">Encerrados · ' + enc.length + '</summary><div class="gp-cards">' + enc.map(cardProjeto).join("") + "</div></details>";
+    } else html = list.length ? '<div class="gp-cards">' + list.map(cardProjeto).join("") + "</div>" : "";
+    if (!todos.length) html = '<div class="card gp-empty"><h3 class="panel-title">Nenhum projeto no Gestor ainda</h3><p>Crie o primeiro com “+ Novo projeto”. Projetos já em andamento entram direto na etapa em que estão; os que já existem em Cadastros › Projetos podem ser levados ao Gestor por lá.</p></div>';
     else if (!html) html = '<div class="empty">Nenhum projeto neste filtro.</div>';
     $("gp-grupos").innerHTML = html;
   }
 
   // ---------- painel do projeto ----------
-  var ABAS = [["geral", "Visão geral"], ["plano", "Plano de Projeto"], ["tarefas", "Tarefas"], ["programa", "Programa"], ["ficha", "Ficha"]];
+  var ABAS = [["geral", "Visão geral"], ["plano", "Plano de Projeto"], ["tarefas", "Tarefas"], ["historico", "Histórico"], ["programa", "Programa"], ["ficha", "Ficha"]];
   function renderProjeto() {
     var p = proj(S.projId), g = G(S.projId);
     if (!g) { S.view = "lista"; return render(); }
     var pct = pctProjeto(g);
-    $("gp-p-head").innerHTML = '<button class="link" data-voltar="1">← Todos os projetos</button>' +
+    var acoes = g.arquivado ? '<button class="btn btn-small" data-act="desarquivar">Desarquivar</button>' :
+      g.suspenso ? '<button class="btn btn-small btn-primary" data-act="reativar">Reativar</button><button class="btn btn-small" data-act="arquivar">Arquivar</button>' :
+        '<button class="btn btn-small" data-act="suspender">Suspender</button><button class="btn btn-small" data-act="arquivar">Arquivar</button>';
+    $("gp-p-head").innerHTML = '<div class="gp-p-nav"><button class="link" data-voltar="1">← Todos os projetos</button><div class="form-actions gp-p-acts">' + acoes + "</div></div>" +
       '<div class="gp-p-title"><span class="gp-sig">' + esc(g.sigla) + '</span><div><h2 class="gp-name gp-p-name">' + esc(p.nome) + '</h2><div class="section-meta">' + esc(p.codigo || "") + " · " + esc(clientesNomes(p) || "sem cliente") + "</div></div>" + sitPill(g) + "</div>" +
       '<div class="segmented gp-abas">' + ABAS.map(function (a) { return '<button class="seg-pill' + (S.tab === a[0] ? " is-selected" : "") + '" data-tab="' + a[0] + '">' + a[1] + "</button>"; }).join("") + "</div>" +
       '<div class="gp-hprog" title="Itens do Plano de Projeto concluídos"><span>Projeto concluído</span><div class="gp-hbar"><i style="width:' + pct + '%"></i></div><b class="num">' + pct + "%</b></div>";
-    $("gp-p-body").innerHTML = S.tab === "plano" ? abaPlano(g) : S.tab === "tarefas" ? abaTarefas(g) : S.tab === "programa" ? abaPrograma(g, p) : S.tab === "ficha" ? abaFicha(g, p) : abaGeral(g, p);
+    $("gp-p-body").innerHTML = S.tab === "plano" ? abaPlano(g) : S.tab === "tarefas" ? abaTarefas(g) : S.tab === "historico" ? abaHistorico(g, p) : S.tab === "programa" ? abaPrograma(g, p) : S.tab === "ficha" ? abaFicha(g, p) : abaGeral(g, p);
+  }
+  function passos(g, pid) {
+    var f = fluxo(g.sigla), i = f.indexOf(g.etapa), lista = f.filter(function (e) { return e !== "encerrado"; }).map(function (e) { return { e: e, k: f.indexOf(e), trilha: "arq" }; });
+    if (marcAtiva(g)) ["mep", "mex"].forEach(function (e) { lista.push({ e: e, trilha: "marc" }); });
+    var mi = marcAtiva(g) ? ["aguardando", "mep", "espera", "mex", "fim"].indexOf(g.marc.etapa) : -1;
+    return '<div class="gp-steps">' + lista.map(function (s, n) {
+      var info = (g.etapas || {})[s.e] || {}, done, cur;
+      if (s.trilha === "arq") { done = s.k < i; cur = s.k === i; } else { done = s.e === "mep" ? mi >= 2 : mi >= 4; cur = s.e === "mep" ? mi === 1 : mi === 3; }
+      var h = horasEtapa(pid, s.e), sub = done ? (info.termoEm ? "termo " + T.fmtYmd(info.termoEm) : "concluída") : cur ? "em curso" : s.e === "mex" && mi === 2 ? "aguarda a arquitetura" : "";
+      return '<div class="gp-step ' + (done ? "done" : cur ? "cur" : "") + (s.trilha === "marc" ? " marc" : "") + '"><i>' + (done ? "✓" : n + 1) + "</i><b>" + esc(ETAPAS[s.e].curto) + "</b><small>" + esc(sub) + '</small><span class="gp-step-h" title="Horas lançadas nesta etapa">' + (h ? T.fmtH(h) : "—") + "</span></div>";
+    }).join("") + "</div>";
   }
   function abaGeral(g, p) {
-    var f = fluxo(g.sigla), i = f.indexOf(g.etapa), et = ETAPAS[g.etapa] || {};
-    var steps = '<div class="gp-steps">' + f.map(function (e, k) {
-      var info = (g.etapas || {})[e] || {}, cls = k < i ? "done" : k === i ? "cur" : "";
-      var sub = k < i ? (info.termoEm ? "termo " + T.fmtYmd(info.termoEm) : "concluída") : k === i ? "em curso" : "";
-      return '<div class="gp-step ' + cls + '"><i>' + (k < i ? "✓" : k + 1) + "</i><b>" + esc(ETAPAS[e].nome) + "</b><small>" + esc(sub) + "</small></div>";
-    }).join("") + "</div>";
-    var pz = prazoInfo(g), ie = itensDe(g, g.etapa);
-    var numeros = '<div class="tiles gp-nums gp-nums4"><div class="tile"><small>Prazo da etapa</small><b>' + (pz ? pz.usados + " / " + pz.prazo + " d.u." : "—") + "</b><span>" + (pz ? (pz.pausado ? "pausado" : pz.resta >= 0 ? "restam " + pz.resta : "vencido") : "sem prazo nesta etapa") + "</span></div>" +
-      '<div class="tile"><small>Data final</small><b>' + (pz ? T.fmtYmd(T.ymd(pz.fim)) : "—") + "</b><span>" + (pz ? (pz.pausado ? "avança enquanto pausado" : "em dias úteis") : "") + "</span></div>" +
-      '<div class="tile"><small>Itens da etapa</small><b>' + (ie.length ? prontos(ie) + " / " + ie.length : "—") + "</b><span>prontos</span></div>" +
-      '<div class="tile"><small>Horas no projeto</small><b>' + T.fmtH(horasProj(p.id)) + "</b><span>pelo cronômetro</span></div></div>" +
-      '<div class="gp-prazo-full">' + barraPrazo(pz) + "</div>";
+    var et = ETAPAS[g.etapa] || {}, pz = prazoInfo(g), ie = itensDe(g, g.etapa === "encerrado" && marcAberta(g) ? g.marc.etapa : g.etapa);
+    var numeros = '<div class="card gp-strip"><div><small>Prazo' + (pz ? " · " + esc(ETAPAS[pz.etapa].curto) : "") + "</small><b>" + (pz ? pz.usados + " / " + pz.prazo + " d.u." : "—") + "</b><span>" + (pz ? (pz.pausado ? "pausado" : pz.resta >= 0 ? "restam " + pz.resta : "vencido há " + (-pz.resta)) : "sem prazo nesta etapa") + "</span></div>" +
+      "<div><small>Data final</small><b>" + (pz ? T.fmtYmd(T.ymd(pz.fim)) : "—") + "</b><span>" + (pz ? (pz.pausado ? "avança enquanto pausado" : "em dias úteis") : "") + "</span></div>" +
+      "<div><small>Itens da etapa</small><b>" + (ie.length ? prontos(ie) + " / " + ie.length : "—") + "</b><span>prontos</span></div>" +
+      "<div><small>Horas no projeto</small><b>" + T.fmtH(horasProj(p.id)) + "</b><span>pelo cronômetro</span></div>" +
+      '<div class="gp-strip-bar">' + barraPrazo(pz) + "</div></div>";
     var fase = et.fases ? '<div class="field"><label for="gp-fase">Fase</label><select id="gp-fase">' + et.fases.map(function (n, k) { return '<option value="' + (k + 1) + '"' + (+g.fase === k + 1 ? " selected" : "") + ">" + (k + 1) + " · " + esc(n) + "</option>"; }).join("") + "</select></div>" : "";
     var e = esperaAberta(g);
     var sit = '<div class="card gp-box"><h3 class="panel-title">Situação</h3>' +
-      (g.suspenso ? "<p>Suspenso desde " + T.fmtYmd(g.suspenso.desde) + '. Sai da lista de prioridades até ser reativado.</p><div class="form-actions"><button class="btn btn-small btn-primary" data-act="reativar">Reativar projeto</button></div>' :
-        e ? "<p>Aguardando <b>" + esc(nomeQuem(e.quem)) + "</b> desde " + T.fmtYmd(e.inicio) + (e.previsto ? " · retorno previsto " + T.fmtYmd(e.previsto) : "") + '. O prazo está pausado.</p><div class="form-actions"><button class="btn btn-small btn-primary" data-act="retomar">Retomou: voltar a em dia</button>' + (e.quem === "cliente" ? '<button class="btn btn-small" data-act="suspender">Suspender</button>' : "") + "</div>" :
-          '<p class="hint">Em dia. Marque quando o projeto parar esperando alguém de fora da Trilha: o prazo pausa sozinho.</p><div class="gp-wait-form"><select id="gp-quem">' + QUEM.map(function (q) { return '<option value="' + q[0] + '">Aguardando ' + q[1] + "</option>"; }).join("") + '</select><input type="date" id="gp-previsto" title="Retorno previsto (opcional)"><button class="btn btn-small" data-act="aguardar">Marcar</button></div>') + "</div>";
-    var legal = doZero(g.sigla) ? '<div class="card gp-box"><h3 class="panel-title">Projeto Legal</h3><select id="gp-legal">' + T.optHtml(LEGAL, g.legal) + '</select><p class="hint">Corre em paralelo ao Anteprojeto. O Executivo só abre com o Legal aprovado.</p></div>' : "";
-    var marcoBox = g.etapa === "briefing" || g.etapa === "abertura" ? '<div class="card gp-box"><h3 class="panel-title">Marco zero</h3>' + MARCO.map(function (m) {
+      (g.arquivado ? "<p>Arquivado desde " + T.fmtYmd(g.arquivado.desde) + ". Fica fora da lista principal.</p>" :
+        g.suspenso ? "<p>Suspenso desde " + T.fmtYmd(g.suspenso.desde) + (g.suspenso.auto ? " (automático, cláusula 3.4)" : "") + ". Depois de " + SUSPENSO_ARQUIVA + " dias úteis suspenso, vai sozinho para Arquivados.</p>" :
+          e ? "<p>Aguardando <b>" + esc(nomeQuem(e.quem)) + "</b> desde " + T.fmtYmd(T.ymd(new Date(e.inicio))) + (e.previsto ? " · retorno previsto " + T.fmtYmd(e.previsto) : "") + ". O prazo está pausado." + (e.quem === "cliente" ? " Com " + ESPERA_SUSPENDE + " dias úteis sem retorno, o projeto vai sozinho para Suspensos." : "") + '</p><div class="form-actions"><button class="btn btn-small btn-primary" data-act="retomar">Retomou: voltar a em dia</button></div>' :
+            '<p class="hint">Em dia. Marque quando o projeto parar esperando alguém de fora da Trilha: o prazo pausa sozinho.</p><div class="gp-wait-form"><select id="gp-quem">' + QUEM.map(function (q) { return '<option value="' + q[0] + '">Aguardando ' + q[1] + "</option>"; }).join("") + '</select><input type="date" id="gp-previsto" title="Retorno previsto (opcional)"><button class="btn btn-small" data-act="aguardar">Marcar</button></div>') + "</div>";
+    var legal = doZero(g.sigla) && temLegal(g) ? '<div class="card gp-box"><h3 class="panel-title">Projeto Legal</h3><select id="gp-legal">' + T.optHtml(LEGAL, g.legal) + '</select><p class="hint">Corre em paralelo ao Anteprojeto. O Executivo só abre com o Legal aprovado.</p></div>' : "";
+    var marcoBox = g.etapa === "abertura" ? '<div class="card gp-box"><h3 class="panel-title">Marco zero</h3>' + MARCO.map(function (m) {
       var auto = m[0] === "topografico" || m[0] === "documentos";
       return '<label class="gp-check"><input type="checkbox" data-marco="' + m[0] + '"' + (marco(g, m[0]) ? " checked" : "") + (auto ? " disabled" : "") + "> " + esc(m[1]) + (auto ? ' <span class="hint">(pela Abertura)</span>' : "") + "</label>";
     }).join("") + '<p class="hint">Pelo contrato, o prazo começa com contrato, 1ª parcela e topográfico.</p></div>' : "";
-    return steps + numeros + '<div class="gp-cols"><div class="card gp-box"><h3 class="panel-title">' + esc(et.nome || "") + "</h3>" + fase +
+    return passos(g, p.id) + numeros + '<div class="gp-cols"><div class="gp-main"><div class="card gp-box"><h3 class="panel-title">' + esc(g.etapa === "encerrado" && marcAberta(g) ? "Arquitetura entregue" : et.nome || "") + "</h3>" + fase +
       '<div class="field"><label for="gp-proximo">Próximo passo</label><input id="gp-proximo" value="' + esc(g.proximo || "") + '" placeholder="Ex.: apresentar o Estudo Preliminar"></div>' +
-      '<div class="field"><label for="gp-resp">Responsável pelo projeto</label><select id="gp-resp">' + optPessoas(g.resp, "Sem responsável") + "</select></div>" +
-      (g.etapa === "encerrado" ? '<p class="hint">Projeto encerrado. Obras e acompanhamento ficam no futuro app de obra.</p>' : blocoAvanco(g)) + "</div>" +
-      '<div class="gp-side">' + sit + legal + marcoBox + "</div></div>" + historico(g);
+      (g.etapa === "encerrado" ? '<p class="hint">Arquitetura encerrada.' + (marcAberta(g) ? " A marcenaria continua na aba Plano › Marcenaria." : " Obras e acompanhamento ficam no futuro app de obra.") + "</p>" : blocoAvanco(g)) + "</div>" +
+      (marcAtiva(g) ? blocoMarc(g) : "") + reunioesBox(g) + "</div>" +
+      '<div class="gp-side">' + sit + legal + marcoBox + ultimos(g) + "</div></div>";
   }
   function blocoAvanco(g) {
-    var f = fluxo(g.sigla), prox = f[f.indexOf(g.etapa) + 1], falta = [], bloqueio = false, rotulo;
-    if (g.etapa === "briefing") { rotulo = "Projeto contratado: iniciar a Abertura"; if (!marco(g, "contrato")) falta.push("contrato assinado"); if (!marco(g, "parcela")) falta.push("1ª parcela paga"); }
-    else if (g.etapa === "abertura") { rotulo = "Base pronta: iniciar o Estudo Preliminar (marco zero)"; if (!marco(g, "topografico")) falta.push("topográfico"); var ab = itensDe(g, "abertura"); if (prontos(ab) < ab.length) falta.push((ab.length - prontos(ab)) + " item(ns) da Abertura"); }
-    else { rotulo = "Registrar " + ETAPAS[g.etapa].termo + (prox === "encerrado" ? "" : " e abrir " + ETAPAS[prox].nome); if (prox === "pe" && temLegal(g) && g.legal !== "aprovado") { falta.push("Projeto Legal aprovado"); bloqueio = true; } }
+    var f = fluxo(g.sigla), prox = f[f.indexOf(g.etapa) + 1], falta = [], bloqueio = false, rotulo, et = ETAPAS[g.etapa];
+    if (g.etapa === "abertura") { rotulo = "Base pronta: iniciar o Estudo Preliminar (marco zero)"; if (!marco(g, "contrato")) falta.push("contrato assinado"); if (!marco(g, "parcela")) falta.push("1ª parcela paga"); if (!marco(g, "topografico")) falta.push("topográfico"); var ab = itensDe(g, "abertura"); if (prontos(ab) < ab.length) falta.push((ab.length - prontos(ab)) + " item(ns) da Abertura"); }
+    else { rotulo = "Termo assinado: " + (prox === "encerrado" ? "encerrar a arquitetura" : "abrir " + ETAPAS[prox].nome); if (prox === "pe" && temLegal(g) && g.legal !== "aprovado") { falta.push("Projeto Legal aprovado"); bloqueio = true; } }
     var txt = falta.length ? '<p class="hint warn">Falta: ' + esc(falta.join(", ")) + ".</p>" : "";
-    if (bloqueio) return '<div class="gp-avanco">' + txt + '<p class="hint">O Executivo só abre com o Projeto Legal aprovado. Sem exceção.</p></div>';
-    var antecip = falta.length ? '<label class="gp-check"><input type="checkbox" id="gp-antecipa"> Antecipação autorizada pela direção, com Termo de Ciência assinado pelo cliente</label>' : "";
-    return '<div class="gp-avanco">' + txt + antecip + '<div class="form-actions"><input type="date" id="gp-termo-data" value="' + hojeIso() + '" aria-label="Data"><button class="btn btn-primary btn-small" data-act="avancar">' + esc(rotulo) + "</button></div></div>";
+    var termo = et.termo ? '<button class="btn btn-small btn-termo" data-termo="' + g.etapa + '">' + (et.termo === "projeto" ? "Gerar Termo de Encerramento de Projeto (PDF)" : "Gerar Termo de Encerramento de Etapa (PDF)") + "</button>" : "";
+    if (bloqueio) return '<div class="gp-avanco">' + txt + '<p class="hint">O Executivo só abre com o Projeto Legal aprovado. Sem exceção.</p><div class="form-actions">' + termo + "</div></div>";
+    var antecip = falta.length ? '<label class="gp-check"><input type="checkbox" id="gp-antecipa"> Antecipação autorizada pela direção, com Termo de Ciência assinado pelo cliente</label><div class="form-actions"><button class="btn btn-small btn-termo" data-termo="ciencia">Gerar Termo de Ciência de Antecipação (PDF)</button></div>' : "";
+    return '<div class="gp-avanco">' + txt + antecip + (termo ? '<div class="form-actions">' + termo + "</div>" : "") + '<div class="form-actions"><input type="date" id="gp-termo-data" value="' + hojeIso() + '" aria-label="Data"><button class="btn btn-primary btn-small" data-act="avancar">' + esc(rotulo) + "</button></div></div>";
   }
-  function historico(g) { var ev = (g.eventos || []).slice(-8).reverse(); return ev.length ? '<div class="card gp-box"><h3 class="panel-title">Registro</h3><ul class="gp-log">' + ev.map(function (x) { return "<li><span>" + T.fmtYmd(x.data) + "</span>" + esc(x.txt) + "</li>"; }).join("") + "</ul></div>" : ""; }
+  function blocoMarc(g) {
+    var m = g.marc, et = m.etapa, pz = et === "mep" || et === "mex" ? calcPrazo(g, et) : null;
+    var st = et === "aguardando" ? "Aguardando contrato e 1ª parcela para iniciar o Estudo Preliminar." : et === "mep" ? "Estudo Preliminar da marcenaria em curso." : et === "espera" ? "EP da marcenaria encerrado. O Executivo começa quando o Executivo arquitetônico for entregue." : et === "mex" ? "Executivo da marcenaria em curso." : "Marcenaria entregue.";
+    var acao = "";
+    if (et === "aguardando") acao = '<div class="form-actions"><label class="gp-check"><input type="checkbox" data-marcmarco="contrato"' + (m.contratoOk ? " checked" : "") + '> Contrato assinado</label><label class="gp-check"><input type="checkbox" data-marcmarco="parcela"' + (m.parcela ? " checked" : "") + '> 1ª parcela paga</label></div>' + (m.contratoOk && m.parcela ? '<div class="form-actions"><button class="btn btn-small btn-primary" data-act="marc-iniciar">Iniciar o EP da marcenaria</button></div>' : "");
+    else if (et === "mep" || et === "mex") acao = '<div class="form-actions"><button class="btn btn-small btn-termo" data-termo="' + et + '">Gerar ' + (et === "mep" ? "Termo de Encerramento de Etapa" : "Termo de Encerramento de Projeto") + ' (PDF)</button></div><div class="form-actions"><input type="date" id="gp-marc-data" value="' + hojeIso() + '" aria-label="Data"><button class="btn btn-small btn-primary" data-act="marc-avancar">Termo assinado: ' + (et === "mep" ? "encerrar o EP da marcenaria" : "encerrar a marcenaria") + "</button></div>";
+    return '<div class="card gp-box gp-marc-box"><h3 class="panel-title">Marcenaria</h3><p>' + esc(st) + "</p>" + (pz ? '<div class="gp-prazo-row"><span class="num">' + pz.usados + " / " + pz.prazo + " d.u. · " + T.fmtYmd(T.ymd(pz.fim)) + "</span>" + barraPrazo(pz) + "</div>" : "") + acao + "</div>";
+  }
+  function ultimos(g) { var ev = (g.eventos || []).slice(-5).reverse(); return '<div class="card gp-box"><div class="section-head" style="margin:0"><h3 class="panel-title" style="margin:0">Últimos registros</h3><button class="link" data-tab="historico">Histórico completo</button></div>' + (ev.length ? '<ul class="gp-log">' + ev.map(function (x) { return "<li><span>" + T.fmtYmd(x.data) + "</span>" + esc(x.txt) + "</li>"; }).join("") + "</ul>" : '<p class="hint">Nada registrado ainda.</p>') + "</div>"; }
+
+  // ---------- reuniões (marcar → aviso na véspera → registrar com a duração, que vai para o Tempo e o Histórico) ----------
+  function reunioesBox(g) {
+    var rs = (g.reunioes || []).slice().sort(function (a, b) { return (a.data + (a.hora || "")).localeCompare(b.data + (b.hora || "")); });
+    var marc = rs.filter(function (r) { return r.status === "marcada"; }), feitas = rs.filter(function (r) { return r.status === "realizada"; });
+    var tot = feitas.reduce(function (s, r) { return s + (r.duracao || 0) * ((r.participantes || []).length || 1); }, 0);
+    function linha(r) {
+      var pes = (r.participantes || []).map(function (id) { var p = T.pessoa(id); return p ? p.nome : ""; }).filter(Boolean).join(", ");
+      return '<div class="rn-row' + (r.status === "realizada" ? " is-done" : "") + '"><span class="rn-d num">' + fmtDataCurta(r.data) + (r.hora ? " " + esc(r.hora) : "") + '</span><span class="rn-t"><b>' + esc(r.tipo || "Reunião") + "</b>" + (r.pauta ? " · " + esc(r.pauta) : "") + '<small>' + esc(pes || "sem participantes") + (r.status === "realizada" ? " · " + T.fmtH(r.duracao) : "") + "</small></span>" +
+        (r.status === "marcada" ? '<button class="btn btn-small" data-rnreg="' + r.id + '">Registrar</button>' : "") + "</div>";
+    }
+    return '<div class="card gp-box"><div class="section-head" style="margin:0"><h3 class="panel-title" style="margin:0">Reuniões</h3><button class="btn btn-small btn-primary" data-act="reuniao">+ Reunião</button></div>' +
+      (rs.length ? (marc.length ? '<div class="rn-list">' + marc.map(linha).join("") + "</div>" : "") + (feitas.length ? '<div class="rn-list">' + feitas.slice(-4).reverse().map(linha).join("") + '</div><p class="hint">' + feitas.length + (feitas.length === 1 ? " reunião realizada" : " reuniões realizadas") + " · " + T.fmtH(tot) + " de equipe</p>" : "") : '<p class="hint">Marque a reunião antes (aviso na véspera) ou registre uma que já aconteceu. A duração vai para o Tempo de cada participante.</p>') + "</div>";
+  }
+  function modalReuniao(g, r) {
+    var novo = !r; r = r || { tipo: TIPOS_REUNIAO[0], data: hojeIso(), hora: "", participantes: [T.state.pessoaId || ((T.pessoasAtivas()[0] || {}).id)], pauta: "", duracao: 60, decisoes: "", etapa: g.etapa === "encerrado" ? (marcAberta(g) ? g.marc.etapa : "pe") : g.etapa };
+    var ets = etapasPlano(g).filter(function (e) { return ETAPAS[e].tempo; });
+    return '<h2 class="section-title">' + (novo ? "Reunião" : "Registrar reunião") + '</h2><form class="grid-form" id="rn-form" data-rn="' + (r.id || "") + '">' +
+      '<div class="field col-6"><label for="rn-tipo">Tipo</label><select id="rn-tipo">' + TIPOS_REUNIAO.map(function (t) { return "<option" + (t === r.tipo ? " selected" : "") + ">" + esc(t) + "</option>"; }).join("") + "</select></div>" +
+      '<div class="field col-6"><label for="rn-et">Etapa (para as horas)</label><select id="rn-et">' + ets.map(function (e) { return '<option value="' + e + '"' + (e === r.etapa ? " selected" : "") + ">" + esc(ETAPAS[e].nome) + "</option>"; }).join("") + "</select></div>" +
+      '<div class="field col-4"><label for="rn-data">Data</label><input type="date" id="rn-data" required value="' + esc(r.data) + '"></div>' +
+      '<div class="field col-4"><label for="rn-hora">Horário</label><input type="time" id="rn-hora" value="' + esc(r.hora || "") + '"></div>' +
+      '<div class="field col-4"><label for="rn-dur">Duração (min)</label><input type="number" id="rn-dur" min="0" step="15" value="' + (r.duracao || 60) + '"></div>' +
+      '<div class="field col-12"><span class="label">Participantes da Trilha</span><div class="gp-multi">' + T.pessoasAtivas().map(function (p) { return '<label class="gp-check"><input type="checkbox" data-rnp="' + esc(p.id) + '"' + ((r.participantes || []).indexOf(p.id) >= 0 ? " checked" : "") + "> " + esc(p.nome) + "</label>"; }).join("") + "</div></div>" +
+      '<div class="field col-12"><label for="rn-pauta">Pauta</label><input id="rn-pauta" value="' + esc(r.pauta || "") + '" placeholder="Ex.: apresentação do Estudo Preliminar"></div>' +
+      '<div class="field col-12"><label for="rn-dec">Decisões e observações (depois da reunião)</label><textarea id="rn-dec" rows="3">' + esc(r.decisoes || "") + "</textarea></div>" +
+      '<div class="col-12 form-actions">' + (novo ? '<button class="btn btn-primary" data-rnmodo="marcar">Marcar (vai para a agenda)</button><button class="btn" data-rnmodo="realizada">Já aconteceu: registrar</button>' : '<button class="btn btn-primary" data-rnmodo="realizada">Registrar como realizada</button>') + '<button type="button" class="btn" data-close="1">Cancelar</button><span class="save-state" id="rn-st"></span></div>' +
+      '<p class="hint col-12">Ao registrar, a duração entra no Tempo de cada participante (projeto e etapa escolhidos) e a reunião fica no Histórico.</p></form>';
+  }
+  async function salvarReuniao(modo) {
+    var pid = S.projId, g = G(pid), f = $("rn-form"), id = f.dataset.rn || T.novoId(), part = [];
+    T.each("[data-rnp]", function (i) { if (i.checked) part.push(i.dataset.rnp); }, f);
+    var r = { id: id, tipo: $("rn-tipo").value, etapa: $("rn-et").value, data: $("rn-data").value, hora: $("rn-hora").value || "", duracao: Math.max(0, +$("rn-dur").value || 0), participantes: part, pauta: $("rn-pauta").value.trim(), decisoes: $("rn-dec").value.trim() };
+    var st = $("rn-st");
+    if (!r.data) { st.className = "save-state err"; st.textContent = "Escolha a data"; return; }
+    if (modo === "realizada" && (!r.duracao || !part.length)) { st.className = "save-state err"; st.textContent = "Informe a duração e os participantes"; return; }
+    var antiga = T.byId(g.reunioes || [], id);
+    st.className = "save-state"; st.textContent = "Salvando…";
+    try {
+      if (modo === "marcar") {
+        r.status = "marcada"; r.criadaEm = new Date().toISOString();
+        await salvar(pid, function (x) { x.reunioes = (x.reunioes || []).concat([r]); evento(x, "Reunião marcada para " + T.fmtYmd(r.data) + (r.hora ? " às " + r.hora : "") + ": " + r.tipo + (r.pauta ? " · " + r.pauta : ""), hojeIso(), { tipo: "reuniao" }); });
+        if (T.tarefas) for (var i = 0; i < part.length; i++) await T.tarefas.criar(part[i], { title: r.tipo + (r.pauta ? " · " + r.pauta : "") + " (" + (proj(pid).codigo || proj(pid).nome) + ")", subdivision: "compromisso", dueDate: r.data, dueTime: r.hora || null, durationMinutes: r.duracao || 60, projetoId: pid, reuniaoId: id });
+      } else {
+        r.status = "realizada"; r.registradaEm = new Date().toISOString();
+        var ini = new Date(r.data + "T" + (r.hora || "09:00") + ":00"), fim = new Date(ini.getTime() + r.duracao * 60000), tempoId = (ETAPAS[r.etapa].tempo || [])[0] || null;
+        if (T.tempo && T.tempo.lancar) for (var k = 0; k < part.length; k++) {
+          await T.tempo.lancar({ pessoaId: part[k], tipo: "projeto", alvoId: pid, etapaId: tempoId, topicoId: null, pranchaId: null, descricao: "Reunião: " + r.tipo + (r.pauta ? " · " + r.pauta : ""), inicio: ini.toISOString(), fim: fim.toISOString(), min: r.duracao,
+            origem: "reuniao", reuniaoId: id, criadoEm: new Date().toISOString(), excluido: false, atividadeId: null, ajustes: ini < T.weekStart(new Date()) ? [{ em: new Date().toISOString(), por: T.state.pessoaId || part[k], acao: "inclusao", motivo: "Reunião registrada no Gestor de Projetos" }] : [] });
+        }
+        await salvar(pid, function (x) { x.reunioes = (x.reunioes || []).filter(function (y) { return y.id !== id; }).concat([Object.assign({}, antiga || {}, r)]); evento(x, "Reunião realizada (" + T.fmtH(r.duracao) + ", " + part.length + (part.length === 1 ? " pessoa" : " pessoas") + "): " + r.tipo + (r.pauta ? " · " + r.pauta : "") + (r.decisoes ? " — " + r.decisoes : ""), r.data, { tipo: "reuniao", min: r.duracao * part.length }); });
+      }
+      fecharModal(); T.toast(modo === "marcar" ? "Reunião marcada" : "Reunião registrada: " + T.fmtH(r.duracao * part.length) + " no Tempo");
+    } catch (e) { st.className = "save-state err"; st.textContent = "Não foi possível salvar"; }
+  }
 
   // ---------- Plano de Projeto ----------
-  function etapaPlanoPadrao(g) { var e = g.etapa === "briefing" ? "abertura" : g.etapa === "encerrado" ? "pe" : g.etapa; return etapasPlano(g).indexOf(e) >= 0 ? e : "abertura"; }
+  function etapaPlanoPadrao(g) { if (g.etapa === "encerrado") return marcAtiva(g) ? "marc" : "pe"; return etapasPlano(g).indexOf(g.etapa) >= 0 ? g.etapa : "abertura"; }
+  function abasPlano(g) { return etapasPlano(g).filter(function (e) { return !ETAPAS[e].marc; }).concat(["marc"]); }
   function abaPlano(g) {
-    var ets = etapasPlano(g), et = ets.indexOf(S.planoEtapa) >= 0 ? S.planoEtapa : etapaPlanoPadrao(g), cod = codigos(g);
+    var ets = abasPlano(g), et = ets.indexOf(S.planoEtapa) >= 0 ? S.planoEtapa : etapaPlanoPadrao(g), cod = codigos(g);
     S.planoEtapa = et;
-    var tabs = '<div class="gp-etabs">' + ets.map(function (e) { var l = itensDe(g, e); return '<button class="gp-etab' + (e === et ? " is-selected" : "") + (e === g.etapa ? " is-cur" : "") + '" data-pet="' + e + '"><b>' + esc(ETAPAS[e].nome) + "</b><small>" + prontos(l) + "/" + l.length + "</small></button>"; }).join("") + "</div>";
-    var tool = '<div class="section-head"><div class="section-meta">Clique no nome para abrir desenhos e checklists. Os números das pranchas seguem a posição na série.</div><label class="gp-check"><input type="checkbox" id="gp-pend"' + (S.pendentes ? " checked" : "") + "> Só pendentes</label></div>";
-    var html = grupos(et).map(function (gr) {
-      var todos = ordenar(itensDe(g, et).filter(function (x) { return x.grupo === gr.k; }));
-      var vis = S.pendentes ? todos.filter(function (x) { return !feito(x); }) : todos;
-      if (!todos.length && gr.serie === 900) return '<div class="gp-serie"><div class="gp-serie-h"><b>' + esc(gr.n) + '</b><span class="hint">só quando a marcenaria for contratada</span><button class="link" data-add900="1">+ Ativar série</button></div></div>';
-      var add = S.addGrupo === et + "|" + gr.k ? '<form class="pr-add" data-addg="' + gr.k + '"><input id="gp-add-in" placeholder="Nome do item" aria-label="Nome do novo item"><button class="btn btn-small btn-primary">Adicionar</button><button type="button" class="btn btn-small" data-addcancel="1">Cancelar</button></form>' : '<button class="gp-add-btn" data-addopen="' + gr.k + '">+ Adicionar item</button>';
-      return '<div class="gp-serie"><div class="gp-serie-h"><b>' + esc(gr.n) + '</b><span class="hint">' + prontos(todos) + "/" + todos.length + ' prontos</span><span class="mini gp-gprog"><i style="width:' + (todos.length ? Math.round(prontos(todos) / todos.length * 100) : 0) + '%"></i></span></div>' +
-        vis.map(function (x) { return linhaItem(x, cod[x.id], todos); }).join("") + add + "</div>";
-    }).join("");
-    return tabs + tool + html;
+    var tabs = '<div class="gp-etabs">' + ets.map(function (e) {
+      var l = e === "marc" ? itensDe(g, "mep").concat(itensDe(g, "mex")) : itensDe(g, e), nome = e === "marc" ? "Marcenaria" : ETAPAS[e].nome, cur = e === "marc" ? g.etapa === "encerrado" && marcAberta(g) : e === g.etapa;
+      return '<button class="gp-etab' + (e === et ? " is-selected" : "") + (cur ? " is-cur" : "") + (e === "marc" && !marcAtiva(g) ? " is-off" : "") + '" data-pet="' + e + '"><b>' + esc(nome) + "</b><small>" + (e === "marc" && !marcAtiva(g) ? "não contratada" : prontos(l) + "/" + l.length) + "</small></button>";
+    }).join("") + "</div>";
+    if (et === "marc") return tabs + planoMarcenaria(g, cod);
+    var tool = '<div class="section-head gp-tool"><div class="section-meta">Clique no nome para abrir desenhos e checklists.</div><label class="gp-check"><input type="checkbox" id="gp-pend"' + (S.pendentes ? " checked" : "") + "> Só pendentes</label></div>";
+    return tabs + tool + grupos(et).map(function (gr) { return grupoHtml(g, et, gr, cod); }).join("");
+  }
+  function grupoHtml(g, et, gr, cod, extraBtn) {
+    var todos = ordenar(itensDe(g, et).filter(function (x) { return x.grupo === gr.k; }));
+    var vis = S.pendentes ? todos.filter(function (x) { return !feito(x); }) : todos;
+    var add = S.addGrupo === et + "|" + gr.k ? '<form class="pr-add" data-addg="' + gr.k + '" data-adde="' + et + '"><input id="gp-add-in" placeholder="' + (extraBtn ? "Nome do móvel (ex.: Armário da cozinha)" : "Nome do item") + '" aria-label="Nome do novo item">' + (extraBtn ? '<label class="gp-check"><input type="checkbox" id="gp-add-mod" checked> Usar o modelo de móvel</label>' : "") + '<button class="btn btn-small btn-primary">Adicionar</button><button type="button" class="btn btn-small" data-addcancel="1">Cancelar</button></form>' : '<button class="gp-add-btn" data-addopen="' + gr.k + '" data-adde="' + et + '">' + (extraBtn || "+ Adicionar item") + "</button>";
+    return '<div class="gp-serie"><div class="gp-serie-h"><b>' + esc(gr.n) + '</b><span class="hint">' + prontos(todos) + "/" + todos.length + ' prontos</span><span class="mini gp-gprog"><i style="width:' + (todos.length ? Math.round(prontos(todos) / todos.length * 100) : 0) + '%"></i></span></div>' +
+      vis.map(function (x) { return linhaItem(x, cod[x.id], todos); }).join("") + add + "</div>";
+  }
+  function planoMarcenaria(g, cod) {
+    if (!marcAtiva(g)) {
+      if (S.modal !== "marc-ativar") return '<div class="card gp-box gp-marc-off"><h3 class="panel-title">Marcenaria (Interiores)</h3><p>Serviço contratado à parte, junto com a arquitetura ou depois. Fica dentro deste projeto, com duas etapas: <b>Estudo Preliminar</b> (em paralelo à arquitetura) e <b>Executivo</b> (depois do Executivo arquitetônico e do EP da marcenaria aprovado).</p><div class="form-actions"><button class="btn btn-go" data-act="marc-form">✓ Marcenaria contratada</button></div></div>';
+      return '<form class="card gp-box grid-form" id="marc-form"><h3 class="panel-title col-12">Ativar a marcenaria</h3>' +
+        '<div class="field col-4"><label for="mc-num">Nº do contrato</label><input id="mc-num"></div><div class="field col-4"><label for="mc-data">Data do contrato</label><input type="date" id="mc-data" value="' + hojeIso() + '"></div>' +
+        '<div class="field col-4" style="align-self:end"><label class="gp-check"><input type="checkbox" id="mc-parc"> 1ª parcela paga</label></div>' +
+        '<div class="field col-4"><label for="mc-pep">Prazo do EP (dias úteis)</label><input type="number" id="mc-pep" min="1" placeholder="combinado com o cliente"></div><div class="field col-4"><label for="mc-pex">Prazo do Executivo (dias úteis)</label><input type="number" id="mc-pex" min="1" placeholder="combinado com o cliente"></div>' +
+        '<div class="field col-4"><label for="mc-ini">Início do EP (se já começou)</label><input type="date" id="mc-ini"></div>' +
+        '<div class="col-12 hint">Os móveis não são gerados sozinhos: vocês lançam cada um (com o modelo de desenhos e checklist). Prazos variam com o combinado (por ambiente ou da casa toda) e podem ser ajustados depois na Ficha.</div>' +
+        '<div class="col-12 form-actions"><button class="btn btn-go">Ativar marcenaria</button><button type="button" class="btn" data-act="marc-cancel">Cancelar</button></div></form>';
+    }
+    var m = g.marc;
+    var head = '<div class="section-head gp-tool"><div class="section-meta">Contrato ' + esc(m.contrato && m.contrato.numero || "s/ nº") + (m.contrato && m.contrato.data ? " de " + T.fmtYmd(m.contrato.data) : "") + " · prazos: EP " + (m.prazos.mep || "—") + " d.u., Executivo " + (m.prazos.mex || "—") + ' d.u.</div><button class="link" data-act="modelo">' + (S.editModelo ? "Fechar modelo de móvel" : "Modelo de móvel") + "</button></div>";
+    return head + (S.editModelo ? editorModelo() : "") + grupoHtml(g, "mep", grupos("mep")[0], cod, "+ Adicionar móvel / item") + grupoHtml(g, "mex", grupos("mex")[0], cod, "+ Adicionar móvel");
+  }
+  function editorModelo() {
+    var md = modelo();
+    return '<form class="card gp-box grid-form" id="modelo-form"><h3 class="panel-title col-12">Modelo de móvel</h3><p class="hint col-12">Vale para os próximos móveis adicionados, em todos os projetos. Os móveis já lançados não mudam.</p>' +
+      '<div class="field col-6"><label for="md-des">Desenhos (um por linha)</label><textarea id="md-des" rows="6">' + esc((md.desenhos || []).map(function (d) { return d.nome; }).join("\n")) + "</textarea></div>" +
+      '<div class="field col-6"><label for="md-ck">Checklist de cada desenho (um por linha)</label><textarea id="md-ck" rows="6">' + esc((md.checklist || []).join("\n")) + "</textarea></div>" +
+      '<div class="field col-12"><label for="md-guia">Link do PDF "Como fazer marcenaria na Trilha"</label><input id="md-guia" value="' + esc(md.guia || "") + '"></div>' +
+      '<div class="col-12 form-actions"><button class="btn btn-primary" id="md-save">Salvar modelo</button></div></form>';
   }
   function linhaItem(x, codigo, irmaos) {
     var k = irmaos.indexOf(x), open = !!S.open[x.id], atras = x.prazo && x.prazo < hojeIso() && !feito(x);
     var row = '<div class="it-row' + (x.prio ? " prio-" + x.prio : "") + (open ? " open" : "") + (feito(x) ? " is-done" : "") + '">' +
       '<span class="it-cod num">' + esc(codigo || "·") + "</span>" +
-      '<button class="it-tit" data-itopen="' + x.id + '"><span class="car">' + (open ? "▾" : "▸") + "</span>" + esc(x.titulo) + (x.rev ? ' <em class="pr-et">' + esc(x.rev) + "</em>" : "") + desenhosProg(x) + "</button>" +
-      '<input type="date" class="it-prazo' + (atras ? " late" : "") + '" data-iprazo="' + x.id + '" value="' + (x.prazo || "") + '" aria-label="Prazo" title="Prazo">' +
+      '<button class="it-tit" data-itopen="' + x.id + '"><span class="car">' + (open ? "▾" : "▸") + '</span><span class="it-nome">' + esc(x.titulo) + "</span>" + (x.rev ? ' <em class="pr-et">' + esc(x.rev) + "</em>" : "") + desenhosProg(x) + "</button>" +
+      '<span class="it-ctl"><label class="it-date' + (atras ? " late" : "") + (x.prazo ? "" : " empty") + '" title="Prazo"><span>' + (x.prazo ? fmtDataCurta(x.prazo) : "prazo") + '</span><input type="date" data-iprazo="' + x.id + '" value="' + (x.prazo || "") + '" aria-label="Prazo"></label>' +
       '<select class="pr-resp" data-iresp="' + x.id + '" aria-label="Responsável">' + optPessoas(x.resp, "—") + "</select>" +
       sitSel(x, "data-isit") + prioSel(x, "data-iprio") +
-      '<span class="pr-act"><button class="link" data-imove="' + x.id + '" data-dir="-1"' + (k === 0 ? " disabled" : "") + ' aria-label="Subir">↑</button><button class="link" data-imove="' + x.id + '" data-dir="1"' + (k === irmaos.length - 1 ? " disabled" : "") + ' aria-label="Descer">↓</button><button class="link danger" data-idel="' + x.id + '" aria-label="Remover">✕</button></span></div>';
+      '<span class="pr-act"><button class="link" data-imove="' + x.id + '" data-dir="-1"' + (k === 0 ? " disabled" : "") + ' aria-label="Subir">↑</button><button class="link" data-imove="' + x.id + '" data-dir="1"' + (k === irmaos.length - 1 ? " disabled" : "") + ' aria-label="Descer">↓</button><button class="link danger" data-idel="' + x.id + '" aria-label="Remover">✕</button></span></span></div>';
     if (!open) return row;
     var d = (x.desenhos || []).map(function (z) {
       var ck = z.checklist || [], okc = ck.filter(function (c) { return c.ok; }).length, od = !!S.openDes[z.id];
@@ -397,37 +613,55 @@
   }
 
   // ---------- Tarefas (moram na agenda de cada pessoa, com projetoId) ----------
-  function tarefasDoProjeto(pid) {
-    var out = [], docs = T.tarefas ? T.tarefas.todas() : {};
-    Object.keys(docs).forEach(function (pes) { (docs[pes] || []).forEach(function (t) { if (t.projetoId === pid) out.push({ pes: pes, t: t }); }); });
-    return out.sort(function (a, b) { return (a.t.status === "done") - (b.t.status === "done") || String(a.t.dueDate || "9").localeCompare(String(b.t.dueDate || "9")); });
-  }
   function abaTarefas(g) {
     if (!T.tarefas) return '<div class="empty">O módulo Tarefas não está disponível.</div>';
     var cod = codigos(g), itens = etapasPlano(g).reduce(function (a, e) { return a.concat(ordenar(itensDe(g, e))); }, []);
-    var form = '<form class="card gp-box grid-form" id="gp-tf-form"><div class="col-12 segmented" id="tf-tipo">' + TIPOS_TAREFA.map(function (t, k) { return '<button type="button" class="seg-pill' + (k === 0 ? " is-selected" : "") + '" data-tft="' + t[0] + '">' + t[1] + "</button>"; }).join("") + "</div>" +
-      '<div class="field col-6"><label for="tf-txt">Tarefa</label><input id="tf-txt" required placeholder="Ex.: ajustar layout da suíte após reunião"></div>' +
-      '<div class="field col-3"><label for="tf-resp">Responsável</label><select id="tf-resp" required>' + optPessoas(g.resp || (T.pessoasAtivas()[0] || {}).id) + "</select></div>" +
-      '<div class="field col-3"><label for="tf-prazo" id="tf-prazo-l">Prazo</label><input type="date" id="tf-prazo"></div>' +
-      '<div class="field col-3" id="tf-hora-w" hidden><label for="tf-hora">Horário</label><input type="time" id="tf-hora"></div>' +
-      '<div class="field col-9"><label for="tf-it">Item do Plano de Projeto (opcional)</label><select id="tf-it"><option value="">Sem item</option>' + itens.map(function (x) { return '<option value="' + x.id + '">' + esc(ETAPAS[x.etapa].nome + " · " + (cod[x.id] ? cod[x.id] + " " : "") + x.titulo) + "</option>"; }).join("") + "</select></div>" +
-      '<div class="col-12 form-actions"><button class="btn btn-primary">Adicionar tarefa</button><span class="hint">A tarefa vai para a aba Tarefas da pessoa responsável. Compromissos com data vão para a Agenda Google.</span></div></form>';
-    var hoje = hojeIso(), lista = tarefasDoProjeto(S.projId);
-    var html = lista.length ? lista.map(function (o) {
+    var form = '<form class="card gp-box" id="gp-tf-form"><div class="section-head" style="margin:0"><h3 class="panel-title" style="margin:0">Nova tarefa do projeto</h3><div class="segmented" id="tf-tipo">' + TIPOS_TAREFA.map(function (t, k) { return '<button type="button" class="seg-pill' + (k === 0 ? " is-selected" : "") + '" data-tft="' + t[0] + '">' + t[1] + "</button>"; }).join("") + "</div></div>" +
+      '<div class="grid-form"><div class="field col-12"><label for="tf-txt">Tarefa</label><input id="tf-txt" required placeholder="Ex.: ajustar layout da suíte após reunião"></div>' +
+      '<div class="field col-4"><label for="tf-resp">Responsável</label><select id="tf-resp" required>' + optPessoas(T.state.pessoaId || (T.pessoasAtivas()[0] || {}).id) + "</select></div>" +
+      '<div class="field col-4"><label for="tf-prazo" id="tf-prazo-l">Prazo</label><input type="date" id="tf-prazo"></div>' +
+      '<div class="field col-4" id="tf-hora-w" hidden><label for="tf-hora">Horário</label><input type="time" id="tf-hora"></div>' +
+      '<div class="field col-12"><label for="tf-it">Item do Plano de Projeto (opcional)</label><select id="tf-it"><option value="">Sem item</option>' + itens.map(function (x) { return '<option value="' + x.id + '">' + esc(ETAPAS[x.etapa].curto + " · " + (cod[x.id] ? cod[x.id] + " " : "") + x.titulo) + "</option>"; }).join("") + "</select></div>" +
+      '<div class="col-12 form-actions"><button class="btn btn-primary">Adicionar tarefa</button><span class="hint">Vai para a aba Tarefas do responsável. Compromissos com data vão para a Agenda Google.</span></div></div></form>';
+    var hoje = hojeIso(), lista = tarefasDoProjeto(S.projId), abertas = lista.filter(function (o) { return o.t.status !== "done"; }), feitas = lista.filter(function (o) { return o.t.status === "done"; });
+    function card(o) {
       var t = o.t, done = t.status === "done", atras = !done && t.dueDate && t.dueDate < hoje, it = t.itemId ? T.byId(g.itens || [], t.itemId) : null;
-      return '<div class="task' + (done ? " is-done" : "") + (t.subdivision === "prioridade" ? " prio" : "") + '"><div class="task-top"><input type="checkbox" class="task-check" data-tfdone="' + esc(o.pes) + "|" + t.id + '"' + (done ? " checked" : "") + ' aria-label="Concluir"><div class="task-main"><div class="task-title-row"><span class="task-title">' + esc(t.title) + '</span><button class="link danger" data-tfdel="' + esc(o.pes) + "|" + t.id + '" aria-label="Excluir">✕</button></div>' +
+      return '<div class="task gp-task' + (done ? " is-done" : "") + (t.subdivision === "prioridade" ? " prio" : "") + '"><div class="task-top"><input type="checkbox" class="task-check" data-tfdone="' + esc(o.pes) + "|" + t.id + '"' + (done ? " checked" : "") + ' aria-label="Concluir"><div class="task-main"><div class="task-title-row"><span class="task-title">' + esc(t.title) + '</span><button class="link danger" data-tfdel="' + esc(o.pes) + "|" + t.id + '" aria-label="Excluir tarefa">✕</button></div>' +
         '<div class="task-badges"><span class="badge static">' + esc((TIPOS_TAREFA.filter(function (x) { return x[0] === t.subdivision; })[0] || ["", "Tarefa"])[1]) + '</span><select class="pr-resp tf-mv" data-tfmv="' + esc(o.pes) + "|" + t.id + '" aria-label="Responsável">' + optPessoas(o.pes) + "</select>" +
         (t.dueDate ? '<span class="badge static' + (atras ? " is-overdue" : "") + '">' + T.fmtYmd(t.dueDate) + (t.dueTime ? " " + t.dueTime : "") + (atras ? " · atrasada" : "") + "</span>" : "") + (it ? '<span class="badge static">' + esc((cod[it.id] ? cod[it.id] + " · " : "") + it.titulo) + "</span>" : "") + "</div></div></div></div>";
-    }).join("") : '<div class="empty">Nenhuma tarefa deste projeto.</div>';
-    return form + '<div class="task-list">' + html + "</div>";
+    }
+    return form + '<div class="section-head"><h3 class="tsec-title">A fazer · ' + abertas.length + '</h3></div><div class="task-list">' + (abertas.map(card).join("") || '<div class="empty">Nenhuma tarefa em aberto neste projeto.</div>') + "</div>" +
+      (feitas.length ? '<details class="gp-group" style="margin-top:18px"><summary class="tsec-title">Concluídas · ' + feitas.length + '</summary><div class="task-list">' + feitas.map(card).join("") + "</div></details>" : "");
+  }
+
+  // ---------- Histórico (registro fiel: dia e hora; não se edita) ----------
+  function abaHistorico(g, p) {
+    var cod = codigos(g), linhas = [];
+    (g.eventos || []).forEach(function (e) { linhas.push({ em: e.em || isoDeData(e.data), data: e.data, txt: e.txt, tipo: e.tipo || "evento", hora: !!e.em, por: e.por }); });
+    (g.itens || []).forEach(function (x) { if (x.concluidoEm) linhas.push({ em: x.concluidoEm, data: T.ymd(new Date(x.concluidoEm)), txt: "Concluído: " + (cod[x.id] ? cod[x.id] + " · " : "") + x.titulo + " (" + ETAPAS[x.etapa].curto + ")" + (x.resp && T.pessoa(x.resp) ? " — " + T.pessoa(x.resp).nome : ""), tipo: "item", hora: true }); });
+    linhas.sort(function (a, b) { return a.em < b.em ? 1 : -1; });
+    var fmtEm = function (l) { var d = new Date(l.em); return T.fmtYmd(l.data || T.ymd(d)) + (l.hora ? " " + T.hm(d) : ""); };
+    var lista = linhas.length ? '<ul class="gp-hist">' + linhas.map(function (l) { return '<li class="h-' + l.tipo + '"><span class="num">' + fmtEm(l) + "</span><div>" + esc(l.txt) + (l.por && T.pessoa(l.por) ? ' <small class="hint">· ' + esc(T.pessoa(l.por).nome) + "</small>" : "") + "</div></li>"; }).join("") + "</ul>" : '<div class="empty">Nada registrado ainda.</div>';
+    // horas por item do Plano, por etapa e por pessoa (pelo cronômetro e pelas reuniões)
+    var ls = lancDoProj(p.id), porItem = {}, porEt = {}, porPes = {}, semItem = 0, total = 0;
+    ls.forEach(function (l) { total += l.min; if (l.pranchaId && T.byId(g.itens || [], l.pranchaId)) porItem[l.pranchaId] = (porItem[l.pranchaId] || 0) + l.min; else semItem += l.min; porEt[l.etapaId || "—"] = (porEt[l.etapaId || "—"] || 0) + l.min; porPes[l.pessoaId] = (porPes[l.pessoaId] || 0) + l.min; });
+    var itemRows = Object.keys(porItem).map(function (id) { return T.byId(g.itens, id); }).sort(function (a, b) { return porItem[b.id] - porItem[a.id]; }).map(function (x) {
+      return "<tr><td class=\"num\">" + esc(cod[x.id] || "") + '</td><td class="name">' + esc(x.titulo) + "</td><td>" + esc(ETAPAS[x.etapa].curto) + "</td><td>" + (x.concluidoEm ? T.fmtYmd(T.ymd(new Date(x.concluidoEm))) : '<span class="hint">em aberto</span>') + '</td><td class="num">' + T.fmtH(porItem[x.id]) + "</td></tr>";
+    }).join("");
+    var mini = function (obj, nome) { return Object.keys(obj).sort(function (a, b) { return obj[b] - obj[a]; }).map(function (k) { return '<div class="kv-row"><span>' + esc(nome(k)) + '</span><b class="num">' + T.fmtH(obj[k]) + "</b></div>"; }).join(""); };
+    var horas = '<div class="card gp-box"><h3 class="panel-title">Horas do projeto · ' + T.fmtH(total) + "</h3>" +
+      '<div class="gp-hist-cols"><div><div class="hint gp-cap">Por etapa</div>' + (mini(porEt, function (k) { return T.etapaNome(k) || "Sem etapa"; }) || '<p class="hint">Sem horas lançadas.</p>') + '</div><div><div class="hint gp-cap">Por pessoa</div>' + (mini(porPes, function (k) { var pe = T.pessoa(k); return pe ? pe.nome : "Pessoa removida"; }) || '<p class="hint">—</p>') + "</div></div>" +
+      '<div class="hint gp-cap">Por item do Plano (cronômetro no item)</div>' + (itemRows ? '<div class="table-wrap as-list"><table><thead><tr><th>Cód.</th><th>Item</th><th>Etapa</th><th>Concluído</th><th>Horas</th></tr></thead><tbody>' + itemRows + "</tbody></table></div>" : '<p class="hint">Nenhuma hora lançada em itens ainda. Use ▶ Iniciar no item (área da pessoa › Projetos) ou escolha o item no cronômetro.</p>') +
+      (semItem ? '<p class="hint">' + T.fmtH(semItem) + " sem item do Plano (reuniões, tarefas livres).</p>" : "") + "</div>";
+    return '<p class="hint" style="margin:0 0 12px">Registro fiel do projeto, com dia e hora. Nada aqui é editado ou apagado: correções entram como novos registros. Análises e gráficos entre projetos ficam em Relatórios.</p>' + horas + '<div class="card gp-box"><h3 class="panel-title">Linha do tempo</h3>' + lista + "</div>";
   }
 
   // ---------- Programa ----------
   function abaPrograma(g, p) {
     var amb = g.ambientes || [], pavs = g.pavs || ["Térreo"], dim = (p.categorias || {}).dimensao || "confortavel", tot = 0, porSetor = {};
     amb.forEach(function (a) { var ar = (+a.area || 0) * (+a.qtd || 1); tot += ar; porSetor[a.setor] = (porSetor[a.setor] || 0) + ar; });
-    var resumo = '<div class="tiles gp-nums">' + SETORES.filter(function (s) { return porSetor[s[0]]; }).map(function (s) { return '<div class="tile"><small>' + s[1] + "</small><b>" + T.fmtNum(porSetor[s[0]]) + " m²</b></div>"; }).join("") +
-      '<div class="tile"><small>Total estimado</small><b>' + T.fmtNum(tot * 1.2) + " m²</b><span>" + T.fmtNum(tot) + " m² + 10% circulação + 10% paredes</span></div></div>";
+    var resumo = '<div class="card gp-strip">' + SETORES.filter(function (s) { return porSetor[s[0]]; }).map(function (s) { return "<div><small>" + s[1] + "</small><b>" + T.fmtNum(porSetor[s[0]]) + " m²</b></div>"; }).join("") +
+      "<div><small>Total estimado</small><b>" + T.fmtNum(tot * 1.2) + " m²</b><span>" + T.fmtNum(tot) + " m² + 20% (circulação e paredes)</span></div></div>";
     var add = '<form class="pr-add" id="gp-amb-add"><select id="amb-tipo" aria-label="Tipo de ambiente">' + CATALOGO.map(function (t) { return '<option value="' + t.id + '">' + esc(t.n) + "</option>"; }).join("") + '</select><button class="btn btn-small">+ Ambiente</button><button type="button" class="btn btn-small" data-act="sync-plano">Atualizar o Plano pelo programa</button></form>';
     var html = SETORES.map(function (s) {
       var itens = amb.filter(function (a) { return a.setor === s[0]; }); if (!itens.length) return "";
@@ -436,7 +670,7 @@
         return '<div class="amb' + (open ? " open" : "") + '"><button class="amb-row" data-amb="' + a.id + '"><span class="amb-n">' + esc(a.nome) + (a.qtd > 1 ? " ×" + a.qtd : "") + '</span><span class="amb-m">' + esc(a.pav || "—") + " · " + (a.area != null ? T.fmtNum(a.area) + " m²" : "área a definir") + (t.amp ? " · ampliação" : "") + '</span><span class="amb-c">' + esc(resumoConfig(a) || "Sem configuração") + "</span></button>" + (open ? editorAmb(a, t, pavs) : "") + "</div>";
       }).join("") + "</div>";
     }).join("") || '<div class="empty">Programa vazio. Adicione os ambientes do projeto.</div>';
-    return '<div class="section-head"><div class="section-meta">Dimensão: <b>' + esc((DIMENSAO.filter(function (d) { return d[0] === dim; })[0] || ["", "—"])[1]) + "</b> · áreas de referência do catálogo (Confortável). Clique num ambiente para ver e editar a configuração.</div></div>" + resumo + add + html;
+    return '<div class="section-head"><div class="section-meta">Dimensão: <b>' + esc((DIMENSAO.filter(function (d) { return d[0] === dim; })[0] || ["", "—"])[1]) + "</b> · clique num ambiente para editar área e configuração.</div></div>" + resumo + add + html;
   }
   function resumoConfig(a) {
     var c = a.cfg || {}, t = tipoAmb(a.tipo);
@@ -446,7 +680,7 @@
     var c = a.cfg || {};
     var campos = (t.c || []).map(function (k) {
       var d = CAMPOS[k], v = c[k], id = "ac-" + k;
-      if (d.t === "bool") return '<label class="gp-check"><input type="checkbox" data-cfg="' + k + '"' + (v ? " checked" : "") + "> " + esc(d.l) + "</label>";
+      if (d.t === "bool") return '<label class="gp-check col-4"><input type="checkbox" data-cfg="' + k + '"' + (v ? " checked" : "") + "> " + esc(d.l) + "</label>";
       if (d.t === "multi") return '<div class="field col-12"><span class="label">' + esc(d.l) + '</span><div class="gp-multi">' + d.o.map(function (o) { return '<label class="gp-check"><input type="checkbox" data-cfgm="' + k + '" value="' + esc(o) + '"' + ((v || []).indexOf(o) >= 0 ? " checked" : "") + "> " + esc(o) + "</label>"; }).join("") + "</div></div>";
       if (d.t === "sel") return '<div class="field col-4"><label for="' + id + '">' + esc(d.l) + '</label><select id="' + id + '" data-cfg="' + k + '"><option value="">—</option>' + d.o.map(function (o) { return "<option" + (v === o ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select></div>";
       if (d.t === "num") return '<div class="field col-3"><label for="' + id + '">' + esc(d.l) + '</label><input type="number" min="0" id="' + id + '" data-cfg="' + k + '" value="' + (v != null ? v : "") + '"></div>';
@@ -462,72 +696,216 @@
 
   // ---------- Ficha ----------
   function abaFicha(g, p) {
-    var cat = p.categorias || {}, dir = g.diretrizes || {}, clientes = T.cadastros ? T.cadastros.contatos("cliente") : [];
-    var cl = clientes.length ? clientes.map(function (c) { return '<label class="gp-check"><input type="checkbox" data-fcli="' + esc(c.id) + '"' + ((p.clienteIds || []).indexOf(c.id) >= 0 ? " checked" : "") + "> " + esc(c.nome) + "</label>"; }).join("") : '<span class="hint">Nenhum cliente cadastrado. Cadastre em Cadastros → Contatos.</span>';
+    var cat = p.categorias || {}, dir = g.diretrizes || {}, cls = T.cadastros ? T.cadastros.contatos("cliente") : [], ct = p.contrato || {};
+    var cl = cls.length ? cls.map(function (c) { return '<label class="gp-check"><input type="checkbox" data-fcli="' + esc(c.id) + '"' + ((p.clienteIds || []).indexOf(c.id) >= 0 ? " checked" : "") + "> " + esc(c.nome) + "</label>"; }).join("") : '<span class="hint">Nenhum cliente cadastrado. Cadastre em Cadastros › Contatos.</span>';
     function sel(id, opts, v) { return '<select id="' + id + '">' + T.optHtml([["", "—"]].concat(opts), v || "") + "</select>"; }
     function ta(k, l) { return '<div class="field col-6"><label for="fd-' + k + '">' + l + '</label><textarea id="fd-' + k + '" rows="3">' + esc(dir[k] || "") + "</textarea></div>"; }
-    return '<form class="card gp-box grid-form" id="gp-ficha"><div class="field col-6"><label for="f-nome">Nome do projeto</label><input id="f-nome" value="' + esc(p.nome) + '" required></div>' +
-      '<div class="field col-3"><label for="f-cod">Código</label><input id="f-cod" value="' + esc(p.codigo || "") + '"></div>' +
-      '<div class="field col-3"><label for="f-sig">Tipo</label>' + sel("f-sig", SIGLAS.map(function (s) { return [s[0], s[0] + " · " + s[1]]; }), g.sigla) + "</div>" +
-      '<div class="field col-12"><span class="label">Clientes</span><div class="gp-multi">' + cl + "</div></div>" +
-      '<div class="field col-4"><label for="f-pad">Padrão</label>' + sel("f-pad", PADRAO, cat.padrao) + "</div>" +
-      '<div class="field col-4"><label for="f-dim">Dimensão</label>' + sel("f-dim", DIMENSAO, cat.dimensao) + "</div>" +
-      '<div class="field col-4"><label for="f-dif">Dificuldade do terreno</label>' + sel("f-dif", DIFICULDADE, cat.dificuldade) + "</div>" +
-      '<div class="field col-6"><label for="f-end">Endereço da obra</label><input id="f-end" value="' + esc(p.endereco || "") + '"></div>' +
-      '<div class="field col-6"><label for="f-pavs">Pavimentos (um por linha)</label><textarea id="f-pavs" rows="2">' + esc((g.pavs || []).join("\n")) + "</textarea></div>" +
-      '<div class="field col-6"><label for="f-pasta">Pasta do projeto (link)</label><input id="f-pasta" value="' + esc(g.pasta || "") + '"></div>' +
-      '<div class="field col-6"><label for="f-bimx">BIMx (link)</label><input id="f-bimx" value="' + esc(g.bimx || "") + '"></div>' +
-      '<div class="col-12"><label class="gp-check"><input type="checkbox" id="f-marc"' + (g.marcenaria ? " checked" : "") + "> Marcenaria contratada (ativa a série 900)</label></div>" +
-      '<div class="col-12"><div class="hint" style="text-transform:uppercase;letter-spacing:.6px;font-size:11.5px">Diretrizes do briefing</div></div>' +
-      ta("uso", "Uso, moradores e pets, acessibilidade") + ta("expectativas", "Expectativas do cliente") + ta("estetica", "Estética e materiais") + ta("relacao", "Relação com exterior, paisagismo e rua") + ta("sistemas", "Sistemas (solar, reúso, ar, aquecimento, automação)") + ta("execucao", "Sistema construtivo e execução da obra") +
-      '<div class="col-12 form-actions"><button class="btn btn-primary" id="f-save">Salvar ficha</button><button type="button" class="link danger" data-act="apagar">Apagar projeto do Gestor</button></div></form>' +
-      (S.confirmDel === p.id ? '<div class="confirm-box">Apagar o projeto do Gestor? As horas lançadas continuam no Tempo. <button class="btn btn-small btn-stop" data-act="apagar-ok">Apagar</button><button class="btn btn-small" data-act="apagar-nao">Cancelar</button></div>' : "");
+    function sec(t, corpo) { return '<section class="ficha-sec"><h3 class="ficha-h">' + t + '</h3><div class="grid-form">' + corpo + "</div></section>"; }
+    var ets = etapasPlano(g).filter(function (e) { return e !== "pl" && (!ETAPAS[e].marc || marcAtiva(g)); });
+    var datas = ets.map(function (e) {
+      var info = (g.etapas || {})[e] || {};
+      return '<div class="ficha-et"><b>' + esc(ETAPAS[e].curto) + '</b><label>Início<input type="date" data-fet="' + e + '|inicio" value="' + (info.inicio ? T.ymd(new Date(info.inicio)) : "") + '"></label><label>Fim / termo<input type="date" data-fet="' + e + '|fim" value="' + (info.fim ? T.ymd(new Date(info.fim)) : "") + '"></label>' +
+        (ETAPAS[e].prazo || ETAPAS[e].marc ? '<label>Prazo (d.u.)<input type="number" min="1" data-fet="' + e + '|prazo" value="' + (prazoEtapa(g, e) || "") + '"></label>' : "<span></span>") + "</div>";
+    }).join("");
+    return '<form id="gp-ficha" class="ficha">' +
+      sec("Projeto", '<div class="field col-6"><label for="f-nome">Nome do projeto</label><input id="f-nome" value="' + esc(p.nome) + '" required></div>' +
+        '<div class="field col-3"><label for="f-cod">Código</label><input id="f-cod" value="' + esc(p.codigo || "") + '"></div>' +
+        '<div class="field col-3"><label for="f-sig">Tipo</label>' + sel("f-sig", SIGLAS.map(function (s) { return [s[0], s[0] + " · " + s[1]]; }), g.sigla) + "</div>" +
+        '<div class="field col-12"><span class="label">Clientes</span><div class="gp-multi">' + cl + "</div></div>" +
+        '<div class="field col-12"><label for="f-end">Endereço da obra</label><input id="f-end" value="' + esc(p.endereco || "") + '"></div>') +
+      sec("Contrato", '<div class="field col-4"><label for="f-cnum">Nº do contrato</label><input id="f-cnum" value="' + esc(ct.numero || "") + '"></div>' +
+        '<div class="field col-4"><label for="f-cdata">Data do contrato</label><input type="date" id="f-cdata" value="' + esc(ct.data || "") + '"></div>' +
+        '<div class="field col-4"><label for="f-cid">Cidade (para os termos)</label><input id="f-cid" value="' + esc(ct.cidade || "") + '" placeholder="Ex.: Juiz de Fora"></div>' +
+        (marcAtiva(g) ? '<div class="field col-4"><label for="f-mnum">Nº do contrato da marcenaria</label><input id="f-mnum" value="' + esc(g.marc.contrato && g.marc.contrato.numero || "") + '"></div><div class="field col-4"><label for="f-mdata">Data do contrato da marcenaria</label><input type="date" id="f-mdata" value="' + esc(g.marc.contrato && g.marc.contrato.data || "") + '"></div>' : "") +
+        '<p class="hint col-12">Usados nos termos em PDF. Os dados de cada cliente (CPF/CNPJ) vêm de Cadastros.</p>') +
+      sec("Categorias", '<div class="field col-4"><label for="f-pad">Padrão</label>' + sel("f-pad", PADRAO, cat.padrao) + "</div>" +
+        '<div class="field col-4"><label for="f-dim">Dimensão</label>' + sel("f-dim", DIMENSAO, cat.dimensao) + "</div>" +
+        '<div class="field col-4"><label for="f-dif">Dificuldade do terreno</label>' + sel("f-dif", DIFICULDADE, cat.dificuldade) + "</div>" +
+        '<div class="field col-6"><label for="f-pavs">Pavimentos (um por linha)</label><textarea id="f-pavs" rows="3">' + esc((g.pavs || []).join("\n")) + "</textarea></div>" +
+        '<div class="field col-6"><label for="f-leg">Projeto Legal</label>' + sel("f-leg", LEGAL, g.legal) + "</div>") +
+      sec("Datas e prazos das etapas", '<div class="col-12 ficha-ets">' + datas + '</div><p class="hint col-12">Para projetos que entraram já em andamento, ajuste aqui as datas reais. O prazo conta em dias úteis a partir do início e pausa quando o projeto aguarda alguém de fora.</p>') +
+      sec("Links", '<div class="field col-6"><label for="f-pasta">Pasta do projeto</label><input id="f-pasta" value="' + esc(g.pasta || "") + '"></div><div class="field col-6"><label for="f-bimx">BIMx</label><input id="f-bimx" value="' + esc(g.bimx || "") + '"></div>') +
+      sec("Diretrizes do briefing", ta("uso", "Uso, moradores e pets, acessibilidade") + ta("expectativas", "Expectativas do cliente") + ta("estetica", "Estética e materiais") + ta("relacao", "Relação com exterior, paisagismo e rua") + ta("sistemas", "Sistemas (solar, reúso, ar, aquecimento, automação)") + ta("execucao", "Sistema construtivo e execução da obra")) +
+      '<div class="form-actions ficha-save"><button class="btn btn-primary" id="f-save">Salvar ficha</button><span class="hint">Excluir o projeto: só em Cadastros › Projetos.</span></div></form>';
   }
 
+  // ---------- termos em PDF ----------
+  function contratoDe(g, p, etapa) { if (ETAPAS[etapa] && ETAPAS[etapa].marc) return (g.marc && g.marc.contrato) || {}; return p.contrato || {}; }
+  function modalTermo(tipo) {
+    var g = G(S.projId), p = proj(S.projId), et = tipo === "ciencia" ? g.etapa : tipo, info = ETAPAS[et] || {};
+    var titulo = tipo === "ciencia" ? "Termo de Ciência de Antecipação" : info.termo === "projeto" ? "Termo de Encerramento de Projeto" : "Termo de Encerramento de Etapa";
+    var anot = tipo === "ciencia" || info.termo === "etapa", ct = contratoDe(g, p, et), falta = [];
+    if (!ct.numero) falta.push("nº do contrato"); if (!clientes(p).length) falta.push("clientes cadastrados");
+    var prox = tipo === "ciencia" ? proxEtapa(g) : "";
+    return '<h2 class="section-title">' + esc(titulo) + '</h2><form class="grid-form" id="termo-form" data-tipo="' + tipo + '"><p class="hint col-12">' + esc(p.nome) + (tipo === "ciencia" ? "" : " · " + esc(info.nome)) + "</p>" +
+      (falta.length ? '<p class="hint warn col-12">Falta na Ficha/Cadastros: ' + esc(falta.join(", ")) + ". O termo sai com espaço em branco.</p>" : "") +
+      (tipo === "ciencia" ? '<div class="field col-12"><label for="tm-oq">O que será antecipado</label><input id="tm-oq" required value="' + esc(prox ? "o " + prox : "") + '"></div><div class="field col-12"><label for="tm-pre">Pré-requisito previsto no contrato</label><input id="tm-pre" value="' + esc(prereq(g)) + '"></div>' : "") +
+      (anot ? '<div class="field col-12"><label for="tm-anot">Anotações (opcional)</label><textarea id="tm-anot" rows="4" placeholder="Ex.: rever a posição do pilar da sala junto com a estrutura"></textarea><span class="hint">' + (tipo === "ciencia" ? "" : "As anotações não reabrem a etapa: são pontos para a próxima etapa.") + "</span></div>" : "") +
+      '<div class="field col-6"><label for="tm-data">Data do termo</label><input type="date" id="tm-data" value="' + hojeIso() + '"></div>' +
+      '<div class="col-12 form-actions"><button class="btn btn-primary" id="tm-pdf">Gerar PDF</button><button type="button" class="btn" data-close="1">Fechar</button><span class="save-state" id="tm-st"></span></div></form>';
+  }
+  function proxEtapa(g) { var f = fluxo(g.sigla), n = f[f.indexOf(g.etapa) + 1]; return n && ETAPAS[n] && n !== "encerrado" ? ETAPAS[n].nome : ""; }
+  function prereq(g) { if (g.etapa === "abertura") return "contrato assinado, 1ª parcela paga e levantamento topográfico entregue"; if (g.etapa === "ep") return "Termo de Encerramento de Etapa do Estudo Preliminar assinado"; if (g.etapa === "ap") return "Termo de Encerramento de Etapa do Anteprojeto assinado e aprovação dos projetos necessários"; return ""; }
+  function loadScript(src) { return new Promise(function (ok, fail) { var s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = fail; document.head.appendChild(s); }); }
+  async function logo() {
+    if (S.logo) return S.logo;
+    var img = new Image(); img.src = "logo.png"; await img.decode();
+    var cv = document.createElement("canvas"); cv.width = img.naturalWidth; cv.height = img.naturalHeight;
+    var cx = cv.getContext("2d"); cx.fillStyle = "#fff"; cx.fillRect(0, 0, cv.width, cv.height); cx.drawImage(img, 0, 0);
+    S.logo = { url: cv.toDataURL("image/jpeg", 0.92), w: img.naturalWidth, h: img.naturalHeight }; return S.logo;
+  }
+  function textoTermo(tipo, g, p, dados) {
+    var et = tipo === "ciencia" ? g.etapa : tipo, info = ETAPAS[et] || {}, marc = !!info.marc, cls = "o(s) CONTRATANTE(s) acima identificado(s)";
+    if (tipo === "ciencia") return ["Pelo presente termo, " + cls + " solicita(m) que " + (dados.oq || "________________") + " seja iniciado antes do momento previsto no contrato, que tem como pré-requisito " + (dados.pre || "________________") + ".",
+      "Declara(m) estar ciente(s) de que:", "• a antecipação é feita a seu pedido;", "• informações ainda não definidas podem mudar e exigir que partes do projeto sejam refeitas;", "• o retrabalho causado pela antecipação será cobrado como adicional de contrato, conforme a cláusula 9.1;", "• os prazos das etapas seguintes podem ser afetados."];
+    if (info.termo === "etapa") {
+      var prox = marc ? "Executivo da marcenaria" : ETAPAS[fluxo(g.sigla)[fluxo(g.sigla).indexOf(et) + 1]].nome;
+      return ["Pelo presente termo, " + cls + " declara(m) que recebeu(ram) o " + info.nome + " do projeto " + p.nome + ", desenvolvido pela Trilha Arquitetura Brasileira conforme o contrato acima.",
+        "Declara(m) que todo o conteúdo previsto para esta etapa foi apresentado, ajustado e entregue, e dá(ão) seu ACEITE, encerrando a etapa e autorizando o início do " + prox + (info.clausula ? ", conforme a cláusula " + info.clausula + " do contrato." : "."),
+        "Declara(m) estar ciente(s) de que qualquer revisão desta etapa, depois de encerrada, será tratada como adicional de contrato" + (marc ? "." : ", conforme a cláusula 9.1.")];
+    }
+    if (marc) return ["Pelo presente termo, " + cls + " declara(m) que recebeu(ram) o Executivo da marcenaria do projeto " + p.nome + ", entregue em meio digital pela Trilha Arquitetura Brasileira em " + T.fmtYmd(dados.data) + ".",
+      "Declara(m) que todo o conteúdo previsto no contrato da marcenaria foi entregue, e dá(ão) seu ACEITE, encerrando o projeto de marcenaria e os serviços contratados.",
+      "Declara(m) estar ciente(s) de que alterações a partir deste momento serão tratadas como novo serviço ou adicional de contrato."];
+    return ["Pelo presente termo, " + cls + " declara(m) que recebeu(ram) o Projeto Executivo completo do projeto arquitetônico " + p.nome + ", entregue em meio digital pela Trilha Arquitetura Brasileira em " + T.fmtYmd(dados.data) + ", conforme a cláusula 2.4.8 do contrato (Termo de Finalização de Projeto).",
+      "Declara(m) que todo o conteúdo previsto no contrato e no Plano de Projeto foi entregue, e dá(ão) seu ACEITE, encerrando o projeto arquitetônico e os serviços contratados neste contrato.",
+      "Declara(m) estar ciente(s) de que alterações no projeto a partir deste momento serão tratadas como novo serviço ou adicional de contrato, conforme as cláusulas 2.4.2 e 9.1, e de que a disponibilização do material aos executores e o seu uso em obra são de sua responsabilidade (cláusulas 2.4.5 a 2.4.7)."];
+  }
+  async function gerarTermo() {
+    var f = $("termo-form"), tipo = f.dataset.tipo, g = G(S.projId), p = proj(S.projId), st = $("tm-st");
+    var et = tipo === "ciencia" ? g.etapa : tipo, info = ETAPAS[et] || {}, ct = contratoDe(g, p, et);
+    var dados = { data: $("tm-data").value || hojeIso(), anot: $("tm-anot") ? $("tm-anot").value.trim() : "", oq: $("tm-oq") ? $("tm-oq").value.trim() : "", pre: $("tm-pre") ? $("tm-pre").value.trim() : "" };
+    var titulo = tipo === "ciencia" ? "TERMO DE CIÊNCIA DE ANTECIPAÇÃO" : info.termo === "projeto" ? "TERMO DE ENCERRAMENTO DE PROJETO" : "TERMO DE ENCERRAMENTO DE ETAPA";
+    if (!T.downloads) { st.className = "save-state err"; st.textContent = "Este acesso não permite baixar arquivos"; return; }
+    st.className = "save-state"; st.textContent = "Gerando PDF…";
+    try {
+      if (!window.jspdf) await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+      var doc = new window.jspdf.jsPDF({ unit: "mm", format: "a4" }), L = await logo(), x = 22, W = 166, y = 20;
+      var verde = [111, 148, 80], tinta = [31, 42, 26], cinza = [111, 125, 102];
+      function quebra(h) { if (y + h > 262) { doc.addPage(); y = 22; } }
+      function par(txt, tam, estilo, cor) { doc.setFont("helvetica", estilo || "normal"); doc.setFontSize(tam || 11); doc.setTextColor.apply(doc, cor || tinta); var ls = doc.splitTextToSize(txt, W); quebra(ls.length * tam * 0.53); doc.text(ls, x, y, { lineHeightFactor: 1.45 }); y += ls.length * (tam || 11) * 0.51 + 3.5; }
+      var lh = 12, lw = L.w / L.h * lh; if (lw > 64) { lw = 64; lh = lw * L.h / L.w; }
+      doc.addImage(L.url, "JPEG", x, y, lw, lh); y += lh + 7;
+      doc.setDrawColor.apply(doc, verde); doc.setLineWidth(0.7); doc.line(x, y, x + W, y); y += 9;
+      doc.setFont("helvetica", "bold"); doc.setFontSize(15); doc.setTextColor.apply(doc, tinta); doc.text(titulo, x, y); y += 9;
+      var cab = [["Contrato", ct.numero ? "Contrato de Prestação de Serviço nº " + ct.numero + (ct.data ? ", de " + T.fmtYmd(ct.data) : "") : "________________"],
+        ["Contratante(s)", clientes(p).map(function (c) { return c.nome + (c.doc ? " (CPF/CNPJ " + c.doc + ")" : ""); }).join("; ") || clientesNomes(p) || "________________"],
+        ["Projeto", p.nome + (p.codigo ? " (" + p.codigo + ")" : "") + (p.endereco ? " · " + p.endereco : "")],
+        ["Etapa", tipo === "ciencia" ? (ETAPAS[g.etapa] || {}).nome || "" : info.nome + ((g.etapas || {})[et] && g.etapas[et].inicio ? " · início " + T.fmtYmd(T.ymd(new Date(g.etapas[et].inicio))) : "") + " · entrega " + T.fmtYmd(dados.data)]];
+      doc.setFontSize(10);
+      cab.forEach(function (c) { var ls = doc.splitTextToSize(c[1], W - 36); quebra(ls.length * 5); doc.setFont("helvetica", "normal"); doc.setTextColor.apply(doc, cinza); doc.text(c[0], x, y); doc.setTextColor.apply(doc, tinta); doc.text(ls, x + 36, y, { lineHeightFactor: 1.35 }); y += ls.length * 4.8 + 2; });
+      y += 5;
+      textoTermo(tipo, g, p, dados).forEach(function (t) { par(t, 11); });
+      if (tipo === "ciencia" || info.termo === "etapa") {
+        y += 2; quebra(34);
+        doc.setFont("helvetica", "bold"); doc.setFontSize(10.5); doc.setTextColor.apply(doc, tinta); doc.text(tipo === "ciencia" ? "Anotações" : "Anotações para a próxima etapa", x, y); y += 3;
+        var corpo = dados.anot || "Sem anotações.", ls2 = doc.splitTextToSize(corpo, W - 8), alt = Math.max(22, ls2.length * 5.2 + 12);
+        quebra(alt); doc.setDrawColor(136, 172, 103); doc.setLineWidth(0.3); doc.setFillColor(246, 249, 242); doc.roundedRect(x, y, W, alt, 2, 2, "FD");
+        var yy = y + 7; if (tipo !== "ciencia") { doc.setFont("helvetica", "italic"); doc.setFontSize(9); doc.setTextColor.apply(doc, cinza); doc.text("As anotações não reabrem a etapa encerrada: são pontos combinados para a próxima etapa.", x + 4, yy); yy += 6; alt += 0; }
+        doc.setFont("helvetica", "normal"); doc.setFontSize(10.5); doc.setTextColor.apply(doc, tinta); doc.text(ls2, x + 4, yy, { lineHeightFactor: 1.4 }); y += alt + 8;
+      }
+      quebra(60); y += 4;
+      par((ct.cidade ? ct.cidade + ", " : (S.fin && S.fin.recibo && S.fin.recibo.cidade ? S.fin.recibo.cidade + ", " : "")) + dataExtenso(dados.data) + ".", 11);
+      y += 16; var assin = clientes(p).map(function (c) { return c.nome; }); if (!assin.length) assin = ["CONTRATANTE"]; assin.push("Trilha Arquitetura Brasileira (CONTRATADO)");
+      for (var i = 0; i < assin.length; i += 2) {
+        quebra(22);
+        [assin[i], assin[i + 1]].forEach(function (n, k) { if (!n) return; var cx = x + (k ? W / 2 + 6 : 0), cw = W / 2 - 6; doc.setDrawColor.apply(doc, tinta); doc.setLineWidth(0.3); doc.line(cx, y, cx + cw, y); doc.setFont("helvetica", "normal"); doc.setFontSize(9.5); doc.setTextColor.apply(doc, tinta); doc.text(doc.splitTextToSize(n, cw), cx + cw / 2, y + 5, { align: "center" }); });
+        y += 22;
+      }
+      var np = doc.getNumberOfPages();
+      for (var pg = 1; pg <= np; pg++) { doc.setPage(pg); doc.setDrawColor(217, 224, 210); doc.setLineWidth(0.3); doc.line(x, 280, x + W, 280); doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor.apply(doc, cinza); doc.text("trilha arquitetura brasileira · www.trilhaarq.com.br · trilha@trilhaarq.com.br", x + W / 2, 285, { align: "center" }); }
+      var nome = T.slug(titulo.toLowerCase()) + "-" + T.slug(p.codigo || p.nome) + (tipo !== "ciencia" ? "-" + T.slug(ETAPAS[et].curto) : "") + ".pdf";
+      st.textContent = "";
+      await T.downloads.save({ filename: nome, data: doc.output("arraybuffer") });
+      st.className = "save-state ok"; st.textContent = "PDF salvo ✓";
+      salvar(S.projId, function (x2) { evento(x2, (tipo === "ciencia" ? "Termo de Ciência de Antecipação" : titulo.charAt(0) + titulo.slice(1).toLowerCase() + " (" + info.nome + ")") + " gerado em PDF" + (dados.anot ? ". Anotações: " + dados.anot : ""), dados.data, { tipo: "termo" }); });
+    } catch (e) { if (window.console) console.error(e); st.className = "save-state err"; st.textContent = e && e.code === "declined" ? "Download cancelado" : "Não foi possível gerar o PDF"; }
+  }
+
+  // ---------- janela (reunião, termo) ----------
+  function abrirModal(html) { S.modal = true; $("gp-modal-box").innerHTML = html; $("gp-overlay").hidden = false; var f = $("gp-modal-box").querySelector("input,select,textarea"); if (f) f.focus(); }
+  function fecharModal() { S.modal = null; $("gp-overlay").hidden = true; $("gp-modal-box").innerHTML = ""; }
+
   // ---------- novo projeto (assistente) ----------
-  function wizInicial() { return { step: 1, sigla: "RES", nome: "", codigo: "", codManual: false, clienteIds: [], novoCli: { nome: "", contato: "", email: "" }, padrao: "", dimensao: "confortavel", dificuldade: "", npav: 1, pavs: ["Térreo"], marcenaria: false, resp: T.pessoasAtivas()[0] ? T.pessoasAtivas()[0].id : null, qtd: T.clone(PADRAO_RES) }; }
+  function wizInicial(pj) {
+    var w = { step: 1, sigla: "RES", nome: "", codigo: "", codManual: false, clienteIds: [], novoCli: { nome: "", contato: "", email: "" }, padrao: "", dimensao: "confortavel", dificuldade: "", npav: 1, pavs: ["Térreo"],
+      qtd: T.clone(PADRAO_RES), areas: {}, inicio: "novo", etapaAtual: "ep", fase: 1, dataEtapa: hojeIso(), legal: "nao_iniciado", projetoId: null };
+    if (pj) { w.projetoId = pj.id; w.nome = pj.nome; w.codManual = !!pj.codigo; w.codigo = pj.codigo || ""; w.clienteIds = (pj.clienteIds || []).slice(); var sg = { res: "RES", comr: "COM", hot: "HOT", ref: "REF", int: "INT" }[pj.tipo]; if (sg) w.sigla = sg; w.inicio = "andamento"; if (w.sigla !== "RES") w.qtd = {}; }
+    return w;
+  }
   function codigoDe(sigla, nome) { return sigla + "-" + String(nome || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase().replace(/[^A-Z0-9]+/g, ""); }
+  var desenhando = false;
   function renderNovo() {
-    var w = S.wiz, h = '<div class="card gp-box"><div class="gp-wiz-steps">' + ["Projeto e cliente", "Pavimentos", "Programa de necessidades"].map(function (n, k) { return '<span class="' + (w.step === k + 1 ? "cur" : w.step > k + 1 ? "done" : "") + '">' + (k + 1) + " · " + n + "</span>"; }).join("") + "</div>";
+    // trocar o HTML tira o foco do campo, o que dispara "change" e pediria outro desenho no meio deste
+    if (desenhando) { setTimeout(renderNovo, 0); return; }
+    desenhando = true; try { desenharNovo(); } finally { desenhando = false; }
+  }
+  function desenharNovo() {
+    var w = S.wiz; if (!w) return; var h = '<div class="card gp-box"><div class="section-head" style="margin:0"><h2 class="section-title" style="margin:0">' + (w.projetoId ? "Levar projeto ao Gestor" : "Novo projeto") + '</h2></div><div class="gp-wiz-steps">' + ["Projeto e cliente", "Pavimentos e situação", "Programa de necessidades"].map(function (n, k) { return '<span class="' + (w.step === k + 1 ? "cur" : w.step > k + 1 ? "done" : "") + '">' + (k + 1) + " · " + n + "</span>"; }).join("") + "</div>";
     if (w.step === 1) {
-      var clientes = T.cadastros ? T.cadastros.contatos("cliente") : [];
+      var cls = T.cadastros ? T.cadastros.contatos("cliente") : [];
       h += '<div class="grid-form"><div class="field col-12"><span class="label">Tipo</span><div class="segmented">' + SIGLAS.map(function (s) { return '<button type="button" class="seg-pill' + (w.sigla === s[0] ? " is-selected" : "") + '" data-wsig="' + s[0] + '">' + s[0] + " · " + s[1] + "</button>"; }).join("") + "</div></div>" +
         '<div class="field col-6"><label for="w-nome">Nome do projeto</label><input id="w-nome" data-w="nome" value="' + esc(w.nome) + '" placeholder="Ex.: Casa Duarte"></div>' +
         '<div class="field col-6"><label for="w-cod">Código</label><input id="w-cod" data-w="codigo" value="' + esc(w.codigo || codigoDe(w.sigla, w.nome)) + '"><span class="hint">Sigla + nome, sem acentos. Pode ajustar.</span></div>' +
-        '<div class="field col-12"><span class="label">Clientes cadastrados</span><div class="gp-multi">' + (clientes.length ? clientes.map(function (c) { return '<label class="gp-check"><input type="checkbox" data-wcli="' + esc(c.id) + '"' + (w.clienteIds.indexOf(c.id) >= 0 ? " checked" : "") + "> " + esc(c.nome) + "</label>"; }).join("") : '<span class="hint">Nenhum cliente cadastrado ainda.</span>') + "</div></div>" +
+        '<div class="field col-12"><span class="label">Clientes cadastrados</span><div class="gp-multi">' + (cls.length ? cls.map(function (c) { return '<label class="gp-check"><input type="checkbox" data-wcli="' + esc(c.id) + '"' + (w.clienteIds.indexOf(c.id) >= 0 ? " checked" : "") + "> " + esc(c.nome) + "</label>"; }).join("") : '<span class="hint">Nenhum cliente cadastrado ainda.</span>') + "</div></div>" +
         '<div class="field col-4"><label for="w-cn">+ Novo cliente: nome</label><input id="w-cn" data-wn="nome" value="' + esc(w.novoCli.nome) + '"></div><div class="field col-4"><label for="w-cc">Contato</label><input id="w-cc" data-wn="contato" value="' + esc(w.novoCli.contato) + '"></div><div class="field col-4"><label for="w-ce">E-mail</label><input id="w-ce" data-wn="email" value="' + esc(w.novoCli.email) + '"></div>' +
         '<div class="field col-4"><label for="w-pad">Padrão</label><select id="w-pad" data-w="padrao">' + T.optHtml([["", "—"]].concat(PADRAO), w.padrao) + '</select></div><div class="field col-4"><label for="w-dim">Dimensão</label><select id="w-dim" data-w="dimensao">' + T.optHtml(DIMENSAO, w.dimensao) + '</select></div><div class="field col-4"><label for="w-dif">Dificuldade do terreno</label><select id="w-dif" data-w="dificuldade">' + T.optHtml([["", "A definir após a visita"]].concat(DIFICULDADE), w.dificuldade) + "</select></div></div>";
     } else if (w.step === 2) {
+      var ets = fluxo(w.sigla).filter(function (e) { return e !== "abertura" && e !== "encerrado"; }), fs = (ETAPAS[w.etapaAtual] || {}).fases;
       h += '<div class="grid-form"><div class="field col-3"><label for="w-npav">Pavimentos</label><input id="w-npav" type="number" min="1" max="12" value="' + w.npav + '"></div><div class="field col-9"><span class="label">Nome de cada pavimento</span><div class="gp-pavs">' + w.pavs.map(function (p, k) { return '<input data-wpav="' + k + '" value="' + esc(p) + '" aria-label="Pavimento ' + (k + 1) + '">'; }).join("") + "</div></div>" +
-        '<div class="field col-6"><label for="w-resp">Responsável</label><select id="w-resp" data-w="resp">' + optPessoas(w.resp, "—") + '</select></div><div class="col-6" style="align-self:end"><label class="gp-check"><input type="checkbox" id="w-marc"' + (w.marcenaria ? " checked" : "") + "> Marcenaria contratada</label></div></div>";
+        '<div class="field col-12"><span class="label">Situação do projeto</span><div class="segmented"><button type="button" class="seg-pill' + (w.inicio === "novo" ? " is-selected" : "") + '" data-winicio="novo">Novo: começa na Abertura</button><button type="button" class="seg-pill' + (w.inicio === "andamento" ? " is-selected" : "") + '" data-winicio="andamento">Já em andamento</button></div></div>' +
+        (w.inicio === "andamento" ? '<div class="field col-4"><label for="w-et">Etapa atual</label><select id="w-et" data-w="etapaAtual">' + ets.map(function (e) { return '<option value="' + e + '"' + (e === w.etapaAtual ? " selected" : "") + ">" + esc(ETAPAS[e].nome) + "</option>"; }).join("") + "</select></div>" +
+          (fs ? '<div class="field col-4"><label for="w-fase">Fase</label><select id="w-fase" data-w="fase">' + fs.map(function (n, k) { return '<option value="' + (k + 1) + '"' + (+w.fase === k + 1 ? " selected" : "") + ">" + (k + 1) + " · " + esc(n) + "</option>"; }).join("") + "</select></div>" : "") +
+          '<div class="field col-4"><label for="w-dt">Início da etapa atual</label><input type="date" id="w-dt" data-w="dataEtapa" value="' + esc(w.dataEtapa) + '"></div>' +
+          (doZero(w.sigla) ? '<div class="field col-4"><label for="w-leg">Projeto Legal</label><select id="w-leg" data-w="legal">' + T.optHtml(LEGAL, w.legal) + "</select></div>" : "") +
+          '<p class="hint col-12">As etapas anteriores entram como concluídas, com os itens prontos. Ajuste datas e itens depois, se precisar.</p>' : "") + "</div>";
     } else {
-      h += '<p class="hint">Quantidade de cada ambiente. A área vem da referência (Confortável); área e configuração podem ser ajustadas depois.</p><div class="gp-qtd">' + SETORES.map(function (s) {
+      h += '<p class="hint">Quantidade e área de cada ambiente. A área já vem da referência (Confortável) e pode ser mudada aqui; a configuração de cada ambiente é feita depois, na aba Programa.</p><div class="gp-qtd">' + SETORES.map(function (s) {
         var ts = CATALOGO.filter(function (t) { return t.s === s[0] && t.id !== "outro"; }); if (!ts.length) return "";
-        return '<div><div class="gp-serie-h"><b>' + s[1] + "</b></div>" + ts.map(function (t) { return '<label class="gp-qrow"><span>' + esc(t.n) + (t.a ? " <em>" + T.fmtNum(t.a) + " m²</em>" : "") + '</span><input type="number" min="0" max="20" data-wq="' + t.id + '" value="' + (w.qtd[t.id] || 0) + '"></label>'; }).join("") + "</div>";
+        return '<div><div class="gp-serie-h"><b>' + s[1] + '</b><span class="hint gp-qh">qtd. · m²</span></div>' + ts.map(function (t) { var ar = w.areas[t.id] != null ? w.areas[t.id] : t.a; return '<label class="gp-qrow"><span>' + esc(t.n) + '</span><span class="gp-qin"><input type="number" min="0" max="20" data-wq="' + t.id + '" value="' + (w.qtd[t.id] || 0) + '" aria-label="Quantidade de ' + esc(t.n) + '"><input type="number" min="0" step="0.5" class="gp-qa" data-wa="' + t.id + '" value="' + (ar != null ? ar : "") + '" placeholder="m²" aria-label="Área de ' + esc(t.n) + ' (m²)"></span></label>'; }).join("") + "</div>";
       }).join("") + '</div><div class="note" id="w-prev"></div>';
     }
-    h += '<div class="form-actions" style="margin-top:16px">' + (w.step > 1 ? '<button class="btn" data-wstep="-1">Voltar</button>' : '<button class="btn" data-wcancel="1">Cancelar</button>') + (w.step < 3 ? '<button class="btn btn-primary" data-wstep="1">Próximo</button>' : '<button class="btn btn-primary" id="w-criar">Criar projeto</button>') + "</div></div>";
+    h += '<div class="form-actions" style="margin-top:16px">' + (w.step > 1 ? '<button class="btn" data-wstep="-1">Voltar</button>' : '<button class="btn" data-wcancel="1">Cancelar</button>') + (w.step < 3 ? '<button class="btn btn-primary" data-wstep="1">Próximo</button>' : '<button class="btn btn-primary" id="w-criar">' + (w.projetoId ? "Levar ao Gestor" : "Criar projeto") + "</button>") + "</div></div>";
     $("gp-novo").innerHTML = h;
     if (w.step === 3) previewWiz();
   }
   function previewWiz() {
-    var w = S.wiz, amb = ambientesDeQtd(w.qtd, w.pavs[0]), it = gerarPlano({ sigla: w.sigla, pavs: w.pavs, ambientes: amb, marcenaria: w.marcenaria });
+    var w = S.wiz, amb = ambientesDeQtd(w.qtd, w.pavs[0], w.areas), it = gerarPlano({ sigla: w.sigla, pavs: w.pavs, ambientes: amb });
     var area = amb.reduce(function (s, a) { return s + (+a.area || 0) * (+a.qtd || 1); }, 0), cont = {};
     it.forEach(function (x) { cont[x.etapa] = (cont[x.etapa] || 0) + 1; });
-    var el = $("w-prev"); if (el) el.innerHTML = '<div><div class="note-title">Prévia do projeto</div><div class="note-body">' + amb.length + " ambientes · <b>" + T.fmtNum(area * 1.2) + " m²</b> estimados · <b>" + it.length + " itens</b> no Plano de Projeto (" + Object.keys(cont).map(function (e) { return ETAPAS[e].nome + ": " + cont[e]; }).join(" · ") + ")</div></div>";
+    var el = $("w-prev"); if (el) el.innerHTML = '<div><div class="note-title">Prévia do projeto</div><div class="note-body">' + amb.length + " ambientes · <b>" + T.fmtNum(area * 1.2) + " m²</b> estimados · <b>" + it.length + " itens</b> no Plano de Projeto (" + Object.keys(cont).map(function (e) { return ETAPAS[e].curto + ": " + cont[e]; }).join(" · ") + ")</div></div>";
+  }
+  // Monta o documento do Gestor. Em andamento: etapas anteriores concluídas (itens prontos) até a etapa atual.
+  function montarGp(o) {
+    var legal = doZero(o.sigla) ? o.legal || "nao_iniciado" : "nao_se_aplica", amb = o.ambientes || [];
+    var itens = gerarPlano({ sigla: o.sigla, pavs: o.pavs, ambientes: amb, legal: legal }), agora = new Date().toISOString();
+    var g = { sigla: o.sigla, etapa: "abertura", fase: null, etapas: { abertura: { inicio: agora } }, proximo: "", legal: legal, marco: {}, esperas: [], pavs: o.pavs, ambientes: amb, itens: itens, reunioes: [], eventos: [], criadoEm: agora };
+    if (o.inicio === "andamento") {
+      var f = fluxo(o.sigla), alvo = f.indexOf(o.etapaAtual), ini = isoDeData(o.dataEtapa || hojeIso());
+      g.etapa = o.etapaAtual; g.fase = ETAPAS[o.etapaAtual].fases ? +o.fase || 1 : null; g.marco = { contrato: true, parcela: true }; g.etapas = {};
+      f.slice(0, alvo).forEach(function (e) { g.etapas[e] = { inicio: null, fim: ini, termoEm: ETAPAS[e].termo ? o.dataEtapa : null }; });
+      g.etapas[o.etapaAtual] = { inicio: ini };
+      var feitas = f.slice(0, alvo); if (legal === "aprovado") feitas.push("pl");
+      itens.forEach(function (x) { if (feitas.indexOf(x.etapa) >= 0) { x.sit = "pronto"; x.desenhos.forEach(function (d) { d.feito = true; }); } });
+      evento(g, "Projeto incluído no Gestor já em andamento: " + ETAPAS[o.etapaAtual].nome + (g.fase ? ", fase " + g.fase : "") + " (etapas anteriores concluídas antes do app)", hojeIso(), { tipo: "etapa" });
+    } else evento(g, "Projeto criado no Gestor: Abertura", hojeIso(), { tipo: "etapa" });
+    return g;
   }
   async function criarProjeto() {
     var w = S.wiz, nome = w.nome.trim(); if (!nome) { w.step = 1; renderNovo(); T.toast("Dê um nome ao projeto."); return; }
     await T.saveWith($("w-criar"), async function () {
       var ids = w.clienteIds.slice();
       if (w.novoCli.nome.trim() && T.cadastros) ids.push(await T.cadastros.criarContato({ tipos: ["cliente"], nome: w.novoCli.nome.trim(), contato: w.novoCli.contato.trim(), email: w.novoCli.email.trim() }));
-      var amb = ambientesDeQtd(w.qtd, w.pavs[0]), area = amb.reduce(function (s, a) { return s + (+a.area || 0) * (+a.qtd || 1); }, 0);
-      var nomesCli = ids.map(function (id) { var c = T.cadastros && T.cadastros.contato(id); return c ? c.nome : ""; }).filter(Boolean), legal = doZero(w.sigla) ? "nao_iniciado" : "nao_se_aplica";
-      var ref = await T.db.collection("projetos").add({ nome: nome, codigo: (w.codigo || codigoDe(w.sigla, nome)).trim(), sigla: w.sigla, tipo: TIPO_ANTIGO[w.sigla], cliente: nomesCli.join(" e "), clienteIds: ids, categorias: { padrao: w.padrao || null, dimensao: w.dimensao, dificuldade: w.dificuldade || null }, area: Math.round(area * 1.2), status: "ativo", criadoEm: new Date().toISOString() });
-      var g = { sigla: w.sigla, etapa: "briefing", fase: null, etapas: { briefing: { inicio: new Date().toISOString() } }, resp: w.resp || null, proximo: "Receber o briefing e montar a proposta", legal: legal, marco: {}, esperas: [], pavs: w.pavs, marcenaria: w.marcenaria, ambientes: amb,
-        itens: gerarPlano({ sigla: w.sigla, pavs: w.pavs, ambientes: amb, marcenaria: w.marcenaria, legal: legal }), eventos: [{ data: hojeIso(), txt: "Projeto criado no briefing" }], criadoEm: new Date().toISOString() };
-      S.gp[ref.id] = g; await T.db.doc("gp/" + ref.id).set(g);
-      S.wiz = null; S.view = "projeto"; S.projId = ref.id; S.tab = "geral";
+      var amb = ambientesDeQtd(w.qtd, w.pavs[0], w.areas), area = amb.reduce(function (s, a) { return s + (+a.area || 0) * (+a.qtd || 1); }, 0);
+      var nomesCli = ids.map(function (id) { var c = T.cadastros && T.cadastros.contato(id); return c ? c.nome : ""; }).filter(Boolean);
+      var body = { nome: nome, codigo: (w.codigo || codigoDe(w.sigla, nome)).trim(), sigla: w.sigla, tipo: TIPO_ANTIGO[w.sigla], clienteIds: ids, categorias: { padrao: w.padrao || null, dimensao: w.dimensao, dificuldade: w.dificuldade || null }, status: "ativo" };
+      if (nomesCli.length) body.cliente = nomesCli.join(" e ");
+      var pid;
+      if (w.projetoId) { pid = w.projetoId; if (!(T.projeto(pid) || {}).area && area) body.area = Math.round(area * 1.2); await T.db.doc("projetos/" + pid).update(body); }
+      else { body.area = Math.round(area * 1.2); body.criadoEm = new Date().toISOString(); pid = (await T.db.collection("projetos").add(body)).id; }
+      var g = montarGp({ sigla: w.sigla, pavs: w.pavs, ambientes: amb, inicio: w.inicio, etapaAtual: w.etapaAtual, fase: w.fase, dataEtapa: w.dataEtapa, legal: w.legal });
+      S.gp[pid] = g; await T.db.doc("gp/" + pid).set(g);
+      S.wiz = null; S.view = "projeto"; S.projId = pid; S.tab = "geral";
     });
     T.scheduleRender();
   }
@@ -535,20 +913,47 @@
   // ---------- ações ----------
   async function avancar() {
     var g = G(S.projId), f = fluxo(g.sigla), prox = f[f.indexOf(g.etapa) + 1], data = ($("gp-termo-data") || {}).value || hojeIso();
-    var falta = (g.etapa === "briefing" && !(marco(g, "contrato") && marco(g, "parcela"))) || (g.etapa === "abertura" && !marco(g, "topografico"));
+    var falta = g.etapa === "abertura" && !(marco(g, "contrato") && marco(g, "parcela") && marco(g, "topografico"));
     var antecipa = $("gp-antecipa") && $("gp-antecipa").checked;
     if (falta && !antecipa) { T.toast("Complete o que falta ou marque a antecipação autorizada."); return; }
     if (prox === "pe" && temLegal(g) && g.legal !== "aprovado") return;
-    var iso = new Date(data + "T12:00:00").toISOString();
+    var ok = await T.confirmar({ titulo: prox === "encerrado" ? "Encerrar a arquitetura?" : "Abrir " + ETAPAS[prox].nome + "?", texto: g.etapa === "abertura" ? "Marca o marco zero em " + T.fmtYmd(data) + " e começa a contar o prazo do Estudo Preliminar." : "Registra o termo de " + esc(ETAPAS[g.etapa].nome) + " assinado em " + T.fmtYmd(data) + (prox === "encerrado" ? "." : " e abre a próxima etapa."), ok: prox === "encerrado" ? "Encerrar" : "Abrir etapa" });
+    if (!ok) return;
+    var iso = isoDeData(data);
     await salvar(S.projId, function (x) {
       x.etapas = x.etapas || {}; x.etapas[x.etapa] = Object.assign({}, x.etapas[x.etapa], { fim: iso, termoEm: ETAPAS[x.etapa].termo ? data : null });
-      evento(x, x.etapa === "briefing" ? "Projeto contratado: Abertura iniciada" : x.etapa === "abertura" ? "Marco zero: Estudo Preliminar iniciado" + (antecipa && falta ? " (antecipação com termo de ciência)" : "") : ETAPAS[x.etapa].termo + " registrado (" + ETAPAS[x.etapa].nome + ")", data);
+      evento(x, x.etapa === "abertura" ? "Marco zero: Estudo Preliminar iniciado" + (antecipa && falta ? " (antecipação com Termo de Ciência)" : "") : "Termo de " + (ETAPAS[x.etapa].termo === "projeto" ? "Encerramento de Projeto" : "Encerramento de Etapa") + " assinado (" + ETAPAS[x.etapa].nome + ")", data, { tipo: "etapa" });
       x.etapa = prox; x.fase = ETAPAS[prox].fases ? 1 : null; x.etapas[prox] = { inicio: iso };
-      if (prox === "encerrado") x.esperas = (x.esperas || []).map(function (e) { if (!e.fim) e.fim = iso; return e; });
+      if (prox === "encerrado") {
+        if (!marcAberta(x)) x.esperas = (x.esperas || []).map(function (e) { if (!e.fim) e.fim = iso; return e; });
+        else if (x.marc.etapa === "espera") { x.marc.etapa = "mex"; x.etapas.mex = { inicio: iso }; evento(x, "Executivo da marcenaria iniciado (arquitetura entregue e EP da marcenaria aprovado)", data, { tipo: "etapa" }); }
+      }
     });
     S.planoEtapa = null;
-    if (prox === "encerrado") { try { await T.db.doc("projetos/" + S.projId).update({ status: "concluido" }); } catch (e) { T.showError(e); } }
-    T.toast(prox === "encerrado" ? "Projeto encerrado" : ETAPAS[prox].nome + " aberta");
+    if (prox === "encerrado" && !marcAberta(G(S.projId))) await statusProjeto(S.projId, "concluido");
+    T.toast(prox === "encerrado" ? "Arquitetura encerrada" : ETAPAS[prox].nome + " aberta");
+  }
+  async function marcAvancar() {
+    var g = G(S.projId), m = g.marc, data = ($("gp-marc-data") || {}).value || hojeIso(), iso = isoDeData(data), et = m.etapa;
+    var ok = await T.confirmar({ titulo: et === "mep" ? "Encerrar o EP da marcenaria?" : "Encerrar a marcenaria?", texto: "Registra o termo assinado em " + T.fmtYmd(data) + "." + (et === "mep" ? (g.etapa === "encerrado" ? " O Executivo da marcenaria começa em seguida." : " O Executivo da marcenaria começa quando o Executivo arquitetônico for entregue.") : ""), ok: "Registrar" });
+    if (!ok) return;
+    await salvar(S.projId, function (x) {
+      x.etapas = x.etapas || {}; x.etapas[et] = Object.assign({}, x.etapas[et], { fim: iso, termoEm: data });
+      evento(x, "Termo de " + (et === "mep" ? "Encerramento de Etapa" : "Encerramento de Projeto") + " assinado (" + ETAPAS[et].nome + ")", data, { tipo: "etapa" });
+      if (et === "mep") { if (x.etapa === "encerrado") { x.marc.etapa = "mex"; x.etapas.mex = { inicio: iso }; evento(x, "Executivo da marcenaria iniciado", data, { tipo: "etapa" }); } else x.marc.etapa = "espera"; }
+      else { x.marc.etapa = "fim"; if (x.etapa === "encerrado") x.esperas = (x.esperas || []).map(function (e) { if (!e.fim) e.fim = iso; return e; }); }
+    });
+    var g2 = G(S.projId); if (g2.etapa === "encerrado" && !marcAberta(g2)) await statusProjeto(S.projId, "concluido");
+  }
+  async function marcAtivar() {
+    var num = $("mc-num").value.trim(), dt = $("mc-data").value || null, parc = $("mc-parc").checked, pep = T.numOrNull($("mc-pep").value), pex = T.numOrNull($("mc-pex").value), ini = $("mc-ini").value || null;
+    await salvar(S.projId, function (x) {
+      var comeca = parc && (dt || ini), inicio = ini || dt || hojeIso();
+      x.marc = { ativo: true, contrato: { numero: num, data: dt }, contratoOk: !!dt, parcela: parc, prazos: { mep: pep, mex: pex }, etapa: comeca ? "mep" : "aguardando", ativadaEm: new Date().toISOString() };
+      x.etapas = x.etapas || {}; if (comeca) x.etapas.mep = { inicio: isoDeData(inicio) };
+      evento(x, "Marcenaria contratada" + (num ? " (contrato " + num + ")" : "") + (comeca ? ": Estudo Preliminar da marcenaria iniciado em " + T.fmtYmd(inicio) : ": aguardando contrato e 1ª parcela"), dt || hojeIso(), { tipo: "etapa" });
+    });
+    S.modal = null; T.toast("Marcenaria ativada");
   }
   function moverItem(id, dir) {
     salvar(S.projId, function (x) {
@@ -566,71 +971,24 @@
       if (t.banc && !tem[a.id + "b"]) novas.push(novoItem("pe", "s700", "Bancada – " + a.nome, { ambId: a.id, banc: true, ord: 900 + novas.length }));
     });
     if (!novas.length) { T.toast("O Plano já tem todas as ampliações e bancadas do programa."); return; }
-    salvar(S.projId, function (x) { x.itens = x.itens.concat(novas); evento(x, novas.length + " item(ns) incluído(s) a partir do programa"); });
+    salvar(S.projId, function (x) { x.itens = x.itens.concat(novas); evento(x, novas.length + " item(ns) incluído(s) no Executivo a partir do programa"); });
     T.toast(novas.length + (novas.length === 1 ? " item incluído" : " itens incluídos") + " no Executivo");
   }
-
-  // ---------- exemplos ----------
-  async function carregarExemplos(btn) {
-    await T.saveWith(btn, async function () {
-      var db = T.db;
-      if (!T.state.pessoas.length) {
-        await db.doc("pessoas/luan").set({ nome: "Luan", perfil: "socio", custoHora: null, valorHora: null, ativo: true, ordem: 1 });
-        await db.doc("pessoas/elisa").set({ nome: "Elisa", perfil: "socio", custoHora: null, valorHora: null, ativo: true, ordem: 2 });
-      }
-      var L = T.state.pessoas[0] ? T.state.pessoas[0].id : "luan", E = T.state.pessoas[1] ? T.state.pessoas[1].id : "elisa", C = T.cadastros;
-      var c1 = await C.criarContato({ tipos: ["cliente"], nome: "Marina Duarte (exemplo)", contato: "(32) 90000-0001", email: "marina@exemplo.com" });
-      var c2 = await C.criarContato({ tipos: ["cliente"], nome: "Rafael Duarte (exemplo)", contato: "(32) 90000-0002", email: "rafael@exemplo.com" });
-      var c3 = await C.criarContato({ tipos: ["cliente"], nome: "Carlos Menezes (exemplo)", contato: "(32) 90000-0003", email: "carlos@exemplo.com" });
-      var c4 = await C.criarContato({ tipos: ["cliente"], nome: "Pousada Vale Verde (exemplo)", empresa: "Vale Verde Turismo Ltda", contato: "(32) 90000-0004" });
-      var c5 = await C.criarContato({ tipos: ["cliente"], nome: "Helena Souza (exemplo)", contato: "(32) 90000-0005" });
-      await C.criarContato({ tipos: ["parceiro"], categoria: "Engenheiro estrutural", nome: "Tiago Rocha (exemplo)", empresa: "Rocha Estruturas", contato: "(32) 90000-0010" });
-      await C.criarContato({ tipos: ["parceiro"], categoria: "Projetos elétrico e hidrossanitário", nome: "Beatriz Alves (exemplo)", contato: "(32) 90000-0011" });
-      await C.criarContato({ tipos: ["fornecedor"], categoria: "Marmoraria", nome: "Marmoraria Pedra Fina (exemplo)", contato: "(32) 90000-0020" });
-      await C.criarContato({ tipos: ["maodeobra"], categoria: "Pedreiro", nome: "João Batista (exemplo)", contato: "(32) 90000-0030" });
-      function iso(n) { return voltaDu(n).toISOString(); }
-      function dia2(n) { return T.ymd(somaDu(n)); }
-      // marcas: [etapa, grupo|null, quantos, situação, responsável, prioridade, prazo em d.u. a partir de hoje]
-      async function criar(pj, g, marcas, tarefas) {
-        var ref = await db.collection("projetos").add(Object.assign({ status: "ativo", criadoEm: new Date().toISOString() }, pj));
-        var amb = ambientesDeQtd(g.qtd || {}, g.pavs[0]); delete g.qtd;
-        var it = gerarPlano({ sigla: g.sigla, pavs: g.pavs, ambientes: amb, marcenaria: g.marcenaria, legal: g.legal });
-        (marcas || []).forEach(function (m) {
-          it.filter(function (x) { return x.etapa === m[0] && (!m[1] || x.grupo === m[1]) && x.sit === "a_fazer" && !x._m; }).slice(0, m[2]).forEach(function (x, i) {
-            x._m = true; x.sit = m[3]; x.resp = m[4] || null; if (m[5]) x.prio = m[5]; if (m[6] != null) x.prazo = dia2(m[6] + i);
-            if (feito(x)) x.desenhos.forEach(function (d) { d.feito = true; }); else if (m[3] === "andamento" && x.desenhos.length) x.desenhos[0].feito = true;
-          });
-        });
-        it.forEach(function (x) { delete x._m; });
-        amb.forEach(function (a) { if (a.tipo === "banho_master") a.cfg = { agua_quente: true, bancada_tipo: "Cuba esculpida", cubas: "2", sanitario: "Caixa acoplada", ducha_higienica: true, chuveiros: "2", tipo_chuveiro: "Pré-aquecido (gás, boiler…)", banheira: "Em anexo (SPA)" }; if (a.tipo === "cozinha") a.cfg = { ilha: true, agua_quente: true, exaustao: "Coifa", equipamentos: ["Geladeira side by side", "Cooktop 5 bocas", "Forno de embutir", "Lava-louças"], itens_bancada: ["Cuba inox dupla", "Lixeira embutida"], integracao: "Estar, jantar e cozinha integrados" }; if (a.tipo === "estar") a.cfg = { assentos: "8", tv: "65\"" }; });
-        await db.doc("gp/" + ref.id).set(Object.assign({ ambientes: amb, itens: it, esperas: [], eventos: [], marco: {}, criadoEm: new Date().toISOString() }, g));
-        for (var i = 0; i < (tarefas || []).length; i++) { var tf = tarefas[i]; if (T.tarefas) await T.tarefas.criar(tf.pes, { title: tf.title, subdivision: tf.tipo, dueDate: tf.dia != null ? dia2(tf.dia) : null, dueTime: tf.hora || null, projetoId: ref.id }); }
-        return ref.id;
-      }
-      await criar({ nome: "Casa Duarte", codigo: "RES-CASADUARTE", sigla: "RES", tipo: "res", cliente: "Marina Duarte e Rafael Duarte", clienteIds: [c1, c2], categorias: { padrao: "medio_alto", dimensao: "confortavel", dificuldade: "dificil" }, area: 280 },
-        { sigla: "RES", etapa: "ep", resp: L, pavs: ["Garagem/Acesso", "1º pavimento", "2º pavimento"], qtd: PADRAO_RES, legal: "nao_iniciado", marco: { contrato: true, parcela: true },
-          etapas: { briefing: { inicio: iso(50), fim: iso(35) }, abertura: { inicio: iso(35), fim: iso(28) }, ep: { inicio: iso(28) } }, esperas: [{ quem: "cliente", inicio: iso(16), fim: null }], proximo: "Receber a lista de ajustes da 1ª rodada",
-          eventos: [{ data: T.ymd(voltaDu(35)), txt: "Projeto contratado: Abertura iniciada" }, { data: T.ymd(voltaDu(28)), txt: "Marco zero: Estudo Preliminar iniciado" }, { data: T.ymd(voltaDu(17)), txt: "Apresentação do Estudo Preliminar" }] },
-        [["abertura", null, 7, "pronto", E], ["ep", "ep-estudos", 4, "pronto", L], ["ep", "ep-apres", 17, "entregue", E], ["ep", "ep-entrega", 3, "pronto", L], ["ep", "ep-entrega", 1, "andamento", L, 1, 1]],
-        [{ pes: L, title: "Cobrar retorno da apresentação do EP", tipo: "prioridade", dia: 1 }, { pes: L, title: "Reunião de ajustes com Marina e Rafael", tipo: "compromisso", dia: 3, hora: "15:00" }]);
-      await criar({ nome: "Casa Menezes", codigo: "RES-CASAMENEZES", sigla: "RES", tipo: "res", cliente: "Carlos Menezes", clienteIds: [c3], categorias: { padrao: "alto_1", dimensao: "espacosa", dificuldade: "normal" }, area: 320 },
-        { sigla: "RES", etapa: "ap", fase: 2, resp: L, pavs: ["Térreo", "Superior"], qtd: { hall: 1, cozinha: 1, jantar: 1, estar: 1, lavabo: 1, suite_master: 1, banho_master: 1, closet: 1, quarto: 3, banho: 2, garagem: 3, lavanderia: 1, gourmet: 1, piscina: 1, escada: 1 },
-          legal: "protocolado", marco: { contrato: true, parcela: true },
-          etapas: { briefing: { inicio: iso(130), fim: iso(115) }, abertura: { inicio: iso(115), fim: iso(100) }, ep: { inicio: iso(100), fim: iso(38), termoEm: T.ymd(voltaDu(38)) }, ap: { inicio: iso(38) } },
-          esperas: [{ quem: "engenheiro", inicio: iso(20), fim: iso(12) }], proximo: "Compatibilizar o hidrossanitário (2ª rodada)",
-          eventos: [{ data: T.ymd(voltaDu(38)), txt: "Termo de Encerramento de Etapa registrado (Estudo Preliminar)" }, { data: T.ymd(voltaDu(12)), txt: "Estrutural recebido e sobreposto" }] },
-        [["abertura", null, 7, "pronto", E], ["ep", null, 40, "pronto", L], ["ap", "s100", 4, "pronto", E], ["ap", "s200", 2, "pronto", E], ["ap", "s300", 2, "revisao", E, 2, 1], ["ap", "s400", 3, "andamento", L, 1, 2], ["ap", "s400", 6, "a_fazer", E, 3, 6],
-          ["ap", "ap-comp", 1, "pronto", L], ["ap", "ap-comp", 2, "andamento", L, 1, 3], ["pl", "pl-pranchas", 7, "entregue", E], ["pl", "pl-tramite", 3, "pronto", L]],
-        [{ pes: L, title: "Enviar interferências ao projeto elétrico", tipo: "prioridade", dia: 1 }, { pes: E, title: "Revisar quadro de áreas", tipo: "tarefa", dia: 2 }, { pes: E, title: "Separar referências de revestimento para o cliente", tipo: "demanda", dia: 5 }]);
-      await criar({ nome: "Pousada Vale Verde", codigo: "HOT-VALEVERDE", sigla: "HOT", tipo: "hot", cliente: "Pousada Vale Verde", clienteIds: [c4], categorias: { padrao: "alto_1", dimensao: "confortavel", dificuldade: "muito_dificil" }, area: 0 },
-        { sigla: "HOT", etapa: "briefing", resp: L, pavs: ["Térreo"], qtd: {}, legal: "nao_iniciado", marco: { contrato: true }, etapas: { briefing: { inicio: iso(10) } }, proximo: "Apresentar a proposta ao cliente", eventos: [{ data: T.ymd(voltaDu(10)), txt: "Projeto criado no briefing" }] },
-        [], [{ pes: L, title: "Apresentação da proposta", tipo: "compromisso", dia: 2, hora: "10:00" }]);
-      await criar({ nome: "Apartamento Centro", codigo: "INT-APTOCENTRO", sigla: "INT", tipo: "int", cliente: "Helena Souza", clienteIds: [c5], categorias: { padrao: "medio_alto", dimensao: "compacta", dificuldade: "baixa" }, area: 95 },
-        { sigla: "INT", etapa: "pe", fase: 2, resp: E, pavs: ["Apartamento"], qtd: { cozinha: 1, estar: 1, jantar: 1, suite_master: 1, banho_master: 1, quarto: 1, banho: 1, lavanderia: 1 }, marcenaria: true, legal: "nao_se_aplica", marco: { contrato: true, parcela: true },
-          etapas: { briefing: { inicio: iso(95), fim: iso(90) }, abertura: { inicio: iso(90), fim: iso(80) }, ep: { inicio: iso(80), fim: iso(35), termoEm: T.ymd(voltaDu(35)) }, pe: { inicio: iso(35) } }, proximo: "Detalhar marcenaria da cozinha", eventos: [{ data: T.ymd(voltaDu(35)), txt: "Termo de Encerramento de Etapa registrado (Estudo Preliminar)" }] },
-        [["abertura", null, 7, "pronto", E], ["ep", null, 40, "pronto", E], ["pe", "s100", 3, "entregue", E], ["pe", "s200", 2, "pronto", E], ["pe", "s300", 2, "pronto", E], ["pe", "s400", 5, "pronto", E], ["pe", "s500", 2, "andamento", E, 1, 1], ["pe", "s500", 3, "a_fazer", E, 2, 4], ["pe", "s900", 1, "andamento", E, 2, 3]],
-        [{ pes: E, title: "Confirmar medidas da geladeira com a cliente", tipo: "tarefa", dia: 1 }]);
+  async function situacaoProjeto(act) {
+    var pid = S.projId, p = proj(pid), msgs = {
+      suspender: ["Suspender o projeto?", "O projeto sai da lista principal e o prazo fica pausado. Depois de " + SUSPENSO_ARQUIVA + " dias úteis suspenso, vai sozinho para Arquivados.", "Suspender"],
+      arquivar: ["Arquivar o projeto?", "O projeto sai da lista principal e fica na aba Arquivados. Nada é apagado.", "Arquivar"],
+      reativar: ["Reativar o projeto?", "O projeto volta para a lista principal e o prazo volta a contar.", "Reativar"],
+      desarquivar: ["Desarquivar o projeto?", "O projeto volta para a lista principal.", "Desarquivar"] };
+    var m = msgs[act]; if (!(await T.confirmar({ titulo: m[0], texto: "<b>" + esc(p.nome) + "</b>: " + m[1], ok: m[2], perigo: act === "suspender" || act === "arquivar" }))) return;
+    var agora = new Date().toISOString();
+    await salvar(pid, function (x) {
+      if (act === "suspender") { x.suspenso = { desde: hojeIso() }; if (!esperaAberta(x)) x.esperas = (x.esperas || []).concat([{ quem: "cliente", inicio: agora, fim: null, suspenso: true }]); evento(x, "Projeto suspenso", hojeIso(), { tipo: "suspensao" }); }
+      else if (act === "arquivar") { x.arquivado = { desde: hojeIso() }; evento(x, "Projeto arquivado", hojeIso(), { tipo: "arquivamento" }); }
+      else { var e = esperaAberta(x); if (e) e.fim = agora; delete x.suspenso; delete x.arquivado; evento(x, act === "reativar" ? "Projeto reativado" : "Projeto desarquivado", hojeIso(), { tipo: "etapa" }); }
     });
+    await statusProjeto(pid, act === "suspender" || act === "arquivar" ? "pausado" : "ativo");
+    T.toast(m[2] === "Suspender" ? "Projeto suspenso" : m[2] === "Arquivar" ? "Projeto arquivado" : "Projeto de volta à lista");
   }
 
   // ---------- render e eventos ----------
@@ -639,62 +997,77 @@
     if (S.view === "lista") renderLista(); else if (S.view === "projeto") renderProjeto(); else if (S.wiz) renderNovo();
   }
   var html =
-    '<div id="gp-lista"><div class="section-head"><h2 class="section-title">Projetos em andamento</h2><div class="form-actions"><input id="gp-busca" class="gp-busca" placeholder="Buscar projeto ou cliente" aria-label="Buscar"><button class="btn btn-small btn-primary" id="gp-novo-btn">+ Novo projeto</button></div></div>' +
-      '<div class="segmented" id="gp-filtros" style="margin-bottom:14px">' + [["todos", "Todos"], ["aguardando", "Aguardando"], ["suspensos", "Suspensos"]].map(function (f, k) { return '<button class="seg-pill' + (k ? "" : " is-selected") + '" data-f="' + f[0] + '">' + f[1] + "</button>"; }).join("") + "</div>" +
-      '<div class="gp-avisos" id="gp-avisos"></div><div class="tiles gp-resumo" id="gp-resumo"></div><div id="gp-grupos"></div></div>' +
-    '<div id="gp-proj" hidden><div id="gp-p-head" class="gp-p-head"></div><div id="gp-p-body"></div></div><div id="gp-novo" hidden></div>';
+    '<div id="gp-lista"><div class="section-head"><h2 class="section-title">Projetos</h2><div class="form-actions"><input id="gp-busca" class="gp-busca" placeholder="Buscar projeto ou cliente" aria-label="Buscar"><button class="btn btn-small btn-primary" id="gp-novo-btn">+ Novo projeto</button></div></div>' +
+      '<div class="card gp-resumo" id="gp-resumo"></div><div class="gp-avisos" id="gp-avisos"></div><div class="gp-etapas" id="gp-etapas"></div><div id="gp-grupos"></div></div>' +
+    '<div id="gp-proj" hidden><div id="gp-p-head" class="gp-p-head"></div><div id="gp-p-body"></div></div><div id="gp-novo" hidden></div>' +
+    '<div class="overlay" id="gp-overlay" hidden><div class="modal" role="dialog" aria-modal="true" id="gp-modal-box"></div></div>';
 
   function split(v) { return String(v).split("|"); }
   function init() {
     var v = $("view-gestor");
     $("gp-busca").addEventListener("input", function () { S.busca = this.value; renderLista(); });
     $("gp-novo-btn").addEventListener("click", function () { api.novo(); });
-    $("gp-filtros").addEventListener("click", function (e) { var b = e.target.closest("[data-f]"); if (!b) return; S.filtro = b.dataset.f; T.each("[data-f]", function (x) { x.classList.toggle("is-selected", x === b); }, this); renderLista(); });
+    // notificações abrem o projeto de qualquer tela (capa, área da pessoa, Gestor)
+    document.addEventListener("click", function (e) { var b = e.target.closest("[data-gpopen]"); if (b) { api.abrir(b.dataset.gpopen); return; } b = e.target.closest("#pnotes [data-go]"); if (b) T.go("admin", b.dataset.go); });
+    $("gp-overlay").addEventListener("click", function (e) {
+      if (e.target === this || e.target.closest("[data-close]")) { fecharModal(); return; }
+      var b = e.target.closest("[data-rnmodo]"); if (b) { e.preventDefault(); salvarReuniao(b.dataset.rnmodo); return; }
+      if (e.target.closest("#tm-pdf")) { e.preventDefault(); gerarTermo(); }
+    });
+    $("gp-overlay").addEventListener("submit", function (e) { e.preventDefault(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("gp-overlay").hidden) fecharModal(); });
     v.addEventListener("click", async function (e) {
       var t = e.target, b, pid = S.projId;
+      if (t.closest("#gp-overlay")) return;
+      if ((b = t.closest("[data-f]"))) { S.filtro = b.dataset.f; S.foco = null; renderLista(); return; }
+      if ((b = t.closest("[data-foco]"))) { S.foco = S.foco === b.dataset.foco ? null : b.dataset.foco; renderLista(); var gr = document.querySelector(".gp-group.is-foco"); if (gr) gr.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
       if ((b = t.closest("[data-open]"))) { api.abrir(b.dataset.open); return; }
-      if (t.closest("#gp-seed")) { carregarExemplos(t.closest("#gp-seed")); return; }
-      if (t.closest("[data-voltar]")) { S.view = "lista"; S.confirmDel = null; render(); window.scrollTo(0, 0); return; }
-      if ((b = t.closest("[data-tab]"))) { S.tab = b.dataset.tab; S.confirmDel = null; render(); return; }
+      if (t.closest("[data-voltar]")) { S.view = "lista"; render(); window.scrollTo(0, 0); return; }
+      if ((b = t.closest("[data-tab]"))) { S.tab = b.dataset.tab; render(); return; }
       if ((b = t.closest("[data-pet]"))) { S.planoEtapa = b.dataset.pet; S.addGrupo = null; render(); return; }
       if ((b = t.closest("[data-itopen]"))) { S.open[b.dataset.itopen] = !S.open[b.dataset.itopen]; render(); return; }
       if ((b = t.closest("[data-dopen]"))) { S.openDes[b.dataset.dopen] = !S.openDes[b.dataset.dopen]; render(); return; }
-      if ((b = t.closest("[data-addopen]"))) { S.addGrupo = S.planoEtapa + "|" + b.dataset.addopen; render(); var i = $("gp-add-in"); if (i) i.focus(); return; }
+      if ((b = t.closest("[data-addopen]"))) { S.addGrupo = b.dataset.adde + "|" + b.dataset.addopen; render(); var i = $("gp-add-in"); if (i) i.focus(); return; }
       if (t.closest("[data-addcancel]")) { S.addGrupo = null; render(); return; }
       if ((b = t.closest("[data-imove]"))) { moverItem(b.dataset.imove, +b.dataset.dir); return; }
       if ((b = t.closest("[data-idel]"))) { var antes = T.clone(G(pid).itens), idd = b.dataset.idel; salvar(pid, function (x) { x.itens = x.itens.filter(function (y) { return y.id !== idd; }); }); T.toast("Item removido", { label: "Desfazer", fn: function () { salvar(pid, function (x) { x.itens = antes; }); } }); return; }
       if ((b = t.closest("[data-ddel]"))) { var a = split(b.dataset.ddel); mudarItem(pid, a[0], function (it) { it.desenhos = it.desenhos.filter(function (d) { return d.id !== a[1]; }); }); return; }
-      if (t.closest("[data-add900]")) { salvar(pid, function (x) { x.marcenaria = true; (x.pavs || ["Térreo"]).forEach(function (p, k) { x.itens.push(novoItem("pe", "s900", "Mapa de marcenaria – " + p, { ord: k + 1 })); }); }); return; }
       if ((b = t.closest("[data-tft]"))) { T.each("#tf-tipo [data-tft]", function (x) { x.classList.toggle("is-selected", x === b); }); var comp = b.dataset.tft === "compromisso"; $("tf-hora-w").hidden = !comp; $("tf-prazo-l").textContent = comp ? "Data" : "Prazo"; return; }
-      if ((b = t.closest("[data-tfdel]"))) { var d2 = split(b.dataset.tfdel); T.tarefas.remover(d2[0], d2[1]).then(function () { T.toast("Tarefa excluída"); }, T.showError); return; }
+      if ((b = t.closest("[data-tfdel]"))) { var d2 = split(b.dataset.tfdel); if (await T.confirmar({ titulo: "Excluir a tarefa?", texto: "Ela sai da agenda da pessoa.", ok: "Excluir", perigo: true })) T.tarefas.remover(d2[0], d2[1]).then(function () { T.toast("Tarefa excluída"); }, T.showError); return; }
       if ((b = t.closest("[data-amb]"))) { S.openAmb = S.openAmb === b.dataset.amb ? null : b.dataset.amb; render(); return; }
       if ((b = t.closest("[data-ambsave]"))) { salvarAmb(b.dataset.ambsave); return; }
-      if ((b = t.closest("[data-ambdel]"))) { var id = b.dataset.ambdel; salvar(pid, function (x) { x.ambientes = x.ambientes.filter(function (a2) { return a2.id !== id; }); }); S.openAmb = null; return; }
-      if ((b = t.closest("[data-wsig]"))) { S.wiz.sigla = b.dataset.wsig; if (!S.wiz.codManual) S.wiz.codigo = ""; S.wiz.qtd = b.dataset.wsig === "RES" ? T.clone(PADRAO_RES) : {}; renderNovo(); return; }
+      if ((b = t.closest("[data-ambdel]"))) { var id = b.dataset.ambdel; if (await T.confirmar({ titulo: "Remover o ambiente?", ok: "Remover", perigo: true })) { salvar(pid, function (x) { x.ambientes = x.ambientes.filter(function (a2) { return a2.id !== id; }); }); S.openAmb = null; } return; }
+      if ((b = t.closest("[data-wsig]"))) { S.wiz.sigla = b.dataset.wsig; if (!S.wiz.codManual) S.wiz.codigo = ""; S.wiz.qtd = b.dataset.wsig === "RES" ? T.clone(PADRAO_RES) : {}; if (!doZero(S.wiz.sigla) && ["ap"].indexOf(S.wiz.etapaAtual) >= 0) S.wiz.etapaAtual = "ep"; renderNovo(); return; }
+      if ((b = t.closest("[data-winicio]"))) { S.wiz.inicio = b.dataset.winicio; renderNovo(); return; }
       if ((b = t.closest("[data-wstep]"))) { S.wiz.step += +b.dataset.wstep; renderNovo(); window.scrollTo(0, 0); return; }
       if (t.closest("[data-wcancel]")) { S.wiz = null; S.view = "lista"; render(); return; }
       if (t.closest("#w-criar")) { criarProjeto(); return; }
+      if ((b = t.closest("[data-termo]"))) { abrirModal(modalTermo(b.dataset.termo)); return; }
+      if ((b = t.closest("[data-rnreg]"))) { abrirModal(modalReuniao(G(pid), T.byId(G(pid).reunioes || [], b.dataset.rnreg))); return; }
       if ((b = t.closest("[data-act]"))) {
         var act = b.dataset.act;
         if (act === "avancar") avancar();
-        else if (act === "aguardar") { var quem = $("gp-quem").value, prev = $("gp-previsto").value || null; salvar(pid, function (x) { x.esperas = x.esperas || []; x.esperas.push({ quem: quem, inicio: new Date().toISOString(), fim: null, previsto: prev }); evento(x, "Aguardando " + nomeQuem(quem)); }); }
-        else if (act === "retomar") salvar(pid, function (x) { var e2 = esperaAberta(x); if (e2) { e2.fim = new Date().toISOString(); evento(x, "Retomado após " + du(e2.inicio, new Date()) + " d.u. aguardando " + nomeQuem(e2.quem)); } });
-        else if (act === "suspender") salvar(pid, function (x) { var e3 = esperaAberta(x); if (e3) e3.fim = new Date().toISOString(); x.suspenso = { desde: hojeIso() }; x.esperas.push({ quem: "cliente", inicio: new Date().toISOString(), fim: null, suspenso: true }); evento(x, "Projeto suspenso por falta de retorno do cliente"); });
-        else if (act === "reativar") salvar(pid, function (x) { var e4 = esperaAberta(x); if (e4) e4.fim = new Date().toISOString(); delete x.suspenso; evento(x, "Projeto reativado"); });
+        else if (act === "marc-avancar") marcAvancar();
+        else if (act === "marc-form") { S.modal = "marc-ativar"; render(); }
+        else if (act === "marc-cancel") { S.modal = null; render(); }
+        else if (act === "marc-iniciar") salvar(pid, function (x) { x.marc.etapa = "mep"; x.etapas = x.etapas || {}; x.etapas.mep = { inicio: new Date().toISOString() }; evento(x, "Estudo Preliminar da marcenaria iniciado (contrato e 1ª parcela ok)", hojeIso(), { tipo: "etapa" }); });
+        else if (act === "modelo") { S.editModelo = !S.editModelo; render(); }
+        else if (act === "reuniao") abrirModal(modalReuniao(G(pid)));
+        else if (act === "aguardar") { var quem = $("gp-quem").value, prev = $("gp-previsto").value || null; salvar(pid, function (x) { x.esperas = x.esperas || []; x.esperas.push({ quem: quem, inicio: new Date().toISOString(), fim: null, previsto: prev }); evento(x, "Aguardando " + nomeQuem(quem) + " (prazo pausado)", hojeIso(), { tipo: "espera" }); }); }
+        else if (act === "retomar") salvar(pid, function (x) { var e2 = esperaAberta(x); if (e2) { e2.fim = new Date().toISOString(); evento(x, "Retomado após " + du(e2.inicio, new Date()) + " d.u. aguardando " + nomeQuem(e2.quem), hojeIso(), { tipo: "espera" }); } });
+        else if (["suspender", "arquivar", "reativar", "desarquivar"].indexOf(act) >= 0) situacaoProjeto(act);
         else if (act === "sync-plano") syncPlano();
-        else if (act === "apagar") { S.confirmDel = pid; render(); }
-        else if (act === "apagar-nao") { S.confirmDel = null; render(); }
-        else if (act === "apagar-ok") { try { await T.db.doc("gp/" + pid).delete(); delete S.gp[pid]; S.confirmDel = null; S.view = "lista"; render(); T.toast("Projeto removido do Gestor"); } catch (err) { T.showError(err); } }
       }
     });
     v.addEventListener("change", function (e) {
       var t = e.target, pid = S.projId, a;
-      if (t.id === "gp-fase") salvar(pid, function (x) { x.fase = +t.value; evento(x, "Fase " + t.value + " de " + ETAPAS[x.etapa].nome); });
+      if (t.closest("#gp-overlay")) return;
+      if (t.id === "gp-fase") salvar(pid, function (x) { x.fase = +t.value; evento(x, ETAPAS[x.etapa].nome + ": fase " + t.value + " · " + ETAPAS[x.etapa].fases[+t.value - 1], hojeIso(), { tipo: "etapa" }); });
       else if (t.id === "gp-proximo") salvar(pid, function (x) { x.proximo = t.value.trim(); });
-      else if (t.id === "gp-resp") salvar(pid, function (x) { x.resp = t.value || null; });
-      else if (t.id === "gp-legal") salvar(pid, function (x) { x.legal = t.value; evento(x, "Projeto Legal: " + (LEGAL.filter(function (o) { return o[0] === t.value; })[0] || [0, t.value])[1]); });
+      else if (t.id === "gp-legal") salvar(pid, function (x) { x.legal = t.value; evento(x, "Projeto Legal: " + (LEGAL.filter(function (o) { return o[0] === t.value; })[0] || [0, t.value])[1], hojeIso(), { tipo: "etapa" }); });
       else if (t.id === "gp-pend") { S.pendentes = t.checked; render(); }
-      else if (t.dataset.marco) salvar(pid, function (x) { x.marco = x.marco || {}; x.marco[t.dataset.marco] = t.checked; });
+      else if (t.dataset.marco) salvar(pid, function (x) { x.marco = x.marco || {}; x.marco[t.dataset.marco] = t.checked; if (t.checked) evento(x, "Marco zero: " + MARCO.filter(function (m) { return m[0] === t.dataset.marco; })[0][1].toLowerCase(), hojeIso(), { tipo: "etapa" }); });
+      else if (t.dataset.marcmarco) salvar(pid, function (x) { if (t.dataset.marcmarco === "contrato") x.marc.contratoOk = t.checked; else x.marc.parcela = t.checked; });
       else if (t.dataset.iresp != null) mudarItem(pid, t.dataset.iresp, function (it) { it.resp = t.value || null; });
       else if (t.dataset.isit) mudarItem(pid, t.dataset.isit, function (it) { it.sit = t.value; if (feito(it)) (it.desenhos || []).forEach(function (d) { d.feito = true; }); });
       else if (t.dataset.iprio != null) mudarItem(pid, t.dataset.iprio, function (it) { it.prio = t.value ? +t.value : null; });
@@ -707,20 +1080,25 @@
       else if (t.dataset.tfmv) { a = split(t.dataset.tfmv); T.tarefas.mover(a[0], t.value, a[1]).then(function () { T.toast("Tarefa enviada para " + (T.pessoa(t.value) || {}).nome); }, T.showError); }
       else if (t.dataset.wcli) { var ids = S.wiz.clienteIds, i = ids.indexOf(t.dataset.wcli); if (t.checked && i < 0) ids.push(t.dataset.wcli); if (!t.checked && i >= 0) ids.splice(i, 1); }
       else if (t.id === "w-npav") { var n = Math.max(1, Math.min(12, +t.value || 1)); S.wiz.npav = n; var ps = S.wiz.pavs.slice(0, n); while (ps.length < n) ps.push(ps.length === 0 ? "Térreo" : n === 2 ? "Superior" : ps.length + "º pavimento"); S.wiz.pavs = ps; renderNovo(); }
-      else if (t.id === "w-marc") S.wiz.marcenaria = t.checked;
+      else if (t.id === "w-et") { S.wiz.etapaAtual = t.value; S.wiz.fase = 1; renderNovo(); }
       else if (t.dataset.w) S.wiz[t.dataset.w] = t.value;
     });
     v.addEventListener("input", function (e) {
-      var t = e.target; if (!S.wiz) return;
+      var t = e.target; if (!S.wiz || t.closest("#gp-overlay")) return;
       if (t.dataset.w) { S.wiz[t.dataset.w] = t.value; if (t.dataset.w === "codigo") S.wiz.codManual = true; if (t.dataset.w === "nome" && !S.wiz.codManual) { S.wiz.codigo = codigoDe(S.wiz.sigla, t.value); var c = $("w-cod"); if (c) c.value = S.wiz.codigo; } }
       else if (t.dataset.wn) S.wiz.novoCli[t.dataset.wn] = t.value;
       else if (t.dataset.wpav != null) S.wiz.pavs[+t.dataset.wpav] = t.value;
       else if (t.dataset.wq) { S.wiz.qtd[t.dataset.wq] = +t.value || 0; previewWiz(); }
+      else if (t.dataset.wa) { S.wiz.areas[t.dataset.wa] = t.value === "" ? "" : +t.value; previewWiz(); }
     });
     v.addEventListener("submit", function (e) {
       var f = e.target, pid = S.projId, a; e.preventDefault();
-      if (f.dataset.addg) { var tit = f.querySelector("input").value.trim(); if (!tit) return; var gk = f.dataset.addg, et = S.planoEtapa;
-        salvar(pid, function (x) { var n = x.itens.filter(function (y) { return y.etapa === et && y.grupo === gk; }).length; x.itens.push(novoItem(et, gk, tit, { ord: 1000 + n })); }); S.addGrupo = null; return; }
+      if (f.closest("#gp-overlay")) return;
+      if (f.dataset.addg) {
+        var tit = f.querySelector("#gp-add-in").value.trim(); if (!tit) return; var gk = f.dataset.addg, et = f.dataset.adde, usaMod = $("gp-add-mod") && $("gp-add-mod").checked;
+        salvar(pid, function (x) { var n = x.itens.filter(function (y) { return y.etapa === et && y.grupo === gk; }).length; x.itens.push(usaMod ? novoMovel(et, gk, tit, { ord: 1000 + n }) : novoItem(et, gk, tit, { ord: 1000 + n })); if (ETAPAS[et].marc || ["briefing", "abertura"].indexOf(x.etapa) < 0) evento(x, "Item incluído no Plano: " + tit + " (" + ETAPAS[et].curto + ")", hojeIso(), { tipo: "plano" }); });
+        S.addGrupo = null; return;
+      }
       if (f.dataset.dadd) { var nm = f.querySelector("input").value.trim(); if (!nm) return; mudarItem(pid, f.dataset.dadd, function (it) { it.desenhos = (it.desenhos || []).concat(des([nm])); }); return; }
       if (f.dataset.ckadd) { a = split(f.dataset.ckadd); var ct = f.querySelector("input").value.trim(); if (!ct) return; mudarItem(pid, a[0], function (it) { var d = T.byId(it.desenhos, a[1]); if (d) d.checklist.push({ t: ct, ok: false }); }); return; }
       if (f.id === "gp-tf-form") {
@@ -731,8 +1109,15 @@
         return;
       }
       if (f.id === "gp-amb-add") { var g = G(pid), am = novoAmbiente($("amb-tipo").value, { pav: (g.pavs || [])[0] || null }); salvar(pid, function (x) { x.ambientes = (x.ambientes || []).concat([am]); }); S.openAmb = am.id; return; }
+      if (f.id === "marc-form") { marcAtivar(); return; }
+      if (f.id === "modelo-form") { salvarModelo(); return; }
       if (f.id === "gp-ficha") salvarFicha();
     });
+  }
+  async function salvarModelo() {
+    var linhas = function (id) { return $(id).value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean); };
+    var md = { guia: $("md-guia").value.trim(), desenhos: linhas("md-des").map(function (n) { return { nome: n, checklist: [] }; }), checklist: linhas("md-ck") };
+    await T.saveWith($("md-save"), async function () { S.cfg = Object.assign({}, S.cfg || {}, { modeloMovel: md }); await T.db.doc("gp_config/geral").set(S.cfg); });
   }
   function salvarAmb(id) {
     var ed = document.querySelector('[data-ambed="' + id + '"]'); if (!ed) return;
@@ -743,30 +1128,48 @@
       T.each("[data-cfg]", function (i) { var d = CAMPOS[i.dataset.cfg]; a.cfg[i.dataset.cfg] = d.t === "bool" ? i.checked : d.t === "num" ? T.numOrNull(i.value) : i.value; }, ed);
       var multi = {}; T.each("[data-cfgm]", function (i) { multi[i.dataset.cfgm] = multi[i.dataset.cfgm] || []; if (i.checked) multi[i.dataset.cfgm].push(i.value); }, ed);
       Object.keys(multi).forEach(function (k) { a.cfg[k] = multi[k]; });
-      if (["briefing", "abertura"].indexOf(x.etapa) < 0) evento(x, "Ambiente alterado: " + a.nome + " (" + ETAPAS[x.etapa].nome + ")");
+      if (x.etapa !== "abertura") evento(x, "Ambiente alterado: " + a.nome + " (" + ETAPAS[x.etapa].nome + ")", hojeIso(), { tipo: "plano" });
     });
     S.openAmb = null; T.toast("Ambiente salvo");
   }
   async function salvarFicha() {
     var pid = S.projId, cli = []; T.each("[data-fcli]", function (i) { if (i.checked) cli.push(i.dataset.fcli); });
-    var sig = $("f-sig").value || G(pid).sigla, nomes = cli.map(function (id) { var c = T.cadastros && T.cadastros.contato(id); return c ? c.nome : ""; }).filter(Boolean);
+    var g0 = G(pid), sig = $("f-sig").value || g0.sigla, nomes = cli.map(function (id) { var c = T.cadastros && T.cadastros.contato(id); return c ? c.nome : ""; }).filter(Boolean);
     await T.saveWith($("f-save"), async function () {
-      await T.db.doc("projetos/" + pid).update({ nome: $("f-nome").value.trim(), codigo: $("f-cod").value.trim(), sigla: sig, tipo: TIPO_ANTIGO[sig], clienteIds: cli, cliente: nomes.join(" e "), endereco: $("f-end").value.trim(), categorias: { padrao: $("f-pad").value || null, dimensao: $("f-dim").value || null, dificuldade: $("f-dif").value || null } });
+      var body = { nome: $("f-nome").value.trim(), codigo: $("f-cod").value.trim(), sigla: sig, tipo: TIPO_ANTIGO[sig], clienteIds: cli, endereco: $("f-end").value.trim(), categorias: { padrao: $("f-pad").value || null, dimensao: $("f-dim").value || null, dificuldade: $("f-dif").value || null },
+        contrato: { numero: $("f-cnum").value.trim(), data: $("f-cdata").value || null, cidade: $("f-cid").value.trim() } };
+      if (nomes.length) body.cliente = nomes.join(" e ");
+      await T.db.doc("projetos/" + pid).update(body);
       var pavs = $("f-pavs").value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean), dir = {};
       ["uso", "expectativas", "estetica", "relacao", "sistemas", "execucao"].forEach(function (k) { dir[k] = $("fd-" + k).value.trim(); });
-      await salvar(pid, function (x) { x.sigla = sig; x.pavs = pavs.length ? pavs : x.pavs; x.pasta = $("f-pasta").value.trim(); x.bimx = $("f-bimx").value.trim(); x.marcenaria = $("f-marc").checked; x.diretrizes = dir; });
+      var datas = {}; T.each("[data-fet]", function (i) { var a = split(i.dataset.fet); datas[a[0]] = datas[a[0]] || {}; datas[a[0]][a[1]] = i.value; });
+      await salvar(pid, function (x) {
+        x.sigla = sig; x.pavs = pavs.length ? pavs : x.pavs; x.pasta = $("f-pasta").value.trim(); x.bimx = $("f-bimx").value.trim(); x.diretrizes = dir;
+        if ($("f-leg").value && $("f-leg").value !== x.legal) { x.legal = $("f-leg").value; evento(x, "Projeto Legal: " + (LEGAL.filter(function (o) { return o[0] === x.legal; })[0] || [0, x.legal])[1], hojeIso(), { tipo: "etapa" }); }
+        if (x.marc && $("f-mnum")) x.marc.contrato = { numero: $("f-mnum").value.trim(), data: $("f-mdata").value || null };
+        x.etapas = x.etapas || {}; var mud = [];
+        Object.keys(datas).forEach(function (e) {
+          var d = datas[e], cur = x.etapas[e] = x.etapas[e] || {}, ini = d.inicio ? isoDeData(d.inicio) : null, fim = d.fim ? isoDeData(d.fim) : null, pz = T.numOrNull(d.prazo);
+          if ((cur.inicio ? T.ymd(new Date(cur.inicio)) : "") !== (d.inicio || "")) { cur.inicio = ini; mud.push(ETAPAS[e].curto + " início " + (d.inicio ? T.fmtYmd(d.inicio) : "—")); }
+          if (cur.fim && (T.ymd(new Date(cur.fim)) !== (d.fim || ""))) { cur.fim = fim; if (cur.termoEm) cur.termoEm = d.fim || null; mud.push(ETAPAS[e].curto + " fim " + (d.fim ? T.fmtYmd(d.fim) : "—")); }
+          if (d.prazo !== undefined && pz !== prazoEtapa(x, e)) { cur.prazo = pz; mud.push(ETAPAS[e].curto + " prazo " + (pz || "—") + " d.u."); }
+        });
+        if (mud.length) evento(x, "Datas/prazos ajustados na Ficha: " + mud.join("; "), hojeIso(), { tipo: "etapa" });
+      });
     });
   }
 
   var api = T.gestor = {
     abrir: function (pid) { if (T.state.view !== "admin" || T.state.sub !== "gestor") T.go("admin", "gestor"); S.view = "projeto"; S.projId = pid; S.tab = "geral"; S.openAmb = null; S.planoEtapa = null; render(); window.scrollTo(0, 0); },
-    novo: function () { if (T.state.view !== "admin" || T.state.sub !== "gestor") T.go("admin", "gestor"); S.wiz = wizInicial(); S.view = "novo"; render(); window.scrollTo(0, 0); },
+    novo: function (pj) { if (T.state.view !== "admin" || T.state.sub !== "gestor") T.go("admin", "gestor"); S.wiz = wizInicial(pj); S.view = "novo"; render(); window.scrollTo(0, 0); },
+    // Excluir: só pelo Cadastros (com confirmação lá). Remove o processo do Gestor; as horas continuam no Tempo.
+    excluir: async function (pid) { await T.db.doc("gp/" + pid).delete(); delete S.gp[pid]; if (S.projId === pid) { S.view = "lista"; S.projId = null; } },
     gp: G, etapaNome: function (pid) { var g = G(pid); return g ? etapaLinha(g) : ""; }, situacao: function (pid) { var g = G(pid); return g ? situacao(g) : null; },
-    codigos: codigos, ordenar: ordenar, sitNome: sitNome, SIT: SIT, feito: feito, mudarItem: mudarItem, salvar: salvar, etapas: ETAPAS, etapasPlano: etapasPlano, grupos: grupos, desenhosProg: desenhosProg,
+    codigos: codigos, ordenar: ordenar, sitNome: sitNome, SIT: SIT, feito: feito, mudarItem: mudarItem, salvar: salvar, etapas: ETAPAS, etapasPlano: etapasPlano, grupos: grupos, desenhosProg: desenhosProg, ativo: ativo,
     itensParaTempo: function (pid, etapaTempo) {
       var g = G(pid); if (!g || !etapaTempo) return [];
-      var ets = etapasPlano(g).filter(function (e) { return ETAPAS[e].tempo === etapaTempo; }), cod = codigos(g), out = [];
-      ets.forEach(function (e) { ordenar(itensDe(g, e)).forEach(function (x) { if (!feito(x)) out.push({ id: x.id, rotulo: (ets.length > 1 ? ETAPAS[e].nome + " · " : "") + (cod[x.id] ? cod[x.id] + " · " : "") + x.titulo }); }); });
+      var ets = etapasPlano(g).filter(function (e) { return (ETAPAS[e].tempo || []).indexOf(etapaTempo) >= 0; }), cod = codigos(g), out = [];
+      ets.forEach(function (e) { ordenar(itensDe(g, e)).forEach(function (x) { if (!feito(x)) out.push({ id: x.id, rotulo: (ets.length > 1 ? ETAPAS[e].curto + " · " : "") + (cod[x.id] ? cod[x.id] + " · " : "") + x.titulo }); }); });
       return out;
     }
   };
@@ -774,11 +1177,15 @@
   T.register({
     id: "gestor", label: "Gestor de Projetos", area: "admin", html: html, init: init, render: render,
     icon: '<path d="M4 5h16"/><path d="M4 12h10"/><path d="M4 19h6"/><circle cx="18" cy="17" r="3"/>',
-    desc: function () { var n = projetosGestor().filter(function (p) { return G(p.id).etapa !== "encerrado"; }).length; return n ? n + (n === 1 ? " projeto no processo" : " projetos no processo") : "Etapas, plano e prazos de cada projeto"; },
-    connect: function (db) { db.collection("gp").onSnapshot(function (s) { var m = {}; s.docs.forEach(function (d) { m[d.id] = d.data(); }); S.gp = m; T.loaded("gp", s); T.scheduleRender(); }, T.onErr); },
-    notes: function () {
-      var av = avisos().filter(function (a) { return a[0] !== "ok"; });
-      return av.length ? '<div class="note"><div><div class="note-title">Gestor de Projetos</div><div class="note-body">' + av.map(function (a) { return a[1]; }).join("<br>") + '</div></div><button class="btn btn-small" data-go="gestor">Abrir</button></div>' : null;
+    desc: function () { var n = projetosGestor().filter(function (p) { var g = G(p.id); return ativo(g) && (g.etapa !== "encerrado" || marcAberta(g)); }).length; return n ? n + (n === 1 ? " projeto em andamento" : " projetos em andamento") : "Etapas, plano e prazos de cada projeto"; },
+    connect: function (db) {
+      db.collection("gp").onSnapshot(function (s) { var m = {}; s.docs.forEach(function (d) { m[d.id] = d.data(); }); S.gp = m; if (!s.metadata || !s.metadata.fromCache) S.loaded = true; T.loaded("gp", s); T.scheduleRender(); }, T.onErr);
+      db.doc("gp_config/geral").onSnapshot(function (d) { S.cfg = d.exists ? d.data() : null; }, T.onErr);
+      db.doc("fin_config/geral").onSnapshot(function (d) { S.fin = d.exists ? d.data() : null; }, function () {});
+    },
+    notes: function (pessoaId) {
+      var av = avisos(pessoaId || null); if (!av.length) return null;
+      return '<div class="note gp-note"><div class="gp-note-h"><div class="note-title">Gestor de Projetos</div><button class="btn btn-small" data-go="gestor">Abrir</button></div><div class="gp-avisos">' + av.map(avisoHtml).join("") + "</div></div>";
     }
   });
 })();

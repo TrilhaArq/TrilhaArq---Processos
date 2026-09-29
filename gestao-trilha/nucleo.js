@@ -11,9 +11,10 @@
 
   T.DEFAULT_CONFIG = {
     etapas: [
-      { id: "ep", nome: "Estudo Preliminar" }, { id: "ap", nome: "Anteprojeto" },
+      { id: "ab", nome: "Abertura" }, { id: "ep", nome: "Estudo Preliminar" }, { id: "ap", nome: "Anteprojeto" },
       { id: "pl", nome: "Projeto Legal" }, { id: "comp", nome: "Compatibilização" },
-      { id: "ex", nome: "Projeto Executivo" }, { id: "obra", nome: "Obra" }
+      { id: "ex", nome: "Projeto Executivo" }, { id: "mc-ep", nome: "Marcenaria · Estudo Preliminar" },
+      { id: "mc-ex", nome: "Marcenaria · Executivo" }, { id: "obra", nome: "Obra" }
     ],
     areas: [
       { id: "adm", nome: "Administrativo" }, { id: "mkt", nome: "Marketing" },
@@ -109,8 +110,9 @@
 
   // ---------- módulos ----------
   // register({ id, label, area: "pessoa"|"admin", icon, desc(), html, init(T), connect(db), render(),
-  //            homeStats(pid), homeState(pid) })
-  // A capa só tem botões: pessoas (com o resumo de Tempo/Tarefas) e os apps do escritório. Nenhum app manda avisos ou dados para ela.
+  //            homeStats(pid), homeState(pid), notes(pessoaId|null) })
+  // A capa tem os botões (pessoas e apps do escritório) e, acima deles, as notificações dos apps (notes). Na área da
+  // pessoa, as notificações aparecem acima das abas, filtradas para quem está usando (pessoaId).
   T.register = function (m) { T.modules.push(m); };
   T.mod = function (id) { return T.byId(T.modules, id); };
   function modsDaArea(area) { return T.modules.filter(function (m) { return m.area === area; }); }
@@ -130,6 +132,7 @@
       $("app-title").textContent = view === "pessoa" ? (p ? p.nome : "") : T.mod(s.sub).label;
     }
     T.modules.forEach(function (m) { var v = $("view-" + m.id); if (v) v.hidden = view === "home" || m.id !== s.sub; });
+    if ($("pnotes")) $("pnotes").hidden = view !== "pessoa";
     window.scrollTo(0, 0);
     T.render();
   };
@@ -152,6 +155,7 @@
     }).join("") + FUTUROS.map(function (f) {
       return '<div class="tile-btn admin-tile soon" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true">' + f.icon + '</svg><span><span class="t">' + f.t + '<span class="soon-pill">Em breve</span></span><span class="d">' + f.d + "</span></span></div>";
     }).join("");
+    if ($("notes")) $("notes").innerHTML = call("notes", [null]).join("");
   }
   $("home") && document.addEventListener("click", function (e) {
     if (T.state.view === "home" && e.target.closest("#home")) {
@@ -166,10 +170,28 @@
   // ---------- render ----------
   T.render = function () {
     if (T.state.view === "home") renderHome();
-    else { var m = T.mod(T.state.sub); if (m && m.render) m.render(); }
+    else {
+      if (T.state.view === "pessoa" && $("pnotes")) $("pnotes").innerHTML = call("notes", [T.state.pessoaId]).join("");
+      var m = T.mod(T.state.sub); if (m && m.render) m.render();
+    }
   };
   var queued = false;
   T.scheduleRender = function () { if (queued) return; queued = true; requestAnimationFrame(function () { queued = false; T.render(); }); };
+
+  // ---------- confirmação (janela com Confirmar / Cancelar) ----------
+  // T.confirmar({ titulo, texto, ok: "Excluir", perigo: true }) → Promise<boolean>
+  T.confirmar = function (o) {
+    return new Promise(function (resolve) {
+      var ov = document.createElement("div"); ov.className = "overlay"; ov.setAttribute("role", "presentation");
+      ov.innerHTML = '<div class="modal modal-sm" role="alertdialog" aria-modal="true" aria-labelledby="cf-t"><h2 class="section-title" id="cf-t">' + T.esc(o.titulo || "Confirmar") + "</h2>" +
+        (o.texto ? '<p class="cf-txt">' + o.texto + "</p>" : "") +
+        '<div class="form-actions"><button class="btn ' + (o.perigo ? "btn-stop" : "btn-primary") + '" data-cf="1">' + T.esc(o.ok || "Confirmar") + '</button><button class="btn" data-cf="0">Cancelar</button></div></div>';
+      function fim(v) { document.removeEventListener("keydown", tecla); ov.remove(); resolve(v); }
+      function tecla(e) { if (e.key === "Escape") fim(false); }
+      ov.addEventListener("click", function (e) { var b = e.target.closest("[data-cf]"); if (b) fim(b.dataset.cf === "1"); else if (e.target === ov) fim(false); });
+      document.addEventListener("keydown", tecla); document.body.appendChild(ov); ov.querySelector('[data-cf="1"]').focus();
+    });
+  };
 
   // ---------- avisos ----------
   var toastTimer = null;
