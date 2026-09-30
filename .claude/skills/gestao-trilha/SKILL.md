@@ -12,6 +12,7 @@ Um único Artifact, organizado em **módulos**, com um único banco de dados com
 - **Código:** repositório GitHub `TrilhaArq/TrilhaArq---Processos`, pasta `gestao-trilha/`
 - **Regras comuns:** `referencias/CONTRATO.md` (ler antes de qualquer alteração)
 - **Regras de negócio dos módulos atuais:** `referencias/REGRAS.md`
+- **Planejamento do Gestor Comercial (ainda não construído):** `gestao-trilha/COMERCIAL-PLANO.md` no repositório — ler antes de começar esse módulo.
 
 ## Princípios que não se reabrem sem pedido explícito
 
