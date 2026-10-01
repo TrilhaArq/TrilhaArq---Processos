@@ -61,9 +61,9 @@ assinatura no gov.br.
 - Técnica: o .docx é um pacote zip; o app usa JSZip (cdnjs) para abrir, substituir e baixar (capacidade `downloads`).
   Os 47–49 campos de cada modelo estão inteiros no XML (conferido), o que torna a troca segura.
 
-## Divergências contrato × app (a decidir com o Luan)
+## Divergências contrato × app
 
-Regra: o app vale; onde o contrato se sobrepõe ao app, perguntar. Em aberto em 01/10/2026:
+Regra: o app vale; onde o contrato se sobrepõe ao app, perguntar.
 
 | Tema | App | Contrato |
 |---|---|---|
@@ -74,3 +74,13 @@ Regra: o app vale; onde o contrato se sobrepõe ao app, perguntar. Em aberto em 
 | Levantamento (reforma e marcenaria avulsa) | não existe no Gestor | etapa própria, 5 dias úteis |
 
 Iguais nos dois: EP 40, Legal 20 para desenvolver e protocolar, EP marcenaria 30, Executivo marcenaria 40.
+
+**Decisões do Luan (01/10/2026):**
+1. **Pesos:** manter os dois — têm funções diferentes (% concluído no app; valor devido na rescisão no contrato).
+2. **Prazos:** o padrão do app vale (Anteprojeto 70). Os prazos variam por projeto e negociação: a oportunidade
+   permite ajustar cada prazo; o que for contratado vira `etapas.<e>.prazo` ao "Virar projeto" e preenche os
+   campos em amarelo do contrato.
+3. **Levantamento entra no app:** etapa própria para reforma (REF/INT) e marcenaria avulsa, prazo padrão de
+   5 dias úteis (`prazosPadrao.lev`), antes do Estudo Preliminar. Mexe no Gestor de Projetos: combinar com o chat
+   do Gestor e testar na cópia de teste.
+4. Exigências do Legal: os 10 dias úteis ficam como controle interno do app; o contrato não fixa esse prazo.
