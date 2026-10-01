@@ -385,20 +385,21 @@ testando antes na cópia de teste (mudança grande).
 
 **F. Plano de Projeto — leitura do andamento** (Luan, 01/10/2026)
 - **Linha de contagem por situação:** abaixo da linha "Clique no nome para abrir desenhos e checklists." e antes do
-  primeiro quadro, uma linha com o número de itens em cada situação da etapa: **Em andamento, Revisão interna, Em
-  revisão pelo cliente e Pronto**. Ficam de fora "A fazer" e "Entregue" (já aparecem no contador com barra).
+  primeiro quadro, uma linha com o número de itens em cada situação da etapa: **Em andamento, Revisão interna, Revisão
+  Cliente e Pronto**. Ficam de fora "A fazer" e "Entregue" (já aparecem no contador com barra).
 - **Relatório de andamento em PDF:** botão abaixo do último quadro do Plano nas fases **Anteprojeto**, **Projeto
   Executivo** e **Marcenaria** (na marcenaria, contabilizando só o Executivo da marcenaria). Serve para enviar ao
   cliente ou usar em reuniões internas. Conteúdo: só o nome do projeto e a data e hora em que foi gerado como dados
   externos (sem cliente, endereço etc.); o resto são números e gráficos do andamento da fase (itens por situação,
-  % concluído, andamento por série/grupo, prazo usado × restante, o que foi concluído, o que está com o cliente).
+  % concluído, andamento por série/grupo, prazo usado × restante, o que foi concluído, o que está em Revisão Cliente).
   Identidade visual Trilha, com a logo.
 - **Quadros das etapas no topo do Plano** (os que mostram a quantidade de itens e ficam verdes na etapa atual):
   nas **etapas já concluídas**, só acrescentar o **ícone de concluído idêntico ao da Visão geral** (o círculo com ✓
   dos passos `gp-step.done`). Sem cor nova (decisão revista pelo Luan em 01/10/2026).
 
 **C. Situação e responsáveis** (Elisa 3, 4)
-- Nova situação **"Em revisão pelo cliente"** (entre Revisão interna e Pronto).
+- Nova situação **"Revisão Cliente"** (entre Revisão interna e Pronto). Nome definido pelo Luan em 01/10/2026: usar
+  exatamente "Revisão Cliente" em todo o app (seletor, contagem, relatório PDF).
 - **No cabeçalho de cada etapa** do Plano: botão para atribuir o responsável da etapa inteira (depois ajusta item a
   item) e a **situação da etapa: finalizada, em andamento ou aguardando**.
 
