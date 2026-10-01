@@ -83,4 +83,4 @@ Iguais nos dois: EP 40, Legal 20 para desenvolver e protocolar, EP marcenaria 30
 3. **Levantamento entra no app:** etapa própria para reforma (REF/INT) e marcenaria avulsa, prazo padrão de
    5 dias úteis (`prazosPadrao.lev`), antes do Estudo Preliminar. Mexe no Gestor de Projetos: combinar com o chat
    do Gestor e testar na cópia de teste.
-4. Exigências do Legal: os 10 dias úteis ficam como controle interno do app; o contrato não fixa esse prazo.
+4. **Em aberto:** exigências do Legal — proposta de manter os 10 dias úteis só como controle interno do app (o contrato não fixa esse prazo).
