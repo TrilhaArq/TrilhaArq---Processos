@@ -441,10 +441,15 @@ Proposta:
     desenvolver e protocolar como **concluída** (Histórico). Padrão 20 d.u. (contrato 3.3.3, MAPEAMENTO).
   - **Protocolado = em análise pelo órgão:** não existe situação "Em análise" separada. Enquanto protocolado, o prazo
     **não conta** (tempo do órgão, sem responsabilidade da Trilha).
-  - **Em exigência:** volta a contar um prazo da Trilha para atender (padrão **10 d.u.**, a confirmar 10 ou 15;
-    editável). Protocolar de novo para a contagem. Repete até "Aprovado".
+  - **Em exigência:** volta a contar um prazo da Trilha para atender (padrão **10 d.u.**, confirmado; editável).
+    Protocolar de novo para a contagem. Repete até "Aprovado".
   - **Aprovado:** fecha o projeto (condomínio ou prefeitura) e cumpre um dos requisitos para liberar o Executivo.
   - Prazos padrão editáveis em Configurações (junto com os demais) e por projeto na Ficha, com pergunta de proteção.
+  - **Configuração de prazos inclui o Legal** (desenvolvimento e exigência, para condomínio e prefeitura).
+    **Aviso de prazo do Legal começa faltando 5 d.u.** para o fim (nas outras etapas continua 10 d.u.).
+  - **Peso no % concluído:** Legal continua 10% no total; com condomínio e prefeitura, **5% e 5%**.
+  - **Paula e Bruno:** teve os dois; ao processar, condomínio e prefeitura entram como **Aprovado** (o Legal dela já
+    está aprovado).
 - **Plano de Projeto:** a etapa Projeto Legal passa a ter "Projeto de condomínio" (só quando marcado) e "Projeto de
   prefeitura", cada um com as pranchas e o trâmite. Por enquanto os dois recebem os mesmos desenhos padrão de hoje;
   o Luan vai ajustar os padrões de cada um depois, como foi feito na marcenaria (condomínio e prefeitura são padrão).
