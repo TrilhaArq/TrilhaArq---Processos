@@ -419,9 +419,27 @@ Proposta:
 3. **Projeto Legal com controle próprio**, no quadro dele, sem prazo e sem pausar o Anteprojeto: situação (Não
    iniciado, Em preparo, Aguardando condomínio, Protocolado · aguardando prefeitura, Em exigência, Aprovado, Não se
    aplica), com a data e os dias em cada situação. Condomínio e prefeitura saem das opções da Situação geral.
-4. Aviso de cliente sem retorno (15 d.u.) em cada trilha; suspensão automática (20 d.u., cláusula 3.4) — decidir se
-   vale por trilha ou só pela arquitetura (contrato principal).
+4. Aviso de cliente sem retorno (15 d.u.) em cada trilha; **suspensão automática (20 d.u., cláusula 3.4) só pela
+   arquitetura** (contrato principal); na marcenaria, só o aviso. **Pausa interna nunca conta para a suspensão.**
 5. Resolver o prazo vencido da marcenaria da Paula e Bruno corrigindo o início real do EP da marcenaria na Ficha.
+
+**Aprovado pelo Luan em 01/10/2026** (diagnóstico, proposta 1–5 e decisões 1 e 2). O item 3 (Legal) foi refeito:
+
+**H. Projeto Legal = dois projetos possíveis: condomínio e prefeitura** (Luan, 01/10/2026)
+- Projeto de **prefeitura** é o padrão quando o contrato tem Projeto Legal. Uma marcação "Este projeto também tem
+  projeto de **condomínio**" acrescenta o segundo. São projetos diferentes: cada um tem os próprios desenhos, regras
+  de representação, informações exigidas e trâmite.
+- Ordem: primeiro o condomínio (desenvolver → aprovar); depois a prefeitura (desenvolver → aprovar). O protocolo na
+  prefeitura vem depois do condomínio aprovado.
+- **Visão geral:** um quadro para cada um (Condomínio e Prefeitura), com o mesmo trâmite: Não iniciado → Em preparo
+  → Protocolado · em análise pelo condomínio / pela prefeitura → Em exigência → (protocola de novo) → … → Aprovado.
+  É um bate-bola: de "Em exigência" volta-se a "Protocolado" quantas vezes for preciso, até "Aprovado". Cada mudança
+  fica registrada com data; o quadro mostra a situação atual, há quantos dias, o número de rodadas de exigência e o
+  tempo total com o órgão × com a Trilha (em exigência o tempo corre do nosso lado). Não pausa o Anteprojeto.
+- **Plano de Projeto:** a etapa Projeto Legal passa a ter "Projeto de condomínio" (só quando marcado) e "Projeto de
+  prefeitura", cada um com as pranchas e o trâmite. Por enquanto os dois recebem os mesmos desenhos padrão de hoje;
+  o Luan vai ajustar os padrões de cada um depois, como foi feito na marcenaria (condomínio e prefeitura são padrão).
+- Portão Anteprojeto → Executivo: exige a prefeitura aprovada (e o condomínio, quando houver).
 
 **C. Situação e responsáveis** (Elisa 3, 4)
 - Nova situação **"Revisão Cliente"** (entre Revisão interna e Pronto). Nome definido pelo Luan em 01/10/2026: usar
