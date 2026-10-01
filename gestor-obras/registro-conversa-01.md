@@ -239,6 +239,76 @@ evoluir antes de olharmos para o aplicativo.
 
 ---
 
+## 5A. Planejamento e cronograma de obra (2ª parte da conversa)
+
+**Onde começa**
+- **No preliminar**: Luan já pede a cada profissional uma **estimativa de prazo** do serviço (também usada para
+  decidir quem contratar, junto com custo e qualidade). → precisa de **campo de prazo estimado** nas opções.
+- **Ao fechar o executivo**: reunião longa e aprofundada com cada profissional contratado → início do planejamento de fato.
+
+**Três camadas que evoluem**
+1. **Mapa conceitual** — criação do Luan, pela experiência: sequência lógica dos serviços (o que libera o quê,
+   o que corre em paralelo), tempos estimados, ideia de início e fim da obra. Levado pronto às conversas com os
+   profissionais ("você entraria por volta de tal período, consegue?").
+2. **Planejamento efetivo** — com o detalhamento dos profissionais (prazos reais, serviço de uma vez ou em etapas
+   ao longo da obra), o mapa conceitual vira o plano real do começo ao fim.
+3. **Cronograma detalhado** — chega ao **nível de dia** (no dia X o pintor, no dia Y o serralheiro), com leitura
+   agregada **dia / semana / mês / obra inteira**.
+
+**Planejamento × cronograma**: duas etapas atreladas que se alimentam nos dois sentidos. Planejamento = lógica
+(serviços, ordem, dependências, paralelos); cronograma = essa lógica no calendário. Atraso no cronograma pode exigir
+revisar o planejamento. Conceitos técnicos: **dependências**, **folga** e **caminho crítico**.
+→ No app: cronograma montado **por dependências** (não por datas digitadas), recalculando o que vem depois quando algo
+atrasa e mostrando se o atraso **consumiu folga** ou **empurrou o fim da obra**.
+
+**Dois perfis de obra**
+
+| | Obra comercial | Obra residencial |
+|---|---|---|
+| Prazo | curto e apertado (cliente paga aluguel sem faturar, ou a casa funciona durante a obra) | longo, menos pressão |
+| Folga | praticamente nenhuma — quase tudo é caminho crítico | folga entre serviços (alvenaria que atrasa de sexta para terça é absorvida no mês) |
+| Efeito de atraso | um dia perdido refaz o cronograma inteiro | reacomodação local |
+| Granularidade | dia (às vezes turno) | semana |
+| Presença do Luan | diária, intensa, às vezes o dia todo | conforme a etapa: intensa em marcações/decisões, leve em execuções longas (ex.: 1–2 visitas/semana durante um mês de alvenaria, para conferir prumo e alinhamento) |
+| Retorno | rápido e lucrativo, mas exige muita dedicação concentrada | mais diluído no tempo |
+
+- Experiência atual do Luan: principalmente **obras comerciais**, incluindo **3 obras de restaurante funcionando**
+  durante a reforma; próxima obra prevista: reforma de restaurante. Ainda não executou uma residência completa.
+- O app **trabalha sempre em dias**; a visualização principal muda conforme o tipo de obra.
+- **Resposta à pergunta do escopo**: a periodicidade de presença do Luan **depende do tipo de obra e da etapa** e sai
+  do próprio cronograma → ideia de um **plano de presença** junto ao contrato.
+
+**Cronograma físico-financeiro / curva de desembolso (OBRIGATÓRIO no módulo)**
+- Gráfico simples, de linha que sobe e desce, cruzando **custo da obra × cronograma**: mostra ao cliente **em que
+  meses precisa de mais dinheiro** e quando pode ficar mais tranquilo.
+- Motivo: obra **não tem investimento constante**. Há picos (estrutura, formas, revestimentos, fiação) e vales
+  (ex.: alvenaria). Cliente que acha que "10 mil por mês resolve" se enforca no mês de 50 mil — Luan já viu cliente
+  **parar a obra** por isso, e é algo que acontece **na maioria das obras sem planejamento**.
+- Detalhe técnico combinado: **o dinheiro sai quando se paga, não quando se executa** (sinal, 40% na aprovação/60% na
+  entrega, material comprado antes de ser aplicado). A curva deve cruzar **item do orçamento × serviço do cronograma
+  × forma de pagamento**. Sugestão: barras mensais (picos) + linha acumulada (curva S).
+- **Argumento comercial**: "Antes de começar, você sabe mês a mês quanto vai precisar ter para a obra." Também ajuda
+  o cliente a se planejar e reduz o risco de obra parada.
+
+**Pacote executivo (fechado com o cliente antes de iniciar a obra)**
+- **Planejamento + cronograma + orçamento executivo + fluxo de desembolso** — tudo ainda como previsão.
+- O contrato já estará assinado antes; aqui o cliente dá os **aceites assinando termos**.
+- Depois: **checklist de início de obra** ("vamos botar a obra para rodar").
+
+**Desejo do Luan: Mapa da Obra visual (fase futura)**
+- Visualizar o planejamento **em desenho, não em números**: símbolos, ícones, setas, linhas, post-its, bonito,
+  dinâmico e mostrável ao cliente, sem redesenhar no Canva/Illustrator a cada obra (o app **gera o desenho a partir
+  dos dados**).
+- Vistas imaginadas: mapa conceitual (fluxograma/diagrama de precedência, com caminho crítico destacado); linha do
+  tempo (Gantt estilizado, dia/semana/mês, previsto × real); quadro da semana/dia com post-its; versão para cliente
+  exportável em PDF.
+- Caminho: começar pela **linha do tempo visual** (mais simples) e evoluir para o fluxograma e interações (arrastar).
+- **REGRA: primeiro o app funcionando e otimizando o processo. O Mapa da Obra visual só entra quando o Luan pedir.**
+
+**Próximo tema em andamento**: gestão e controle da execução da obra (obra rodando).
+
+---
+
 ## 6. Perguntas em aberto (Luan vai responder depois)
 1. Que RRT é emitido hoje? A Trilha se posiciona como administradora ou executora?
 2. Como os profissionais são contratados hoje e de quem são as responsabilidades trabalhista, de segurança e de regularização?
@@ -251,7 +321,7 @@ evoluir antes de olharmos para o aplicativo.
 ---
 
 ## 7. Próximos temas da conversa
-1. **Planejamento e cronograma de obra.**
+1. ~~Planejamento e cronograma de obra~~ (conversado — ver seção 5A).
 2. **Gestão e controle da execução da obra.**
 3. **Contratos e contratação de profissionais** (como o Luan faz hoje).
 4. Depois: revisar este registro, fechar decisões e só então pensar no aplicativo e nos documentos de mapeamento.
