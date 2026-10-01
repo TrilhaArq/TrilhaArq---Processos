@@ -455,6 +455,33 @@ Proposta:
   o Luan vai ajustar os padrões de cada um depois, como foi feito na marcenaria (condomínio e prefeitura são padrão).
 - Portão Anteprojeto → Executivo: exige a prefeitura aprovada (e o condomínio, quando houver).
 
+**I. Ficha vira "Informações" + nova aba "Configurações" do projeto** (Luan, 01/10/2026 — substitui a ideia de
+deixar a Ficha restrita)
+- **Informações** (aberta a todos, para consulta): nome e código do projeto, clientes, nº e data do contrato,
+  endereço, categorias (padrão, dimensão, dificuldade — vêm do briefing), links (pasta, BIMx), **Descrição do projeto**
+  (campo novo, texto livre e personalizado: o que o cliente trouxe, o que a Trilha observou da casa/terreno) e
+  **Diretrizes do briefing** (acessibilidade etc.).
+- **Dados de cadastro só se alteram em Cadastros:** nome do projeto, clientes e contrato (inclusive o da marcenaria)
+  aparecem em Informações só para leitura. Clientes: mostrar **só os vinculados ao projeto** (hoje a Ficha lista
+  todos os clientes cadastrados com caixa de marcar). Para isso, Cadastros › Projetos ganha o formulário de edição
+  do projeto (nome, código, clientes, contrato, contrato da marcenaria).
+- **Configurações do projeto** (aba nova, lugar das coisas sensíveis; futuramente restrita a Luan e Elisa): datas e
+  prazos das etapas (com a pergunta de proteção), condomínio sim/não do Legal e o que mais exigir controle.
+- Pavimentos: passam para a aba Programa (junto dos ambientes, que já usam os pavimentos).
+
+**J. Ambientes padrão da Trilha (Programa de necessidades)** (Luan, 01/10/2026)
+- Situação hoje (código): a lista de ambientes e as perguntas de cada um (ilha, água quente, exaustão, equipamentos,
+  bancada…) estão fixas no código (`CATALOGO` e `CAMPOS` em gestor.js). Um ambiente novo do tipo Cozinha já recebe
+  as perguntas; "Outro ambiente" não recebe nenhuma, e ninguém consegue acrescentar uma pergunta ou uma opção.
+- Proposta aprovada em princípio: transformar a lista em **Ambientes padrão da Trilha**, guardados no banco
+  (`gp_config/geral.ambientes`), editáveis: cada ambiente com nome, setor, área de referência e as perguntas
+  (sim/não, escolha, várias escolhas, número, texto) com suas opções. Ponto de partida = o que já está configurado
+  hoje (é o briefing padrão de residências).
+- Ao configurar um ambiente num projeto, "+ outra opção" / "+ outra pergunta" acrescenta ali e oferece **"salvar no
+  padrão"**, para o padrão ir melhorando a cada cliente. Também dá para criar um ambiente padrão novo a partir de
+  um ambiente configurado num projeto.
+- Projetos já existentes não mudam sozinhos; novos ambientes já nascem com as perguntas do padrão.
+
 **C. Situação e responsáveis** (Elisa 3, 4)
 - Nova situação **"Revisão Cliente"** (entre Revisão interna e Pronto). Nome definido pelo Luan em 01/10/2026: usar
   exatamente "Revisão Cliente" em todo o app (seletor, contagem, relatório PDF).
