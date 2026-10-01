@@ -283,7 +283,7 @@ chance de fechar) para o Financeiro, valor calculado × valor praticado.
 
 ## Material de apoio
 
-- Página visual para apresentar o app (Luan e Elisa): https://claude.ai/artifact/84BSJdugmhStKNBKKfCNND
+- Página visual para apresentar o app (Luan e Elisa): https://claude.ai/artifact/84BSJdugmhStKNBKKfCNND (cópia em `gestao-trilha/apresentacoes/gestor-comercial.html`). Aprovada pelo Luan como referência para o futuro guia em PDF de todo o app.
 
 ## Pendências para começar a construir
 

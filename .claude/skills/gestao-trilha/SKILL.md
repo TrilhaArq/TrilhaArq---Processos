@@ -78,3 +78,19 @@ Um único Artifact, organizado em **módulos**, com um único banco de dados com
 - **Quando a pessoa disser que é a Elisa (Lili):** só anotar as sugestões dela, sem alterar o app nem os dados, e
   pedir que o Luan confirme e analise antes de qualquer processamento. As sugestões ficam em `REGRAS.md`, seção
   "Sugestões da Elisa (aguardando análise do Luan)", até o Luan aprovar, ajustar ou recusar cada uma.
+
+## Contas e onde cada coisa acontece (decidido em 01/10/2026)
+
+- **Uso do app:** sempre na conta do escritório (dona do link oficial e do banco de dados).
+- **Desenvolvimento e ajustes:** podem ser feitos numa segunda conta de confiança do Luan, com o app e as
+  conversas compartilhados com ela. O código e as regras chegam por este repositório. Antes de publicar no link
+  oficial, confirmar que essa conta tem permissão de edição; senão, testar numa cópia e publicar a partir da
+  conta do escritório.
+
+## Tarefas futuras
+
+- **Guia em PDF de todo o app Gestão Trilha** (todos os apps internos: Tempo, Tarefas, Projetos, Gestor de
+  Projetos, Comercial, Financeiro, Cadastros, Relatórios, Configurações…), explicando como cada um funciona e como
+  se ligam. **Referência de formato e tom:** a página visual do Gestor Comercial
+  (https://claude.ai/artifact/84BSJdugmhStKNBKKfCNND; cópia em `gestao-trilha/apresentacoes/gestor-comercial.html`),
+  que o Luan aprovou: processo em etapas, telas simuladas, exemplos, ligações entre apps e linguagem de gestor.

@@ -1,0 +1,358 @@
+<title>Gestor Comercial Trilha</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Work+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: uma coluna de leitura (~760px) com blocos de "tela simulada" mais largos; identidade Trilha */
+:root{
+  --bg:oklch(98.4% 0.006 135);
+  --surface:oklch(100% 0 0);
+  --soft:oklch(95.6% 0.014 135);
+  --line:oklch(89.5% 0.016 135);
+  --fg:oklch(27% 0.02 140);
+  --muted:oklch(50% 0.02 140);
+  --accent:#88AC67;
+  --accent-ink:oklch(45% 0.09 135);
+  --accent-soft:oklch(93% 0.045 135);
+  --amber:oklch(72% 0.13 75);
+  --red:oklch(60% 0.16 28);
+  --display:"Comfortaa",ui-rounded,system-ui,sans-serif;
+  --body:"Work Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:oklch(19% 0.012 140);--surface:oklch(23% 0.014 140);--soft:oklch(26.5% 0.016 140);--line:oklch(33% 0.018 140);
+  --fg:oklch(93% 0.01 135);--muted:oklch(72% 0.016 135);--accent-ink:oklch(80% 0.1 135);--accent-soft:oklch(31% 0.04 135);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:oklch(19% 0.012 140);--surface:oklch(23% 0.014 140);--soft:oklch(26.5% 0.016 140);--line:oklch(33% 0.018 140);
+  --fg:oklch(93% 0.01 135);--muted:oklch(72% 0.016 135);--accent-ink:oklch(80% 0.1 135);--accent-soft:oklch(31% 0.04 135);color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.6;padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:860px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.25;text-wrap:balance;margin:0}
+h1{font-size:clamp(28px,5vw,40px)}
+h2{font-size:22px}
+h3{font-size:16px}
+p{margin:0;max-width:66ch}
+.muted{color:var(--muted)}
+.eyebrow{font-family:var(--display);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink);font-weight:700}
+header.hero{padding-block:48px 28px;display:grid;gap:14px;border-bottom:1px solid var(--line)}
+.hero p{font-size:18px}
+.principles{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent-ink);font-size:13px;font-weight:600}
+section{padding-block:40px 8px;display:grid;gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.grid2>*{min-width:0}
+ul.clean{margin:0;padding-left:18px;display:grid;gap:4px}
+/* fluxo */
+.flow{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:s}
+.flow li{counter-increment:s;display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.flow li::before{content:counter(s);font-family:var(--display);font-weight:700;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-ink);font-size:14px}
+.flow b{font-family:var(--display)}
+.btnmock{display:inline-block;margin-top:4px;padding:2px 10px;border-radius:6px;background:var(--accent);color:#fff;font-size:12.5px;font-weight:600}
+.flow li.final{border-color:var(--accent)}
+/* tela simulada */
+.screen{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:14px}
+.screen .bar{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:center}
+.today{display:grid;gap:6px}
+.today div{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:14px}
+.kanban{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:8px;overflow-x:auto}
+.col{display:grid;gap:6px;align-content:start;min-width:0}
+.col h4{margin:0;font:600 12px var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.lead{background:var(--surface);border:1px solid var(--line);border-left-width:1px;border-radius:8px;padding:8px;font-size:12.5px;line-height:1.4}
+.lead b{display:block;font-size:13px}
+.lead .d{font-size:11.5px;color:var(--muted)}
+.lead .d.warn{color:var(--amber)}
+.lead .d.late{color:var(--red)}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px;min-width:0}
+.chart h5{margin:0 0 8px;font:600 13px var(--body)}
+.bars{display:flex;align-items:flex-end;gap:6px;height:90px;border-bottom:1px solid var(--line)}
+.bars .m{flex:1;display:flex;gap:2px;align-items:flex-end;height:100%}
+.bars .m span{flex:1;border-radius:3px 3px 0 0}
+.bars .a{background:var(--line)}
+.bars .f{background:var(--accent)}
+.months{display:flex;gap:6px;font-size:10.5px;color:var(--muted);margin-top:4px}
+.months span{flex:1;text-align:center}
+.legend{display:flex;gap:12px;font-size:11.5px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.goal{height:12px;border-radius:999px;background:var(--line);overflow:hidden;margin-top:6px}
+.goal span{display:block;height:100%;background:var(--accent);border-radius:999px}
+.big{font-family:var(--display);font-size:22px;font-weight:700}
+.hb{display:grid;grid-template-columns:90px 1fr 28px;gap:8px;align-items:center;font-size:12px;margin-top:5px}
+.hb div{height:8px;border-radius:999px;background:var(--accent)}
+.tag-ex{font-size:11px;color:var(--muted);font-style:italic}
+/* simulador */
+.sim{display:grid;gap:16px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.field{display:grid;gap:4px;min-width:0}
+.field label{font-size:13px;font-weight:600;color:var(--muted)}
+.field input,.field select{font:inherit;font-size:15px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);width:100%}
+.field input:focus-visible,.field select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.refs{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.ref{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface)}
+.ref small{display:block;color:var(--muted);font-size:12px}
+.ref b{font-family:var(--display);font-size:18px;font-variant-numeric:tabular-nums}
+.ref.mine{border-color:var(--accent);background:var(--accent-soft)}
+.ref .pct{font-size:13px;color:var(--accent-ink);font-weight:600}
+.ruler{position:relative;height:56px;margin:4px 6px 0}
+.ruler .track{position:absolute;left:0;right:0;top:22px;height:4px;border-radius:2px;background:var(--line)}
+.ruler .band{position:absolute;top:18px;height:12px;border-radius:6px;background:var(--accent-soft)}
+.mk{position:absolute;top:14px;transform:translateX(-50%);display:grid;justify-items:center;gap:4px;font-size:11px;color:var(--muted);white-space:nowrap}
+.mk i{width:12px;height:20px;border-radius:3px;background:var(--muted)}
+.mk.me i{background:var(--accent);width:14px}
+.mk.me{color:var(--accent-ink);font-weight:600}
+.out{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:14px}
+.out b{font-variant-numeric:tabular-nums}
+.formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.7;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;white-space:pre}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+.tw{overflow-x:auto}
+/* proposta */
+.pages{display:flex;gap:8px;flex-wrap:wrap}
+.pg{width:86px;height:112px;border-radius:6px;border:1px solid var(--line);display:grid;place-items:center;text-align:center;font-size:11px;padding:6px;line-height:1.3}
+.pg.fix{background:var(--soft);color:var(--muted)}
+.pg.var{background:var(--accent-soft);color:var(--accent-ink);font-weight:600;border-color:var(--accent)}
+/* peça ao claude */
+.ask{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:10px 12px;display:grid;gap:8px}
+.ask .q{color:var(--muted);font-size:15px}
+.ask .row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.chip{font-size:12px;padding:3px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted)}
+.send{width:30px;height:30px;border-radius:8px;background:var(--accent);display:grid;place-items:center}
+.send svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
+/* relações */
+.hub{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center}
+.hub .center{font-family:var(--display);font-weight:700;background:var(--accent);color:#fff;border-radius:10px;padding:14px 16px;text-align:center}
+.hub .side{display:grid;gap:8px;min-width:0}
+.hub .node{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:13.5px;line-height:1.4}
+.hub .node b{display:block;font-family:var(--display);font-size:13.5px}
+.arrowcol{font-size:12px;color:var(--muted);text-align:center}
+@media (max-width:640px){.hub{grid-template-columns:1fr}.hub .center{order:-1}}
+.todo{counter-reset:t;list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.todo li{display:flex;gap:10px;align-items:flex-start}
+.todo li::before{content:"";flex:0 0 16px;height:16px;margin-top:4px;border:1.5px solid var(--accent);border-radius:4px}
+footer{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.goal span,.ref.mine{transition:all .25s ease}}
+</style>
+
+<div class="wrap">
+<header class="hero">
+  <span class="eyebrow">Gestão Trilha · novo app do Escritório</span>
+  <h1>Gestor Comercial</h1>
+  <p>Do primeiro contato do cliente até o contrato assinado. Quando o cliente fecha, o projeto já nasce pronto no Gestor de Projetos e o contrato entra no Financeiro, sem digitar nada de novo.</p>
+  <div class="principles">
+    <span class="pill">Tudo dentro da oportunidade</span>
+    <span class="pill">Um “próximo passo” por vez</span>
+    <span class="pill">A IA rascunha, nós decidimos</span>
+    <span class="pill">Uso eficiente do Claude</span>
+  </div>
+</header>
+
+<section>
+  <span class="eyebrow">O processo</span>
+  <h2>Uma oportunidade anda por oito etapas</h2>
+  <p class="muted">Em cada etapa existe um único botão principal. O app sempre mostra o que fazer agora. Em qualquer etapa a oportunidade pode ser marcada como perdida, com o motivo.</p>
+  <ol class="flow">
+    <li><div><b>Contato</b><br>Cliente chega, normalmente pelo WhatsApp. Cadastramos nome, telefone, origem e tipo. Ele já entra em Cadastros.<br><span class="btnmock">Agendar reunião ou visita</span></div></li>
+    <li><div><b>Reunião ou visita</b><br>Vai para a Agenda Google. Depois, o app pede nossas impressões do cliente: história, terreno, desejos.<br><span class="btnmock">Enviar briefing</span></div></li>
+    <li><div><b>Briefing enviado</b><br>Mensagem pronta de WhatsApp com o link do formulário do Google. Se passar de 5 dias sem resposta, o app avisa.<br><span class="btnmock">Importar respostas</span></div></li>
+    <li><div><b>Briefing recebido</b><br>Copiamos a resposta do cliente e colamos no app. A IA monta o programa de necessidades com os Ambientes padrão da Trilha.<br><span class="btnmock">✨ Gerar proposta</span></div></li>
+    <li><div><b>Proposta em revisão</b><br>Texto personalizado, programa com áreas, plano de projeto, prazos e preço. Tudo editável antes de sair.<br><span class="btnmock">Aprovar e baixar PDF</span></div></li>
+    <li><div><b>Proposta apresentada</b><br>Reunião com o cliente. Fechou ou não fechou.<br><span class="btnmock">Cliente vai fechar</span></div></li>
+    <li><div><b>Contrato</b><br>O app sugere o modelo certo (projeto do zero, reforma…) e só preenche os campos. As cláusulas são as nossas.<br><span class="btnmock">✨ Gerar contrato</span></div></li>
+    <li class="final"><div><b>Fechado</b><br>Com um clique o projeto é criado no Gestor (programa, prazos, Projeto Legal) e o contrato com parcelas vai para o Financeiro.<br><span class="btnmock">Virar projeto</span></div></li>
+  </ol>
+</section>
+
+<section>
+  <span class="eyebrow">Tela principal</span>
+  <h2>O que precisa de nós, o funil e como o ano está indo</h2>
+  <div class="screen" aria-label="Simulação da tela principal">
+    <div class="bar"><b style="font-family:var(--display)">Gestor Comercial</b><span class="btnmock">+ Nova oportunidade</span></div>
+    <div class="today">
+      <span class="eyebrow">Precisa de você hoje</span>
+      <div><span>Ana Souza · briefing recebido</span><span class="btnmock">Gerar proposta</span></div>
+      <div><span>João Lima · proposta sem resposta há 5 dias</span><span class="btnmock">Mensagem WhatsApp</span></div>
+    </div>
+    <div class="kanban">
+      <div class="col"><h4>Contato</h4><div class="lead"><b>Marina</b>Residencial · 180 m²<span class="d">há 1 dia</span></div><div class="lead"><b>Pedro e Lu</b>Reforma · 90 m²<span class="d">há 3 dias</span></div></div>
+      <div class="col"><h4>Reunião</h4><div class="lead"><b>Carla</b>Serviço · layout<span class="d">visita sexta</span></div></div>
+      <div class="col"><h4>Briefing</h4><div class="lead"><b>Ana Souza</b>Residencial · 240 m²<span class="d warn">aguarda proposta</span></div></div>
+      <div class="col"><h4>Proposta</h4><div class="lead"><b>João Lima</b>Residencial · R$ 42 mil<span class="d late">parado há 5 dias</span></div></div>
+      <div class="col"><h4>Fechamento</h4><div class="lead"><b>Rafa e Bia</b>Residencial · R$ 38 mil<span class="d">contrato em revisão</span></div></div>
+    </div>
+    <div class="charts">
+      <div class="chart"><h5>Propostas por mês</h5>
+        <div class="bars">
+          <div class="m"><span class="a" style="height:40%"></span><span class="f" style="height:20%"></span></div>
+          <div class="m"><span class="a" style="height:60%"></span><span class="f" style="height:20%"></span></div>
+          <div class="m"><span class="a" style="height:50%"></span><span class="f" style="height:30%"></span></div>
+          <div class="m"><span class="a" style="height:80%"></span><span class="f" style="height:40%"></span></div>
+          <div class="m"><span class="a" style="height:70%"></span><span class="f" style="height:30%"></span></div>
+          <div class="m"><span class="a" style="height:100%"></span><span class="f" style="height:50%"></span></div>
+        </div>
+        <div class="months"><span>mai</span><span>jun</span><span>jul</span><span>ago</span><span>set</span><span>out</span></div>
+        <div class="legend"><span><i style="background:var(--line)"></i>enviadas</span><span><i style="background:var(--accent)"></i>fechadas</span></div>
+      </div>
+      <div class="chart"><h5>Fechado no ano × meta</h5>
+        <div class="big">R$ 312 mil</div><div class="muted" style="font-size:13px">de R$ 480 mil · 65%</div>
+        <div class="goal"><span style="width:65%"></span></div>
+        <div style="margin-top:12px;font-size:13px">Conversão <b>38%</b> · ticket médio <b>R$ 39 mil</b></div>
+      </div>
+      <div class="chart"><h5>De onde vêm os clientes que fecham</h5>
+        <div class="hb"><span>Indicação</span><div style="width:100%"></div><span>5</span></div>
+        <div class="hb"><span>Instagram</span><div style="width:60%"></div><span>3</span></div>
+        <div class="hb"><span>Clientes atuais</span><div style="width:40%"></div><span>2</span></div>
+        <div class="hb"><span>Site</span><div style="width:20%"></div><span>1</span></div>
+      </div>
+    </div>
+    <span class="tag-ex">Nomes e números ilustrativos.</span>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Precificação</span>
+  <h2>O programa de necessidades gera as horas, os fatores ajustam</h2>
+  <p>Quem manda no preço é o programa de necessidades. Cada Ambiente padrão da Trilha tem horas de referência. Somadas às horas gerais do projeto, elas viram o tempo previsto, que depois é ajustado por fatores.</p>
+  <div class="formula">HORAS DO PROJETO = Σ horas de cada ambiente + horas gerais (implantação, fachadas, legal, reuniões)
+HORAS AJUSTADAS  = horas × fator padrão × dimensão × terreno × cliente
+CUSTO            = horas ajustadas × custo-hora total da equipe
+PREÇO SUGERIDO   = custo com impostos, reserva e lucro do Financeiro
+MEU VALOR        = nosso ajuste no simulador</div>
+  <div class="tw"><table>
+    <thead><tr><th>Fator</th><th>Valores iniciais (vamos calibrar)</th></tr></thead>
+    <tbody>
+      <tr><td><b>Padrão</b></td><td>Médio 1,0 · Médio Alto 1,15 · Alto 1,3 · Alto+ 1,5 · Luxo 1,8</td></tr>
+      <tr><td><b>Dimensão</b></td><td>Compacta 0,95 · Confortável 1,0 · Espaçosa 1,1</td></tr>
+      <tr><td><b>Terreno</b></td><td>Baixa 1,0 · Normal 1,05 · Difícil 1,15 · Muito difícil 1,3</td></tr>
+      <tr><td><b>Cliente</b> <span class="muted">(interno)</span></td><td>Tranquilo 0,95 · Normal 1,0 · Exigente 1,15 · Indeciso 1,2. Nunca aparece na proposta. Para cliente recorrente, o app mede pelas horas reais dos projetos anteriores.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="muted">Com o tempo, o cronômetro (ligado aos itens do Plano de Projeto) mostra quanto cada ambiente consome de verdade e o app sugere corrigir as referências. No futuro, até as configurações pesam: cuba esculpida, dois chuveiros, cozinha com ilha.</p>
+
+  <div class="card sim">
+    <div><h3>Simulador: experimente</h3><p class="muted" style="font-size:14px">Mude a área, o padrão ou o nosso valor e veja o percentual sobre a obra.</p></div>
+    <div class="fields">
+      <div class="field"><label for="s-area">Área estimada (m²)</label><input id="s-area" type="number" inputmode="numeric" value="200" min="20" step="10"></div>
+      <div class="field"><label for="s-pad">Padrão da obra</label><select id="s-pad">
+        <option value="3250">Médio · R$ 3.000–3.500/m²</option>
+        <option value="4000" selected>Médio Alto · R$ 3.500–4.500/m²</option>
+        <option value="5000">Alto · R$ 4.500–5.500/m²</option>
+        <option value="6250">Alto+ · R$ 5.500–7.000/m²</option>
+        <option value="8000">Luxo · acima de R$ 7.000/m²</option>
+      </select></div>
+      <div class="field"><label for="s-val">Meu valor (R$)</label><input id="s-val" type="number" inputmode="numeric" value="28000" step="500"></div>
+    </div>
+    <div class="out" id="s-obra"></div>
+    <div class="refs" id="s-refs"></div>
+    <div class="ruler" id="s-ruler" aria-hidden="true"></div>
+    <span class="tag-ex">Exemplo: tabela de horas de R$ 35 mil para a casa de 200 m² Médio Alto, CAU a 8% e mercado de R$ 60 a 180/m².</span>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Proposta</span>
+  <h2>O nosso design, com as páginas do cliente preenchidas</h2>
+  <div class="grid2">
+    <div class="card" style="display:grid;gap:10px">
+      <h3>Modelo híbrido</h3>
+      <div class="pages">
+        <div class="pg fix">Capa<br>(Canva)</div>
+        <div class="pg var">Texto do cliente</div>
+        <div class="pg fix">A Trilha<br>(Canva)</div>
+        <div class="pg var">Programa e áreas</div>
+        <div class="pg var">Plano e prazos</div>
+        <div class="pg var">Investimento</div>
+        <div class="pg fix">Método<br>(Canva)</div>
+      </div>
+      <p style="font-size:14px">As páginas fixas saem do Canva como imagem. As páginas do cliente são montadas pelo app na identidade Trilha. Trocar o visual é trocar as imagens. Mudar a ordem é editar a sequência.</p>
+    </div>
+    <div class="card" style="display:grid;gap:10px">
+      <h3>Texto personalizado</h3>
+      <ul class="clean" style="font-size:14px">
+        <li><b>Nossas impressões</b> logo depois da reunião, escritas ou ditadas pelo celular.</li>
+        <li><b>O jeito Trilha de escrever</b>: textos exemplares, tom, palavras a usar e a evitar.</li>
+        <li><b>A IA junta tudo</b> com o briefing. O texto abre editável, com “reescrever com esta orientação” e “guardar como exemplo”.</li>
+      </ul>
+      <p class="muted" style="font-size:13px">As impressões também viram a descrição do projeto no Gestor.</p>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Contratos</h3><p style="font-size:14px;margin-top:6px">Modelo padrão e derivações já prontos. O app sugere o modelo pelo tipo de projeto e pelo briefing, pergunta quando há dúvida e só preenche os campos.</p></div>
+    <div class="card"><h3>Serviços menores</h3><p style="font-size:14px;margin-top:6px">Consultoria, layout, visita técnica… Proposta e contrato simplificados de 3 a 4 páginas, montados pela IA. Ao fechar: contrato no Financeiro e um projeto simples para lançar horas.</p></div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Peça ao Claude</span>
+  <h2>Uma barra de conversa dentro do app</h2>
+  <p>Para tudo que foge do padrão. A barra já sabe qual cliente está aberto, conhece os modelos e os valores, e pode fazer coisas no app, sempre mostrando o resultado antes de salvar.</p>
+  <div class="ask" aria-label="Simulação da barra Peça ao Claude">
+    <span class="q">Monta uma proposta simples para consultoria de layout do apê da Carla, 3 visitas, R$ 2.500…</span>
+    <div class="row"><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip">Rápido · Padrão · Complexo</span><span class="chip">🎙 ditado do celular</span></div><span class="send"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
+  </div>
+  <p class="muted" style="font-size:14px">Cada pedido usa a conta Claude de quem está usando. Por isso o app envia só o necessário daquela oportunidade.</p>
+</section>
+
+<section>
+  <span class="eyebrow">Ligações com os outros apps</span>
+  <h2>O que ele usa e o que ele entrega</h2>
+  <div class="hub">
+    <div class="side">
+      <div class="node"><b>Gestor de Projetos</b>Ambientes padrão, faixas de padrão, prazos e pesos das etapas</div>
+      <div class="node"><b>Financeiro</b>Impostos, reserva e lucro para o preço</div>
+      <div class="node"><b>Tempo e Relatórios</b>Custo-hora e horas reais por ambiente</div>
+    </div>
+    <div class="center">Gestor<br>Comercial</div>
+    <div class="side">
+      <div class="node"><b>Gestor de Projetos</b>Projeto pronto: programa, diretrizes, descrição, prazos, Legal</div>
+      <div class="node"><b>Financeiro</b>Contrato com valor e parcelas</div>
+      <div class="node"><b>Cadastros</b>Cliente e dados do contrato assinado</div>
+      <div class="node"><b>Capa, Tarefas e Agenda</b>Avisos, follow-ups e reuniões</div>
+    </div>
+  </div>
+  <p class="muted" style="font-size:14px"><b>Marcenaria:</b> proposta à parte que, ao fechar, ativa a marcenaria no projeto que já existe, com a lista de móveis no Plano.</p>
+</section>
+
+<section>
+  <span class="eyebrow">Para começar a construir</span>
+  <h2>O que falta juntar</h2>
+  <ul class="todo">
+    <li>Perguntas do formulário de briefing de residência e uma resposta real preenchida</li>
+    <li>Modelos de proposta do Canva em PDF, com as páginas fixas e as variáveis indicadas</li>
+    <li>Dois ou três textos de propostas de que gostamos</li>
+    <li>Documento do contrato padrão e das derivações</li>
+    <li>Referências: % CAU, faixa de mercado em R$/m², meta anual</li>
+    <li>Horas iniciais por ambiente (Claude sugere, nós validamos)</li>
+  </ul>
+</section>
+
+<footer>Trilha Arquitetura Brasileira · Gestão Trilha · concepção do Gestor Comercial, outubro de 2026</footer>
+</div>
+
+<script>
+(function(){
+  var brl=function(v){return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL",maximumFractionDigits:0})};
+  var pct=function(v){return v.toLocaleString("pt-BR",{maximumFractionDigits:1})+"%"};
+  var HORAS_BASE=35000, AREA_BASE=200, PAD_BASE=4000, CAU=0.08, MKT_MIN=60, MKT_MAX=180;
+  var fat={3250:1,4000:1.15,5000:1.3,6250:1.5,8000:1.8};
+  function calc(){
+    var a=Math.max(20,+document.getElementById("s-area").value||0), p=+document.getElementById("s-pad").value, v=Math.max(0,+document.getElementById("s-val").value||0);
+    var obra=a*p, horas=Math.round(HORAS_BASE*(a/AREA_BASE)*(fat[p]/fat[PAD_BASE])/500)*500, cau=obra*CAU, mMin=a*MKT_MIN, mMax=a*MKT_MAX;
+    document.getElementById("s-obra").innerHTML="<span>Custo estimado da obra <b>"+brl(obra)+"</b></span><span>"+a+" m² × "+brl(p)+"/m²</span>";
+    document.getElementById("s-refs").innerHTML=
+      '<div class="ref"><small>Tabela de horas</small><b>'+brl(horas)+'</b><div class="pct">'+pct(horas/obra*100)+' da obra</div></div>'+
+      '<div class="ref"><small>Referência CAU (8%)</small><b>'+brl(cau)+'</b><div class="pct">8% da obra</div></div>'+
+      '<div class="ref"><small>Mercado (R$ 60–180/m²)</small><b>'+brl(mMin).replace(",00","")+' a '+brl(mMax)+'</b><div class="pct">'+pct(mMin/obra*100)+' a '+pct(mMax/obra*100)+'</div></div>'+
+      '<div class="ref mine"><small>Meu valor</small><b>'+brl(v)+'</b><div class="pct">'+pct(v/obra*100)+' da obra · '+brl(v/a)+'/m²</div></div>';
+    var max=Math.max(cau,mMax,v,horas)*1.08;
+    function x(n){return Math.min(100,n/max*100)}
+    document.getElementById("s-ruler").innerHTML='<div class="track"></div><div class="band" style="left:'+x(mMin)+'%;width:'+(x(mMax)-x(mMin))+'%"></div>'+
+      '<div class="mk" style="left:'+x(horas)+'%"><i></i>horas</div>'+
+      '<div class="mk" style="left:'+x(cau)+'%"><i></i>CAU</div>'+
+      '<div class="mk me" style="left:'+x(v)+'%"><i></i>meu valor</div>';
+  }
+  ["s-area","s-pad","s-val"].forEach(function(id){document.getElementById(id).addEventListener("input",calc)});
+  calc();
+})();
+</script>
