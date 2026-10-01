@@ -33,6 +33,13 @@ Um único Artifact, organizado em **módulos**, com um único banco de dados com
 7. **Celular e computador:** seguir as regras de layout do `CONTRATO.md` §5 e conferir com imagem em 390 px e
    1280 px antes de publicar. Excluir, suspender e arquivar sempre com `T.confirmar`.
 8. **Nada é rígido:** listas, prazos, modelos e textos são padrões editáveis pelo usuário.
+9. **Uso eficiente do Claude** (pedido do Luan, 01/10/2026): garantir funcionamento, precisão e qualidade
+   sempre pelo caminho que gasta menos uso do Claude.
+   - **No desenvolvimento:** ler só os arquivos e trechos necessários; registrar decisões nos documentos para não
+     redescobrir; agrupar mudanças e publicar uma vez por rodada, depois de testar na cópia de teste.
+   - **No app:** IA só quando o usuário pede (um clique, nunca ao abrir a tela); cálculos, regras e montagem de
+     PDFs em código, não pela IA; enviar à IA só o contexto necessário; usar o nível "rápido" para tarefas
+     pequenas.
 
 ## Fluxo de trabalho em cada pedido
 

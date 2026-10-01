@@ -23,6 +23,11 @@ Futuro: área restrita a Luan e Elisa (a mesma ideia vale para Configurações e
 4. **IA sempre como rascunho.** O que a IA gera (texto, programa, plano, preço, contrato) é revisado antes de
    sair para o cliente. A IA roda dentro do app (capacidade `sample`), com consentimento de quem usa.
 5. **Visual e organizado**, com gráficos que mostram como o comercial está indo. Mesma identidade dos outros apps.
+6. **Uso eficiente do Claude.** Funcionamento, precisão e qualidade garantidos pelo caminho que gasta menos uso:
+   a IA só roda quando alguém clica (nunca ao abrir a tela); preço, prazos, áreas, gráficos e PDFs são calculados
+   e montados em código; cada pedido à IA leva só os dados daquela oportunidade; tarefas pequenas usam o nível
+   "rápido". No desenvolvimento: ler só o necessário, registrar decisões aqui, testar na cópia de teste e
+   publicar uma vez por rodada.
 
 ## Fluxo da oportunidade (etapas e botão principal)
 
@@ -275,6 +280,10 @@ chance de fechar) para o Financeiro, valor calculado × valor praticado.
 - Antes de começar, **ler a versão publicada atual** (ela vale sobre o repositório). Em 01/10/2026 o ramo mais
   recente do repositório era `claude/adoring-fermi-ln8hvg`.
 - Módulo novo é testado primeiro na cópia de teste: https://claude.ai/artifact/V9bUhPfLyowX83XUz5Zeaw
+
+## Material de apoio
+
+- Página visual para apresentar o app (Luan e Elisa): https://claude.ai/artifact/84BSJdugmhStKNBKKfCNND
 
 ## Pendências para começar a construir
 
