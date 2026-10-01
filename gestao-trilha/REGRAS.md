@@ -270,6 +270,13 @@ Quem vê: sócios veem tudo; colaborador vê os projetos em que tem item ou tare
   própria trilha (cliente, engenheiro, pausa interna com motivo) e encerramento; quadros do Projeto Legal por órgão.
 - **Prazos:** padrão em Configurações › Prazos padrão; cada projeto guarda os seus em `etapas.<e>.prazo` (congelados
   na criação/ativação da marcenaria); `marc.prazos` antigo só como reserva. Aviso 10 d.u. (Legal 5 d.u.).
+- **Prazos seguem os contratos (decisão de 01/10/2026, a implementar com o Gestor Comercial):** o app adota os
+  prazos dos modelos de contrato e, quando o contrato dá uma faixa, o **maior número**. Prazos padrão por tipo
+  (d.u.): **projeto do zero** EP 40 · AP **80** (30 + 15 + 15 + 20) · Legal 20 · PE 60; **reforma** Levantamento 5 ·
+  EP 30 · Legal 20 · PE 40; **marcenaria** Levantamento 5 (só avulsa) · EP 30 · PE 40. Exigência do Legal: 10 d.u.,
+  controle interno (o contrato não fixa). Rodadas acrescentam prazo quando acontecem ("Registrar rodada"): ajustes
+  do EP +15, revisão total +40, compatibilização com engenheiro/complementares +10. Projetos existentes mantêm os
+  prazos já congelados. Detalhes em `referencias-comercial/CONTRATOS.md`.
 - **Plano:** cabeçalho de etapa (situação, contagem Em andamento/Revisão interna/Revisão Cliente/Pronto, "Atribuir a
   etapa"); ✓ nas abas de etapas concluídas; situação "Revisão Cliente"; desenhos e itens de checklist renomeáveis e
   reordenáveis; "Desfazer" ao remover item, desenho ou item de checklist; móveis da marcenaria vinculados EP ↔

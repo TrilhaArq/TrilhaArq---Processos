@@ -77,10 +77,15 @@ Iguais nos dois: EP 40, Legal 20 para desenvolver e protocolar, EP marcenaria 30
 
 **Decisões do Luan (01/10/2026):**
 1. **Pesos:** manter os dois — têm funções diferentes (% concluído no app; valor devido na rescisão no contrato).
-2. **Prazos:** o padrão do app vale (Anteprojeto 70). Os prazos variam por projeto e negociação: a oportunidade
+2. **Prazos:** ~~o padrão do app vale (Anteprojeto 70)~~ — revisto no item 5. Os prazos variam por projeto e negociação: a oportunidade
    permite ajustar cada prazo; o que for contratado vira `etapas.<e>.prazo` ao "Virar projeto" e preenche os
    campos em amarelo do contrato.
 3. **Levantamento entra no app:** etapa própria para reforma (REF/INT) e marcenaria avulsa, prazo padrão de
    5 dias úteis (`prazosPadrao.lev`), antes do Estudo Preliminar. Mexe no Gestor de Projetos: combinar com o chat
    do Gestor e testar na cópia de teste.
-4. **Em aberto:** exigências do Legal — proposta de manter os 10 dias úteis só como controle interno do app (o contrato não fixa esse prazo).
+4. Exigências do Legal: 10 dias úteis só como controle interno do app (o contrato não fixa esse prazo).
+5. **Prazos do app seguem os contratos, sempre pelo maior número da faixa** (revisão da decisão 2). Prazos padrão
+   por tipo — projeto do zero: EP 40 · AP 80 · Legal 20 · PE 60; reforma: Levantamento 5 · EP 30 · Legal 20 · PE 40;
+   marcenaria: Levantamento 5 (avulsa) · EP 30 · PE 40. Rodadas somam prazo quando acontecem (ajustes EP +15,
+   revisão total +40, compatibilização +10), pelo botão "Registrar rodada" do Gestor. Sem cronômetro por fase do
+   Anteprojeto: as esperas do Gestor já descontam o tempo do engenheiro e do cliente.
