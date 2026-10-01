@@ -397,6 +397,32 @@ testando antes na cópia de teste (mudança grande).
   nas **etapas já concluídas**, só acrescentar o **ícone de concluído idêntico ao da Visão geral** (o círculo com ✓
   dos passos `gp-step.done`). Sem cor nova (decisão revista pelo Luan em 01/10/2026).
 
+**G. Visão geral do Gestor reorganizada por trilha** (Luan, 01/10/2026 — proposta do Claude, aguardando aprovação)
+
+Problemas relatados: com a marcenaria a Visão geral ficou confusa; o quadro da marcenaria é diferente do da fase
+da arquitetura; a "Situação" (aguardando cliente/engenheiro/condomínio/prefeitura) é uma só para o projeto todo e
+pausa os prazos de todas as trilhas (no código, `calcPrazo` desconta `g.esperas` de qualquer etapa — mandar a
+marcenaria ao cliente pausa também o Anteprojeto, e vice-versa); condomínio e prefeitura não deveriam pausar o
+Anteprojeto, porque o Legal corre em paralelo; o quadro de números (prazo, data final, itens, horas) só mostra a
+arquitetura quando há marcenaria.
+
+Proposta:
+1. **Um quadro por trilha contratada, todos iguais:** Arquitetura e Marcenaria (e as futuras). Cada quadro tem:
+   etapa e fase atuais; situação (em dia, aguardando, pausado, vencido); números (prazo usado/total, data final,
+   itens prontos/total, horas da trilha) com a barra de prazo; próximo passo; controle de espera/pausa; e o
+   encerramento da etapa (gerar termo em PDF → "Termo assinado"). O quadro de números solto some (entra em cada
+   trilha).
+2. **Espera/pausa por trilha** (`esperas[].trilha`: "arq" | "marc"; registros antigos = arquitetura). Opções:
+   Aguardando cliente, Aguardando engenheiro/complementar e **Pausa interna** (decisão da Trilha, com motivo
+   obrigatório e registrada no Histórico; ex.: cliente viajando pediu para segurar o prazo). Pausa de uma trilha não
+   afeta a outra.
+3. **Projeto Legal com controle próprio**, no quadro dele, sem prazo e sem pausar o Anteprojeto: situação (Não
+   iniciado, Em preparo, Aguardando condomínio, Protocolado · aguardando prefeitura, Em exigência, Aprovado, Não se
+   aplica), com a data e os dias em cada situação. Condomínio e prefeitura saem das opções da Situação geral.
+4. Aviso de cliente sem retorno (15 d.u.) em cada trilha; suspensão automática (20 d.u., cláusula 3.4) — decidir se
+   vale por trilha ou só pela arquitetura (contrato principal).
+5. Resolver o prazo vencido da marcenaria da Paula e Bruno corrigindo o início real do EP da marcenaria na Ficha.
+
 **C. Situação e responsáveis** (Elisa 3, 4)
 - Nova situação **"Revisão Cliente"** (entre Revisão interna e Pronto). Nome definido pelo Luan em 01/10/2026: usar
   exatamente "Revisão Cliente" em todo o app (seletor, contagem, relatório PDF).
