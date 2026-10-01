@@ -78,6 +78,7 @@
       if (t.recurrence) { var rl = REC_OPTS.filter(function (o) { return o[0] === t.recurrence; })[0]; badges.push('<span class="badge static">' + (rl ? rl[1] : "") + "</span>"); }
       if (t.calendarEventId) badges.push('<span class="pill accent" title="Sincronizado com a Agenda Google">Na agenda</span>');
     }
+    if (t.projetoId) { var pj = T.projeto(t.projetoId); badges.unshift('<span class="badge static gp-tag">' + esc(pj ? pj.codigo || pj.nome : "Projeto removido") + "</span>"); }
     var cl = t.checklist || [], feitos = cl.filter(function (c) { return c.done; }).length, body = "";
     if (S.open[t.id]) {
       body = '<div class="task-body">' + (t.description ? '<div class="task-desc">' + esc(t.description) + "</div>" : "") +
@@ -194,6 +195,22 @@
       if (e.target.dataset && e.target.dataset.inline) setTimeout(function () { if (S.inline && !document.querySelector("[data-inline]:focus")) { S.inline = null; render(); } }, 150);
     });
   }
+
+  // Usado pelo Gestor de Projetos: a tarefa de projeto mora na agenda da pessoa responsável, com projetoId.
+  T.tarefas = {
+    todas: function () { return S.docs; },
+    criar: async function (pid, item) {
+      var t = Object.assign({ id: T.novoId(), status: "todo", createdAt: new Date().toISOString(), completedAt: null, calendarEventId: null, calendarId: null, recurrence: null, checklist: [], description: "", durationMinutes: 60, reminderMinutes: null }, item);
+      await save(pid, T.clone(tarefas(pid)).concat([t])); syncAgenda(pid, t); return t.id;
+    },
+    concluir: function (pid, id, feita) { return patch(pid, id, { status: feita ? "done" : "todo", completedAt: feita ? new Date().toISOString() : null }); },
+    remover: function (pid, id) { return save(pid, tarefas(pid).filter(function (t) { return t.id !== id; })); },
+    mover: async function (de, para, id) {
+      var t = T.byId(tarefas(de), id); if (!t || de === para) return;
+      await save(para, T.clone(tarefas(para)).concat([T.clone(t)]));
+      await save(de, tarefas(de).filter(function (x) { return x.id !== id; }));
+    }
+  };
 
   T.register({
     id: "tarefas", label: "Tarefas", area: "pessoa", html: html, init: init, render: render,

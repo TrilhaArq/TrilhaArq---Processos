@@ -11,9 +11,10 @@
 
   T.DEFAULT_CONFIG = {
     etapas: [
-      { id: "ep", nome: "Estudo Preliminar" }, { id: "ap", nome: "Anteprojeto" },
+      { id: "ab", nome: "Abertura" }, { id: "ep", nome: "Estudo Preliminar" }, { id: "ap", nome: "Anteprojeto" },
       { id: "pl", nome: "Projeto Legal" }, { id: "comp", nome: "Compatibilização" },
-      { id: "ex", nome: "Projeto Executivo" }, { id: "obra", nome: "Obra" }
+      { id: "ex", nome: "Projeto Executivo" }, { id: "mc-ep", nome: "Marcenaria · Estudo Preliminar" },
+      { id: "mc-ex", nome: "Marcenaria · Executivo" }, { id: "obra", nome: "Obra" }
     ],
     areas: [
       { id: "adm", nome: "Administrativo" }, { id: "mkt", nome: "Marketing" },
@@ -27,8 +28,13 @@
     ],
     tipos: [
       { id: "res", nome: "Residencial" }, { id: "comr", nome: "Comercial" },
-      { id: "int", nome: "Interiores" }, { id: "ref", nome: "Reforma" }, { id: "out", nome: "Outro" }
+      { id: "hot", nome: "Hotelaria" }, { id: "int", nome: "Interiores" }, { id: "ref", nome: "Reforma" }, { id: "out", nome: "Outro" }
     ],
+    // Peso de cada etapa no % concluído do Gestor (Abertura não conta). Marcenaria: EP e Executivo.
+    pesosEtapas: { ep: 30, ap: 30, pl: 10, pe: 30, mep: 50, mex: 50 },
+    // Prazos padrão em dias úteis (Configurações › Prazos padrão). Cada projeto pode ter o seu (Configurações do projeto).
+    // Legal: desenvolvimento até o 1º protocolo (contrato 3.3.3) e prazo para atender cada exigência.
+    prazosPadrao: { ep: 40, ap: 70, pe: 60, mep: 30, mex: 40, plDev: 20, plExig: 10 },
     custosFixosMensais: null, horasProdutivasMes: 112
   };
   T.MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
@@ -109,7 +115,9 @@
 
   // ---------- módulos ----------
   // register({ id, label, area: "pessoa"|"admin", icon, desc(), html, init(T), connect(db), render(),
-  //            homeStats(pid), homeState(pid), notes(), onHomeClick(e) })
+  //            homeStats(pid), homeState(pid), notes(pessoaId|null) })
+  // A capa tem os botões (pessoas e apps do escritório) e, acima deles, as notificações dos apps (notes). Na área da
+  // pessoa, as notificações aparecem acima das abas, filtradas para quem está usando (pessoaId).
   T.register = function (m) { T.modules.push(m); };
   T.mod = function (id) { return T.byId(T.modules, id); };
   function modsDaArea(area) { return T.modules.filter(function (m) { return m.area === area; }); }
@@ -121,22 +129,27 @@
     if (view !== "home") { var mods = modsDaArea(view); if (!sub || !T.mod(sub) || T.mod(sub).area !== view) sub = mods[0].id; s.sub = sub; }
     $("home").hidden = view !== "home"; $("app").hidden = view === "home";
     if (view !== "home") {
+      // Área da pessoa: abas Tempo e Tarefas. Apps do escritório: cada um é "um app dentro do app" — só o botão de voltar;
+      // os outros apps se abrem pela capa.
       $("tabs").innerHTML = '<button class="tab back" data-home="1" aria-label="Voltar ao início">← Início</button>' +
-        modsDaArea(view).map(function (m) { return '<button class="tab' + (m.id === s.sub ? " is-selected" : "") + '" data-sub="' + m.id + '">' + T.esc(m.label) + "</button>"; }).join("");
+        (view === "pessoa" ? modsDaArea(view).map(function (m) { return '<button class="tab' + (m.id === s.sub ? " is-selected" : "") + '" data-sub="' + m.id + '">' + T.esc(m.label) + "</button>"; }).join("") : "");
       var p = T.pessoa(s.pessoaId);
       $("app-title").textContent = view === "pessoa" ? (p ? p.nome : "") : T.mod(s.sub).label;
     }
     T.modules.forEach(function (m) { var v = $("view-" + m.id); if (v) v.hidden = view === "home" || m.id !== s.sub; });
+    if ($("pnotes")) $("pnotes").hidden = view !== "pessoa";
     window.scrollTo(0, 0);
     T.render();
   };
 
   // ---------- capa ----------
+  // Botões "Em breve" e ordem dos botões do Escritório na capa (da esquerda para a direita, de cima para baixo).
+  // Módulo que não estiver na lista entra no fim.
   var FUTUROS = [
-    { t: "Financeiro", d: "Fluxo de caixa, contas e resultados", icon: '<path d="M3 7h18v12H3z"/><path d="M3 11h18"/><path d="M7 15h3"/>' },
-    { t: "Gestor de projetos", d: "Fases, entregas e prazos de cada projeto", icon: '<path d="M4 5h16"/><path d="M4 12h10"/><path d="M4 19h6"/><circle cx="18" cy="17" r="3"/>' },
-    { t: "Gestor de obras", d: "Orçamentos, execução e custo real das obras", icon: '<path d="M3 20h18"/><path d="M5 20v-6a7 7 0 0 1 14 0v6"/><path d="M12 7V4"/><path d="M9 14h6"/>' }
+    { id: "obras", t: "Gestor de obras", d: "Orçamentos, execução e custo real das obras", icon: '<path d="M3 20h18"/><path d="M5 20v-6a7 7 0 0 1 14 0v6"/><path d="M12 7V4"/><path d="M9 14h6"/>' },
+    { id: "comercial", t: "Gestor Comercial", d: "Oportunidades, briefing e propostas", icon: '<path d="M4 7h16v12H4z"/><path d="M9 7V5h6v2"/><path d="M4 12h16"/><path d="M11 12v2h2v-2"/>' }
   ];
+  var ORDEM_CAPA = ["gestor", "obras", "comercial", "financeiro", "relatorios", "config", "cadastros"];
   function renderHome() {
     var s = T.state;
     $("cover-date").textContent = T.fmtDia(new Date()).replace(/^./, function (c) { return c.toUpperCase(); });
@@ -146,18 +159,19 @@
       return '<button class="tile-btn" data-user="' + T.esc(p.id) + '"><div class="tile-top"><span class="avatar">' + T.esc(p.nome.charAt(0)) + '</span><div><div class="tile-name">' + T.esc(p.nome) + "</div>" + st + "</div></div>" +
         '<div class="tile-stats">' + stats.map(function (x) { return "<div><small>" + T.esc(x.label) + '</small><b class="' + (x.alert ? "alert" : "") + '">' + T.esc(x.value) + "</b></div>"; }).join("") + "</div></button>";
     }).join("") || '<div class="empty">Carregando pessoas…</div>';
-    $("admin-tiles").innerHTML = modsDaArea("admin").map(function (m) {
-      return '<button class="tile-btn admin-tile" data-go="' + m.id + '"><svg viewBox="0 0 24 24" aria-hidden="true">' + m.icon + '</svg><span><span class="t">' + T.esc(m.label) + '</span><span class="d">' + T.esc(m.desc ? m.desc() : "") + "</span></span></button>";
-    }).join("") + FUTUROS.map(function (f) {
+    var botoes = modsDaArea("admin").map(function (m) { return { id: m.id, m: m }; }).concat(FUTUROS.filter(function (f) { return !T.mod(f.id); }).map(function (f) { return { id: f.id, f: f }; }));
+    function pos(b) { var i = ORDEM_CAPA.indexOf(b.id); return i < 0 ? 99 : i; }
+    $("admin-tiles").innerHTML = botoes.sort(function (a, b) { return pos(a) - pos(b); }).map(function (b) {
+      var m = b.m, f = b.f;
+      if (m) return '<button class="tile-btn admin-tile" data-go="' + m.id + '"><svg viewBox="0 0 24 24" aria-hidden="true">' + m.icon + '</svg><span><span class="t">' + T.esc(m.label) + '</span><span class="d">' + T.esc(m.desc ? m.desc() : "") + "</span></span></button>";
       return '<div class="tile-btn admin-tile soon" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true">' + f.icon + '</svg><span><span class="t">' + f.t + '<span class="soon-pill">Em breve</span></span><span class="d">' + f.d + "</span></span></div>";
     }).join("");
-    $("notes").innerHTML = call("notes").join("");
+    if ($("notes")) $("notes").innerHTML = call("notes", [null]).join("");
   }
   $("home") && document.addEventListener("click", function (e) {
     if (T.state.view === "home" && e.target.closest("#home")) {
       var u = e.target.closest("[data-user]"); if (u) { T.go("pessoa", null, u.dataset.user); return; }
       var a = e.target.closest("[data-go]"); if (a) { T.go("admin", a.dataset.go); return; }
-      call("onHomeClick", [e]);
       return;
     }
     if (e.target.closest("[data-home]")) { T.go("home"); return; }
@@ -167,10 +181,28 @@
   // ---------- render ----------
   T.render = function () {
     if (T.state.view === "home") renderHome();
-    else { var m = T.mod(T.state.sub); if (m && m.render) m.render(); }
+    else {
+      if (T.state.view === "pessoa" && $("pnotes")) $("pnotes").innerHTML = call("notes", [T.state.pessoaId]).join("");
+      var m = T.mod(T.state.sub); if (m && m.render) m.render();
+    }
   };
   var queued = false;
   T.scheduleRender = function () { if (queued) return; queued = true; requestAnimationFrame(function () { queued = false; T.render(); }); };
+
+  // ---------- confirmação (janela com Confirmar / Cancelar) ----------
+  // T.confirmar({ titulo, texto, ok: "Excluir", perigo: true }) → Promise<boolean>
+  T.confirmar = function (o) {
+    return new Promise(function (resolve) {
+      var ov = document.createElement("div"); ov.className = "overlay"; ov.setAttribute("role", "presentation");
+      ov.innerHTML = '<div class="modal modal-sm" role="alertdialog" aria-modal="true" aria-labelledby="cf-t"><h2 class="section-title" id="cf-t">' + T.esc(o.titulo || "Confirmar") + "</h2>" +
+        (o.texto ? '<p class="cf-txt">' + o.texto + "</p>" : "") +
+        '<div class="form-actions"><button class="btn ' + (o.perigo ? "btn-stop" : "btn-primary") + '" data-cf="1">' + T.esc(o.ok || "Confirmar") + '</button><button class="btn" data-cf="0">Cancelar</button></div></div>';
+      function fim(v) { document.removeEventListener("keydown", tecla); ov.remove(); resolve(v); }
+      function tecla(e) { if (e.key === "Escape") fim(false); }
+      ov.addEventListener("click", function (e) { var b = e.target.closest("[data-cf]"); if (b) fim(b.dataset.cf === "1"); else if (e.target === ov) fim(false); });
+      document.addEventListener("keydown", tecla); document.body.appendChild(ov); ov.querySelector('[data-cf="1"]').focus();
+    });
+  };
 
   // ---------- avisos ----------
   var toastTimer = null;

@@ -16,7 +16,8 @@
     if (c === "obra") return alvoNome(l) + " · Obra" + (l.topicoId ? " · " + T.topicoNome(l.topicoId) : "");
     return alvoNome(l) + (l.etapaId ? " · " + T.etapaNome(l.etapaId) : "");
   }
-  function custoLanc(l) { var ch = T.custoHoraTotal(l.pessoaId); return ch == null ? null : ch * l.min / 60; }
+  // custo-hora gravado no lançamento (congelado); lançamentos antigos, sem o campo, usam o valor atual
+  function custoLanc(l) { var ch = l.custoHora != null ? l.custoHora : T.custoHoraTotal(l.pessoaId); return ch == null ? null : ch * l.min / 60; }
   function doMes(l, mes) { return ymd(new Date(l.inicio)).slice(0, 7) === mes; }
   function isLocked(iniIso) { return new Date(iniIso) < T.weekStart(new Date()); }
   function ativs(pid) { return S.ativDocs[pid] || []; }
@@ -26,7 +27,7 @@
     lancAtivos().forEach(function (l) { if (l.pessoaId === pid && doMes(l, mes)) { min += l.min; dias[ymd(new Date(l.inicio))] = 1; } });
     return { min: min, dias: Object.keys(dias).length };
   }
-  T.tempo = { lancAtivos: lancAtivos, alvoNome: alvoNome, catDe: catDe, rotulo: rotulo, custoLanc: custoLanc, doMes: doMes, CAT_LABEL: CAT_LABEL, timers: function () { return S.timers; } };
+  T.tempo = { lancAtivos: lancAtivos, alvoNome: alvoNome, catDe: catDe, rotulo: rotulo, custoLanc: custoLanc, doMes: doMes, CAT_LABEL: CAT_LABEL, timers: function () { return S.timers; }, iniciar: function (combo) { return startAtividade(combo); }, parar: function (modo) { return stopTimer(modo); }, lancar: function (l) { return addLanc(l); } };
 
   // ---------- gravação agrupada ----------
   function mesDoc(pid, iniIso) { return pid + "_" + ymd(new Date(iniIso)).slice(0, 7); }
@@ -35,7 +36,7 @@
     S.lancDocs[docId] = itens; flattenLanc();
     await T.db.doc("lancamentos/" + docId).set({ pessoaId: pid, mes: docId.slice(-7), itens: itens });
   }
-  async function addLanc(l) { l.id = T.novoId(); var docId = mesDoc(l.pessoaId, l.inicio), itens = itensDoc(docId); itens.push(l); await gravarDoc(docId, l.pessoaId, itens); return l.id; }
+  async function addLanc(l) { l.id = T.novoId(); if (l.custoHora == null) l.custoHora = T.custoHoraTotal(l.pessoaId); var docId = mesDoc(l.pessoaId, l.inicio), itens = itensDoc(docId); itens.push(l); await gravarDoc(docId, l.pessoaId, itens); return l.id; }
   async function updateLanc(id, patch) {
     var old = T.byId(S.lanc, id); if (!old) return;
     var novo = Object.assign({}, old, patch); delete novo._doc;
@@ -79,13 +80,14 @@
     if (!alvo) return { erro: cat === "gestao" ? "Escolha a área de gestão." : "Escolha o projeto." };
     if (cat === "projeto" && !etapa) return { erro: "Escolha a etapa do projeto." };
     if (cat === "obra" && !top) return { erro: "Escolha o tópico da obra." };
-    return { tipo: cat === "gestao" ? "area" : "projeto", alvoId: alvo, etapaId: cat === "projeto" ? etapa : cat === "obra" ? "obra" : null, topicoId: cat === "obra" ? top : null, descricao: $(p + "-desc").value.trim() };
+    var item = p === "t" && cat === "projeto" && $("t-item") && !$("t-item-wrap").hidden ? $("t-item").value || null : null;
+    return { tipo: cat === "gestao" ? "area" : "projeto", alvoId: alvo, etapaId: cat === "projeto" ? etapa : cat === "obra" ? "obra" : null, topicoId: cat === "obra" ? top : null, pranchaId: item, descricao: $(p + "-desc").value.trim() };
   }
 
   // ---------- cronômetro ----------
   function myTimer() { return T.state.pessoaId ? S.timers[T.state.pessoaId] : null; }
   function mesmaAtiv(a, c) {
-    return a.tipo === c.tipo && a.alvoId === c.alvoId && (a.etapaId || null) === (c.etapaId || null) && (a.topicoId || null) === (c.topicoId || null) &&
+    return a.tipo === c.tipo && a.alvoId === c.alvoId && (a.etapaId || null) === (c.etapaId || null) && (a.topicoId || null) === (c.topicoId || null) && (a.pranchaId || null) === (c.pranchaId || null) &&
       (a.descricao || "").trim().toLowerCase() === (c.descricao || "").trim().toLowerCase();
   }
   function aparelho() { return { id: T.device.id, nome: T.device.nome, em: new Date().toISOString() }; }
@@ -96,7 +98,7 @@
     delete S.timers[pid]; S.confirm = null; T.scheduleRender();
     try {
       if (min >= 1) {
-        lancId = await addLanc({ pessoaId: pid, atividadeId: t.atividadeId || null, tipo: t.tipo, alvoId: t.alvoId, etapaId: t.etapaId || null, topicoId: t.topicoId || null, descricao: t.descricao || "",
+        lancId = await addLanc({ pessoaId: pid, atividadeId: t.atividadeId || null, tipo: t.tipo, alvoId: t.alvoId, etapaId: t.etapaId || null, topicoId: t.topicoId || null, pranchaId: t.pranchaId || null, descricao: t.descricao || "",
           inicio: t.inicio, fim: fim.toISOString(), min: Math.round(min * 10) / 10, origem: "cronometro", motivo: modo, paradoEm: aparelho(), criadoEm: fim.toISOString(), excluido: false, ajustes: [] });
       }
       var itens = T.clone(ativs(pid)), a = t.atividadeId ? T.byId(itens, t.atividadeId) : null;
@@ -129,9 +131,9 @@
     if (myTimer()) await stopTimer("trocar");
     var itens = T.clone(ativs(pid)), agora = new Date().toISOString(), a = ativId ? T.byId(itens, ativId) : null;
     if (!a) a = itens.filter(function (x) { return x.status !== "concluida" && mesmaAtiv(x, combo); })[0];
-    if (!a) { a = { id: T.novoId(), tipo: combo.tipo, alvoId: combo.alvoId, etapaId: combo.etapaId || null, topicoId: combo.topicoId || null, descricao: combo.descricao || "", criadoEm: agora }; itens.push(a); }
+    if (!a) { a = { id: T.novoId(), tipo: combo.tipo, alvoId: combo.alvoId, etapaId: combo.etapaId || null, topicoId: combo.topicoId || null, pranchaId: combo.pranchaId || null, descricao: combo.descricao || "", criadoEm: agora }; itens.push(a); }
     a.status = "andamento"; a.ultimoUso = agora; delete a.concluidoEm;
-    var t = { pessoaId: pid, atividadeId: a.id, tipo: a.tipo, alvoId: a.alvoId, etapaId: a.etapaId || null, topicoId: a.topicoId || null, descricao: a.descricao || "", inicio: agora, dispositivo: { id: T.device.id, nome: T.device.nome } };
+    var t = { pessoaId: pid, atividadeId: a.id, tipo: a.tipo, alvoId: a.alvoId, etapaId: a.etapaId || null, topicoId: a.topicoId || null, pranchaId: a.pranchaId || null, descricao: a.descricao || "", inicio: agora, dispositivo: { id: T.device.id, nome: T.device.nome } };
     S.timers[pid] = t; T.scheduleRender();
     try { await saveAtivs(pid, itens); await T.db.doc("timers/" + pid).set(t); } catch (e) { T.showError(e); }
   }
@@ -165,6 +167,7 @@
         '<div class="field col-4"><label for="t-alvo" id="t-alvo-label">Projeto</label><select id="t-alvo"></select></div>' +
         '<div class="field col-4" id="t-etapa-wrap"><label for="t-etapa">Etapa</label><select id="t-etapa"></select></div>' +
         '<div class="field col-4" id="t-topico-wrap" hidden><label for="t-topico">Tópico da obra</label><select id="t-topico"></select></div>' +
+        '<div class="field col-4" id="t-item-wrap" hidden><label for="t-item">Item do Plano de Projeto</label><select id="t-item"></select></div>' +
         '<div class="field col-4"><label for="t-desc">O que está fazendo</label><input id="t-desc" list="desc-list" placeholder="Ex.: Detalhamento banheiro Paula e Bruno"></div>' +
         '<div class="col-12 form-actions"><button class="btn btn-primary" id="btn-start" type="submit">Iniciar cronômetro</button><span class="hint" id="t-hint"></span></div>' +
       "</form>" +
@@ -215,6 +218,7 @@
     if (t && S.confirm) cf.innerHTML = '<div class="confirm-box"><span>Este cronômetro foi iniciado em <b>' + esc(t.dispositivo.nome) + "</b>. " + (S.confirm === "concluir" ? "Concluir" : "Pausar") + ' daqui mesmo assim?</span><button class="btn btn-small btn-stop" id="cf-sim">Sim</button><button class="btn btn-small" id="cf-nao">Cancelar</button></div>';
     syncCatUI("t", S.cat);
     fillAlvo($("t-alvo"), S.cat, $("t-alvo").value); fillEtapa($("t-etapa"), $("t-etapa").value); fillTopico($("t-topico"), $("t-topico").value);
+    fillItem();
     var pausadas = ativs(T.state.pessoaId).filter(function (a) { return a.status === "pausada" || (a.status === "andamento" && (!t || t.atividadeId !== a.id)); })
       .sort(function (a, b) { return (b.ultimoUso || "") < (a.ultimoUso || "") ? -1 : 1; });
     $("paused").innerHTML = pausadas.length ? pausadas.map(function (a) {
@@ -309,8 +313,21 @@
     syncJust(); $("del-panel").hidden = true; $("entry-panel").hidden = false; $("e-data").focus();
   }
 
+  // Itens do Plano de Projeto (Gestor) do projeto e da etapa escolhidos
+  function fillItem() {
+    var sel = $("t-item"), wrap = $("t-item-wrap"), atual = sel.value;
+    var itens = S.cat === "projeto" && T.gestor && T.gestor.itensParaTempo ? T.gestor.itensParaTempo($("t-alvo").value, $("t-etapa").value) : [];
+    wrap.hidden = !itens.length;
+    sel.innerHTML = '<option value="">Tarefa livre (escrever ao lado)</option>' + itens.map(function (i) { return '<option value="' + esc(i.id) + '">' + esc(i.rotulo) + "</option>"; }).join("");
+    sel.value = itens.some(function (i) { return i.id === atual; }) ? atual : "";
+  }
+
   // ---------- eventos ----------
   function init() {
+    $("timer-form").addEventListener("change", function (e) {
+      if (e.target.id === "t-alvo" || e.target.id === "t-etapa") fillItem();
+      if (e.target.id === "t-item") { var o = e.target.selectedOptions[0]; $("t-desc").value = e.target.value && o ? o.textContent : ""; }
+    });
     $("t-cat").addEventListener("click", function (e) {
       var b = e.target.closest("[data-cat]"); if (!b) return; S.cat = b.dataset.cat; T.ls("tempo.cat", S.cat);
       syncCatUI("t", S.cat); fillAlvo($("t-alvo"), S.cat, ""); fillEtapa($("t-etapa"), ""); fillTopico($("t-topico"), "");
