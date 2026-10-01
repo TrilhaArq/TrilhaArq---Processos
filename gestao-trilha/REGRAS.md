@@ -435,7 +435,16 @@ Proposta:
   → Protocolado · em análise pelo condomínio / pela prefeitura → Em exigência → (protocola de novo) → … → Aprovado.
   É um bate-bola: de "Em exigência" volta-se a "Protocolado" quantas vezes for preciso, até "Aprovado". Cada mudança
   fica registrada com data; o quadro mostra a situação atual, há quantos dias, o número de rodadas de exigência e o
-  tempo total com o órgão × com a Trilha (em exigência o tempo corre do nosso lado). Não pausa o Anteprojeto.
+  tempo total com o órgão × com a Trilha. Não pausa o Anteprojeto.
+- **Prazos do Legal (Luan, 01/10/2026)** — cada um (condomínio e prefeitura) tem os seus:
+  - **Desenvolvimento:** começa em "Em preparo" e termina no **primeiro "Protocolado"**, que registra a fase de
+    desenvolver e protocolar como **concluída** (Histórico). Padrão 20 d.u. (contrato 3.3.3, MAPEAMENTO).
+  - **Protocolado = em análise pelo órgão:** não existe situação "Em análise" separada. Enquanto protocolado, o prazo
+    **não conta** (tempo do órgão, sem responsabilidade da Trilha).
+  - **Em exigência:** volta a contar um prazo da Trilha para atender (padrão **10 d.u.**, a confirmar 10 ou 15;
+    editável). Protocolar de novo para a contagem. Repete até "Aprovado".
+  - **Aprovado:** fecha o projeto (condomínio ou prefeitura) e cumpre um dos requisitos para liberar o Executivo.
+  - Prazos padrão editáveis em Configurações (junto com os demais) e por projeto na Ficha, com pergunta de proteção.
 - **Plano de Projeto:** a etapa Projeto Legal passa a ter "Projeto de condomínio" (só quando marcado) e "Projeto de
   prefeitura", cada um com as pranchas e o trâmite. Por enquanto os dois recebem os mesmos desenhos padrão de hoje;
   o Luan vai ajustar os padrões de cada um depois, como foi feito na marcenaria (condomínio e prefeitura são padrão).
