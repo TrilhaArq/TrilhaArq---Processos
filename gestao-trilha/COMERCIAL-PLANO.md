@@ -291,7 +291,8 @@ chance de fechar) para o Financeiro, valor calculado × valor praticado.
 
 ## Pendências para começar a construir
 
-- Formulário de briefing de residência: as perguntas (PDF "Imprimir" do Forms) e uma resposta real preenchida.
+- ~~Briefing de residência~~ — duas respostas reais recebidas em 01/10 (Gustavo e Paula e Bruno); análise em
+  `referencias-comercial/BRIEFING.md`. Importação recomendada: colar a linha da planilha de respostas (com os títulos) ou CSV.
 - ~~Propostas de referência~~ — recebidas em 01/10 (Gustavo, Paula e Bruno residência e marcenaria, Heitor);
   análise em `referencias-comercial/PROPOSTAS.md`. Falta só exportar do Canva as páginas fixas (por ora, recortadas dos PDFs).
 - ~~Textos de referência do "jeito Trilha"~~ — tirados das três propostas (ver `PROPOSTAS.md`).
