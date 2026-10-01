@@ -329,6 +329,8 @@ Registrados em 29/09/2026 a pedido do Luan, para fazer quando houver um novo aju
 
 ## Sugestões da Elisa (aguardando análise do Luan)
 
+_Sugestões 1–7 analisadas e aprovadas pelo Luan em 01/10/2026: ver "Rodada aprovada" abaixo._
+
 Anotadas quando a Elisa (Lili) pede. Não são processadas até o Luan confirmar e analisar cada uma.
 
 ### 29/09/2026 — Plano de Projeto › Marcenaria e área da pessoa
@@ -357,6 +359,40 @@ Anotadas quando a Elisa (Lili) pede. Não são processadas até o Luan confirmar
    pergunta "Quer mesmo apagar?" antes de apagar. Situação hoje no Plano (levantada pelo Claude): remover um item
    (✕) não pergunta, mas mostra "Desfazer" por 10 segundos; remover um desenho/subitem (✕) não pergunta nem tem
    "Desfazer"; remover um ambiente já pede confirmação.
+
+## Rodada aprovada pelo Luan em 01/10/2026 (a processar — aguardando mais pedidos antes de mexer no app)
+
+Junta os "Ajustes pendentes" acima e as sugestões 1–7 da Elisa, com as decisões do Luan. Fazer numa rodada só,
+testando antes na cópia de teste (mudança grande).
+
+**A. Ficha e prazos** (pendentes 1–3)
+- Prazos padrão em Configurações (arquitetura e marcenaria) e prazo próprio por projeto na Ficha; prazos da marcenaria
+  guardados num lugar só; tudo na Ficha editável, inclusive o fim da etapa em curso e o contrato da marcenaria.
+- Mudar prazo não é corriqueiro, mas às vezes é necessário: **toda alteração de prazo pede confirmação** (pergunta de
+  proteção com o prazo antigo e o novo) e vai para o Histórico.
+- Futuro (não agora): **Ficha e Histórico viram áreas restritas**, só Luan e Elisa têm acesso.
+
+**B. Móveis, desenhos e checklists** (Elisa 1, 2, 6)
+- Regra: **o Executivo da marcenaria tem sempre os mesmos móveis do EP**. Móvel do EP e do Executivo são vinculados
+  (mesmo `mob`): incluir, renomear, reordenar ou retirar um móvel no EP reflete no Executivo. **Os desenhos/subitens e
+  checklists de cada um podem ser diferentes** — é justamente aí que EP e Executivo se diferenciam.
+- MOB01 da Paula e Bruno como modelo: copiar os desenhos, subitens e checklists dele para os outros móveis da mesma
+  etapa (só móveis; ficam de fora apresentação, revisão total e bônus) e oferecer guardar como "Modelo de móvel".
+- Renomear desenhos/subitens e itens de checklist e mudar a ordem dos desenhos (e dos itens do checklist).
+
+**C. Situação e responsáveis** (Elisa 3, 4)
+- Nova situação **"Em revisão pelo cliente"** (entre Revisão interna e Pronto).
+- **No cabeçalho de cada etapa** do Plano: botão para atribuir o responsável da etapa inteira (depois ajusta item a
+  item) e a **situação da etapa: finalizada, em andamento ou aguardando**.
+
+**D. Área pessoal** (Elisa 5)
+- A área de cada pessoa é a tela mais importante do dia a dia: resolver ali o que é dela sem andar pelo app. Na aba
+  Projetos (Meu trabalho): abrir o item, ver e marcar desenhos e checklists, mudar a situação e iniciar o cronômetro
+  do móvel/item ou da etapa.
+
+**E. Proteção contra apagar sem querer** (Elisa 7)
+- "Desfazer" em toda remoção pequena (item, desenho, item de checklist); confirmação antes de apagar coisas grandes
+  (projeto, etapa, ambiente, pessoa, contato).
 
 ## Próximos passos previstos
 
