@@ -291,6 +291,7 @@ chance de fechar) para o Financeiro, valor calculado × valor praticado.
 - ~~Propostas de referência~~ — recebidas em 01/10 (Gustavo, Paula e Bruno residência e marcenaria, Heitor);
   análise em `referencias-comercial/PROPOSTAS.md`. Falta só exportar do Canva as páginas fixas (por ora, recortadas dos PDFs).
 - ~~Textos de referência do "jeito Trilha"~~ — tirados das três propostas (ver `PROPOSTAS.md`).
-- Contrato padrão e derivações (já prontos, no documento com códigos).
+- ~~Contratos~~ — seis modelos oficiais recebidos em 01/10 (revisão de 30/09/2026); análise em
+  `referencias-comercial/CONTRATOS.md`. O app preenche o próprio .docx oficial.
 - Percentuais de referência: CAU por tipo, faixa de mercado R$/m², meta anual (simples; definir com o Luan).
 - Horas de referência iniciais por ambiente e horas gerais (sugestão do Claude, validada pelo Luan).
