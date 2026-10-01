@@ -41,7 +41,7 @@ Um único Artifact, organizado em **módulos**, com um único banco de dados com
 2. **Alterar só o necessário**, no arquivo do módulo envolvido. Núcleo e `estilo.css` só mudam quando algo é
    comum a vários módulos.
 3. **Testar** antes de publicar: `node --check` em cada `.js` e a página aberta no Playwright com um banco simulado
-   (mock de `window.claude.use('db')` com os dados reais lidos por ArtifactData), servida por `page.route` (não
+   (mock de `window.claude.use('db')` com os dados reais lidos por ArtifactData, **com os documentos congelados**, como no app real), servida por `page.route` (não
    `file://`, que bloqueia o PDF do logo), em 390 px e 1280 px, sem erros no console.
 4. **Publicar** no mesmo link: `url` = link acima, `file_path` = `index.html`, `root` = pasta do app, `files`
    com todos os arquivos. Não alterar `capabilities` sem necessidade (hoje: `db`, `downloads` e `mcp` com

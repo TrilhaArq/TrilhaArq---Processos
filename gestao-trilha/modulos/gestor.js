@@ -146,10 +146,11 @@
   function dataExtenso(s) { var d = T.parseYmd(s); return d.getDate() + " de " + T.MESES[d.getMonth()] + " de " + d.getFullYear(); }
 
   // ---------- leitura ----------
-  function G(pid) {
-    var g = S.gp[pid]; if (!g) return null;
+  function G(pid) { return S.gp[pid] || null; }
+  // Os documentos chegam do banco somente-leitura: copiar antes de ajustar formatos antigos.
+  function normalizar(g) {
     if (g.etapa === "briefing") g.etapa = "abertura";
-    if (!g._norm) { g._norm = 1; (g.itens || []).forEach(function (x) { if (x.etapa === "pl" && (x.grupo === "pl-pranchas" || x.grupo === "pl-tramite")) { x.grupo = "pl-pref"; if (x.ord < 100 && x.grupo === "pl-pref" && /^(Organizar|Aprovação|Protocolo|Atender)/.test(x.titulo)) x.ord += 50; } }); }
+    (g.itens || []).forEach(function (x) { if (x.etapa === "pl" && (x.grupo === "pl-pranchas" || x.grupo === "pl-tramite")) { if (x.grupo === "pl-tramite") x.ord = (x.ord || 0) + 50; x.grupo = "pl-pref"; } });
     return g;
   }
   function proj(pid) { return T.projeto(pid) || { id: pid, nome: "Projeto removido" }; }
@@ -369,7 +370,7 @@
 
   // ---------- gravação ----------
   async function salvar(pid, fn) {
-    var cur = T.clone(S.gp[pid] || {}); delete cur._norm; fn(cur); cur.atualizadoEm = new Date().toISOString();
+    var cur = T.clone(S.gp[pid] || {}); fn(cur); cur.atualizadoEm = new Date().toISOString();
     // Limite do banco: 256 KB por documento. Acima de 245 KB não grava (avisa); acima de 200 KB, só avisa.
     var tam = JSON.stringify(cur).length;
     if (tam > 245000) { T.toast("O projeto chegou ao limite de tamanho do banco. Nada foi salvo: avise o Claude para dividir o projeto."); return; }
@@ -1710,8 +1711,8 @@
     icon: '<path d="M4 5h16"/><path d="M4 12h10"/><path d="M4 19h6"/><circle cx="18" cy="17" r="3"/>',
     desc: function () { var n = projetosGestor().filter(function (p) { var g = G(p.id); return ativo(g) && (g.etapa !== "encerrado" || marcAberta(g)); }).length; return n ? n + (n === 1 ? " projeto em andamento" : " projetos em andamento") : "Etapas, plano e prazos de cada projeto"; },
     connect: function (db) {
-      db.collection("gp").onSnapshot(function (s) { var m = {}; s.docs.forEach(function (d) { m[d.id] = d.data(); }); S.gp = m; if (!s.metadata || !s.metadata.fromCache) S.loaded = true; T.loaded("gp", s); T.scheduleRender(); }, T.onErr);
-      db.doc("gp_config/geral").onSnapshot(function (d) { S.cfg = d.exists ? d.data() : null; }, T.onErr);
+      db.collection("gp").onSnapshot(function (s) { var m = {}; s.docs.forEach(function (d) { m[d.id] = normalizar(T.clone(d.data())); }); S.gp = m; if (!s.metadata || !s.metadata.fromCache) S.loaded = true; T.loaded("gp", s); T.scheduleRender(); }, T.onErr);
+      db.doc("gp_config/geral").onSnapshot(function (d) { S.cfg = d.exists ? T.clone(d.data()) : null; T.scheduleRender(); }, T.onErr);
       db.doc("fin_config/geral").onSnapshot(function (d) { S.fin = d.exists ? d.data() : null; }, function () {});
     },
     notes: function (pessoaId) {

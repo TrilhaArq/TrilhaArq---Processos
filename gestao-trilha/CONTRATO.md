@@ -102,6 +102,9 @@ checklists de um item fora do Gestor, como faz a área da pessoa).
   `fin_config`, `fin_contratos`, `fin_mov`, `fin_recorrentes` (Financeiro);
   `fechamentos` (Relatórios); `gp`, `gp_config` (Gestor de Projetos); `contatos`, `obras` (Cadastros). Um módulo novo usa coleções com o próprio prefixo/nome e as documenta aqui.
 - Toda gravação feita pelo Claude no chat (ArtifactData) usa `if_version` do documento lido.
+- **Documentos do banco chegam somente-leitura** (`d.data()` é congelado no app real): nunca alterar o objeto
+  recebido; copiar com `T.clone` antes de ajustar formatos antigos. Nos testes, o banco simulado deve congelar os
+  dados (`Object.freeze` em profundidade) — foi esse erro que deixou o Gestor vazio em 01/10/2026.
 - Datas: ISO (`toISOString`) para instantes; `AAAA-MM-DD` para dias; `AAAA-MM` para meses. Valores em reais
   como número (sem formatação). Mês = do dia 1º ao último; semana = segunda a domingo.
 
