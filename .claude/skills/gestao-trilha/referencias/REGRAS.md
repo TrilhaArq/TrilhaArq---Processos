@@ -380,6 +380,23 @@ testando antes na cópia de teste (mudança grande).
   etapa (só móveis; ficam de fora apresentação, revisão total e bônus) e oferecer guardar como "Modelo de móvel".
 - Renomear desenhos/subitens e itens de checklist e mudar a ordem dos desenhos (e dos itens do checklist).
 
+- **Padrão da série 900 em qualquer projeto:** sempre que a marcenaria for acionada, em qualquer projeto, vale a
+  mesma regra (móveis do EP vinculados aos do Executivo; desenhos e checklists independentes em cada etapa).
+
+**F. Plano de Projeto — leitura do andamento** (Luan, 01/10/2026)
+- **Linha de contagem por situação:** abaixo da linha "Clique no nome para abrir desenhos e checklists." e antes do
+  primeiro quadro, uma linha com o número de itens em cada situação da etapa (Em andamento, Revisão interna, Em
+  revisão pelo cliente…). Sem "A fazer" e sem os concluídos.
+- **Relatório de andamento em PDF:** botão abaixo do último quadro do Plano nas fases **Anteprojeto**, **Projeto
+  Executivo** e **Marcenaria** (na marcenaria, contabilizando só o Executivo da marcenaria). Serve para enviar ao
+  cliente ou usar em reuniões internas. Conteúdo: só o nome do projeto e a data e hora em que foi gerado como dados
+  externos (sem cliente, endereço etc.); o resto são números e gráficos do andamento da fase (itens por situação,
+  % concluído, andamento por série/grupo, prazo usado × restante, o que foi concluído, o que está com o cliente).
+  Identidade visual Trilha, com a logo.
+- **Quadros das etapas no topo do Plano** (os que mostram a quantidade de itens e ficam verdes na etapa atual):
+  marcar também as **etapas já concluídas**, na mesma estética, com outra cor da identidade (escolha do Claude ao
+  processar: tom que leia como "encerrado", distinto do verde da etapa atual, com ✓).
+
 **C. Situação e responsáveis** (Elisa 3, 4)
 - Nova situação **"Em revisão pelo cliente"** (entre Revisão interna e Pronto).
 - **No cabeçalho de cada etapa** do Plano: botão para atribuir o responsável da etapa inteira (depois ajusta item a
