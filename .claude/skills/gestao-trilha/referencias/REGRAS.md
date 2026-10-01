@@ -394,8 +394,8 @@ testando antes na cópia de teste (mudança grande).
   % concluído, andamento por série/grupo, prazo usado × restante, o que foi concluído, o que está com o cliente).
   Identidade visual Trilha, com a logo.
 - **Quadros das etapas no topo do Plano** (os que mostram a quantidade de itens e ficam verdes na etapa atual):
-  marcar também as **etapas já concluídas**, na mesma estética, com outra cor da identidade (escolha do Claude ao
-  processar: tom que leia como "encerrado", distinto do verde da etapa atual, com ✓).
+  nas **etapas já concluídas**, só acrescentar o **ícone de concluído idêntico ao da Visão geral** (o círculo com ✓
+  dos passos `gp-step.done`). Sem cor nova (decisão revista pelo Luan em 01/10/2026).
 
 **C. Situação e responsáveis** (Elisa 3, 4)
 - Nova situação **"Em revisão pelo cliente"** (entre Revisão interna e Pronto).
