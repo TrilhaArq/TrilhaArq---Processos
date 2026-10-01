@@ -67,8 +67,15 @@ simulador de preço.
 do Gestor, em `gp_config/geral.ambientes`: cada ambiente tem nome, setor, área de referência e perguntas
 `campos[{k, l, t, o[]}]` (sim/não, uma opção, várias, número, texto). O catálogo cresce pelo uso ("+ outra opção",
 "+ outra pergunta", "Salvar no padrão da Trilha", "Criar ambiente padrão").
-- As perguntas do formulário do Google devem **casar com as chaves `k`**, para que "Importar respostas" preencha
-  `ambientes[].cfg` direto.
+- **Importar respostas (decidido em 01/10):** o app não acessa o Google Forms. Três caminhos, do mais simples ao
+  mais automático: (A) **copiar e colar** a resposta do cliente num quadro do app — a IA lê o texto e distribui nos
+  ambientes (vale desde o primeiro dia, sem configuração); (B) importar o CSV da planilha de respostas;
+  (C) ler a planilha direto pelo conector Google Drive, se for ligado na conta.
+- Por a IA interpretar o texto, **o formulário atual de residência funciona como está**. Alinhar as perguntas às
+  chaves `k` dos Ambientes padrão é melhoria de precisão, não pré-requisito.
+- Formulários novos ou melhorados (residência revisado, comercial, reforma…) são gerados por um roteiro do Google
+  (Apps Script) que o Claude escreve: colar em script.google.com e executar cria o formulário inteiro.
+- Hoje só existe o formulário de **residência do zero**; é com ele que o app começa.
 - Categorias já usadas no Gestor: padrão em 5 faixas (Médio R$ 3.000–3.500/m², Médio Alto R$ 3.500–4.500/m², Alto
   R$ 4.500–5.500/m², Alto R$ 5.500–7.000/m², Luxo acima de R$ 7.000/m²); dimensão (Compacta, Confortável,
   Espaçosa); dificuldade do terreno.
@@ -80,7 +87,33 @@ do Gestor, em `gp_config/geral.ambientes`: cada ambiente tem nome, setor, área 
 
 Enquanto não houver histórico de horas suficiente, o preço é uma **simulação**: o app sugere, o arquiteto decide.
 
-**Entradas (vêm do briefing, todas editáveis):**
+**Lógica de precificação do Luan (decidida em 01/10):** quem manda no preço é o **programa de necessidades**. Ele
+gera o Plano de Projeto (desenhos e sua complexidade) e, portanto, as horas; depois **fatores** ajustam o resultado.
+
+```
+HORAS DO PROJETO = Σ horas de referência de cada ambiente do programa
+                 + horas gerais (implantação, volumetria, fachadas, legal, reuniões)
+HORAS AJUSTADAS  = horas do projeto × fator padrão × fator dimensão × fator terreno × fator cliente
+CUSTO            = horas ajustadas × custo-hora total
+PREÇO SUGERIDO   = custo ÷ (1 − impostos − reserva − lucro)
+MEU VALOR        = ajuste manual no simulador
+```
+
+- **Horas de referência em cada Ambiente padrão** (`gp_config/geral.ambientes[].horas`), sugeridas no início e
+  corrigidas pelo uso. **Horas gerais** do projeto ficam numa lista própria em Configurações do comercial.
+- **Fatores** (editáveis em Configurações do comercial; valores iniciais para calibrar):
+  - padrão — o mais importante no começo: Médio 1,0 · Médio Alto 1,15 · Alto 1,3 · Alto+ 1,5 · Luxo 1,8;
+  - dimensão: Compacta 0,95 · Confortável 1,0 · Espaçosa 1,1;
+  - terreno: Baixa 1,0 · Normal 1,05 · Difícil 1,15 · Muito difícil 1,3;
+  - cliente (**interno, nunca aparece na proposta**; no cadastro do cliente, só para sócios): Tranquilo 0,95 ·
+    Normal 1,0 · Exigente 1,15 · Indeciso 1,2. Para cliente recorrente o app mede: horas reais ÷ previstas dos
+    projetos anteriores dele.
+  - a lista de fatores é aberta: novos fatores podem ser mapeados depois.
+- **Futuro (estrutura preparada, vazia no começo):** cada opção de configuração de um ambiente pode somar horas
+  (cuba esculpida, dois chuveiros, cozinha com ilha e muitos eletrodomésticos…), no campo opcional `h` das opções
+  `campos[].o[]`. Até haver horas reais, o fator padrão cumpre esse papel.
+
+**Entradas do simulador (vêm do briefing, todas editáveis):**
 - área estimada da casa (m²);
 - padrão da obra, com as 5 faixas do Gestor; o custo/m² começa no meio da faixa e pode ser ajustado.
 
@@ -111,11 +144,32 @@ protocolar (contrato 3.3.3) e 10 para atender cada exigência. O que for contrat
 condomínio e prefeitura), Executivo 30; marcenaria 50/50; reforma e interiores 50/50. Servem para distribuir
 horas e valor entre etapas.
 
-**Aprendizado:** guardar valor calculado, valor escolhido e se fechou. Com o tempo, o cronômetro ligado aos itens do
-Plano de Projeto mede horas reais por ambiente e etapa (somadas aos pesos das etapas); o app compara previsto × realizado, sugere ajustes na base
-de horas e a precificação passa, aos poucos, a ser feita só por horas.
+**Aprendizado:** guardar valor calculado, valor escolhido e se fechou. O cronômetro ligado aos itens do Plano de
+Projeto mede horas reais por ambiente e etapa; o app **desconta os fatores** (horas reais ÷ produto dos fatores do
+projeto) para comparar com a referência e sugere: "banheiro: referência 10 h, média real 13 h em 4 projetos →
+atualizar?". O sócio aceita ou não. Aos poucos o preço passa a ser feito só por horas.
 
 ## Modelos de proposta e de contrato
+
+**Proposta — modelo híbrido (decidido em 01/10).** As propostas atuais são arquivos do Canva, que o app não edita.
+- **Páginas fixas** (apresentação da Trilha, método, etapas, portfólio): exportadas do Canva como imagem/PDF e
+  enviadas uma vez ao app (capacidade `assets`); entram na proposta como são.
+- **Páginas variáveis** (texto do cliente, programa, plano de projeto, investimento, prazos, pagamento): desenhadas
+  pelo app na identidade Trilha e preenchidas com os dados da oportunidade.
+- Um modelo de proposta = **sequência de páginas** (fixas e variáveis). Trocar o visual = trocar as imagens; mudar
+  a ordem ou incluir páginas = editar a sequência. Saída em PDF.
+- Existe a intenção de aprimorar o design das propostas depois; a estrutura acima permite isso sem refazer o módulo.
+
+**Texto personalizado do cliente.**
+1. **Impressões do arquiteto:** ao sair da etapa Reunião, o app abre o quadro "O que você sentiu desse cliente?"
+   (texto livre ou ditado: história, terreno, vista, desejos, preocupações). Também vira a `descricao` do projeto
+   no Gestor.
+2. **Jeito Trilha de escrever** (Configurações do comercial): 2–3 textos exemplares, tom, palavras a usar/evitar.
+3. **Geração:** a IA junta briefing + impressões + estilo; o texto abre editável, com "Reescrever com esta
+   orientação" (ex.: "mais curto, cite a vista para a serra") e "Guardar como exemplo".
+
+**Contratos.** O escritório já tem o contrato padrão e derivações, organizados num documento com códigos que permite
+gerar as variações. O app guarda o texto com **campos marcados** e a IA só preenche os campos.
 
 O escritório terá **vários modelos** de cada um:
 - **Propostas** personalizadas por segmento (residencial, comercial, reforma, interiores, hotelaria…), cada uma
@@ -131,6 +185,30 @@ Regras:
    O modelo aparece antes de gerar e troca com um clique.
 3. No contrato a IA **só preenche os campos** (partes, endereço, escopo, valor, parcelas, prazos); as cláusulas são
    fixas e revisadas juridicamente.
+
+## Serviços menores (proposta e contrato simplificados)
+
+Serviços pequenos (consultoria, layout, visita técnica, laudo, pequeno projeto…) que não pedem o processo completo.
+- Oportunidade do tipo **"Serviço"**: o cliente é criado normalmente em Cadastros; o funil é o mesmo, mais curto.
+- A proposta e o contrato são **simplificados (3–4 páginas)**, montados pela IA a partir do que o sócio descreve, com
+  base num modelo curto cadastrado (e editável) — sem o contrato padrão completo.
+- Ao fechar: contrato e parcelas no Financeiro e um projeto simples em Cadastros (fora do Gestor), para as horas
+  serem lançadas no Tempo.
+- Variações fora do padrão de qualquer contrato ou proposta também são pedidas pela barra "Peça ao Claude".
+
+## "Peça ao Claude" (barra de conversa no app)
+
+Uma barra no estilo do chat do Claude, presente na tela principal e dentro de cada oportunidade.
+- **Viável** pela capacidade `sample`: a IA recebe o contexto (a oportunidade aberta, os modelos, os dados do
+  escritório) e pode **acionar funções do app** — criar oportunidade, montar proposta ou contrato simplificado,
+  ajustar texto, mudar valor —, sempre mostrando o resultado para confirmação antes de gravar.
+- **Escolha do modelo:** três níveis — rápido, padrão e complexo — em vez de nomes de modelos.
+- **Áudio:** o microfone do teclado do celular (ditado) funciona em qualquer campo do app; um botão de microfone
+  próprio (reconhecimento de voz do navegador) entra se o navegador permitir dentro do Claude — testar; se não
+  funcionar, fica o ditado do teclado.
+- **Memória:** a IA não lembra sozinha; o app guarda a conversa de cada oportunidade no banco e a reenvia.
+- **Custo:** cada pedido consome uso da conta Claude de quem está usando; na primeira vez o app pede autorização.
+  Para economizar, cada pedido envia só o necessário daquela oportunidade.
 
 ## Tela principal
 
@@ -200,7 +278,9 @@ chance de fechar) para o Financeiro, valor calculado × valor praticado.
 
 ## Pendências para começar a construir
 
-- Formulário de briefing (link ou perguntas).
-- Modelos de proposta por segmento.
-- Modelos de contrato (em elaboração).
-- Percentuais de referência: CAU por tipo, faixa de mercado R$/m², meta anual.
+- Formulário de briefing de residência: as perguntas (PDF "Imprimir" do Forms) e uma resposta real preenchida.
+- Modelos de proposta do Canva exportados em PDF, indicando páginas fixas e variáveis.
+- 2–3 textos de propostas anteriores considerados os melhores (base do "jeito Trilha de escrever").
+- Contrato padrão e derivações (já prontos, no documento com códigos).
+- Percentuais de referência: CAU por tipo, faixa de mercado R$/m², meta anual (simples; definir com o Luan).
+- Horas de referência iniciais por ambiente e horas gerais (sugestão do Claude, validada pelo Luan).
