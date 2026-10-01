@@ -385,8 +385,8 @@ testando antes na cópia de teste (mudança grande).
 
 **F. Plano de Projeto — leitura do andamento** (Luan, 01/10/2026)
 - **Linha de contagem por situação:** abaixo da linha "Clique no nome para abrir desenhos e checklists." e antes do
-  primeiro quadro, uma linha com o número de itens em cada situação da etapa (Em andamento, Revisão interna, Em
-  revisão pelo cliente…). Sem "A fazer" e sem os concluídos.
+  primeiro quadro, uma linha com o número de itens em cada situação da etapa: **Em andamento, Revisão interna, Em
+  revisão pelo cliente e Pronto**. Ficam de fora "A fazer" e "Entregue" (já aparecem no contador com barra).
 - **Relatório de andamento em PDF:** botão abaixo do último quadro do Plano nas fases **Anteprojeto**, **Projeto
   Executivo** e **Marcenaria** (na marcenaria, contabilizando só o Executivo da marcenaria). Serve para enviar ao
   cliente ou usar em reuniões internas. Conteúdo: só o nome do projeto e a data e hora em que foi gerado como dados
