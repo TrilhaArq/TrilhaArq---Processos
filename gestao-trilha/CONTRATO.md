@@ -69,7 +69,9 @@ obras, comercial, financeiro, relatorios, config, cadastros; módulo fora da lis
 Um módulo **não** mexe no HTML nem no estado de outro módulo. Para ler dados de outro módulo, use o objeto que
 ele expõe (ex.: `Trilha.tempo.lancAtivos()`, `Trilha.tempo.custoLanc(l)`, `Trilha.tempo.lancar(l)`,
 `Trilha.relatorios.fechamentos()`, `Trilha.relatorios.calcFechamento(pid, mes)`, `Trilha.gestor.*`,
-`Trilha.cadastros.contato(id)`, `Trilha.tarefas.criar(pid, item)`).
+`Trilha.cadastros.contato(id)`, `Trilha.cadastros.editarProjeto(pid)`, `Trilha.tarefas.criar(pid, item)`,
+`Trilha.gestor.corpoItem(pid, item)` + `Trilha.gestor.ligarCorpo(elemento)` para mostrar e editar desenhos e
+checklists de um item fora do Gestor, como faz a área da pessoa).
 
 ## 3. O que o núcleo oferece (`window.Trilha`, abreviado `T`)
 

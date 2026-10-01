@@ -261,6 +261,31 @@ Quem vê: sócios veem tudo; colaborador vê os projetos em que tem item ou tare
 - Moram na agenda da pessoa (Tarefa, Demanda, Prioridade, Compromisso → Agenda Google), com `projetoId`/`itemId`.
   Trocar o responsável move a tarefa. P1/P2/P3 são dos itens do Plano; Tarefa/Demanda/Prioridade, da agenda.
 
+### Como ficou a rodada de 01/10/2026 (resumo para quem continuar)
+- **Abas do projeto:** Visão geral, Plano de Projeto, Tarefas, Histórico, Programa, **Informações** (consulta; dados de
+  cadastro só leitura, descrição do projeto, categorias, diretrizes, links) e **Configurações** (datas e prazos com
+  confirmação, Projeto Legal sim/não e condomínio, tipo). Pavimentos ficam no Programa. Nome, clientes, endereço e
+  contratos (inclusive valor da marcenaria) se editam em **Cadastros › Projetos › Editar**.
+- **Visão geral:** quadros iguais por trilha (Arquitetura, Marcenaria) com números, próximo passo, espera/pausa da
+  própria trilha (cliente, engenheiro, pausa interna com motivo) e encerramento; quadros do Projeto Legal por órgão.
+- **Prazos:** padrão em Configurações › Prazos padrão; cada projeto guarda os seus em `etapas.<e>.prazo` (congelados
+  na criação/ativação da marcenaria); `marc.prazos` antigo só como reserva. Aviso 10 d.u. (Legal 5 d.u.).
+- **Plano:** cabeçalho de etapa (situação, contagem Em andamento/Revisão interna/Revisão Cliente/Pronto, "Atribuir a
+  etapa"); ✓ nas abas de etapas concluídas; situação "Revisão Cliente"; desenhos e itens de checklist renomeáveis e
+  reordenáveis; "Desfazer" ao remover item, desenho ou item de checklist; móveis da marcenaria vinculados EP ↔
+  Executivo (mesmo `mob`: incluir, renomear, reordenar e remover valem nos dois; desenhos independentes); "Usar este
+  móvel como modelo" (só móveis não iniciados) e "Salvar como modelo de móvel" (EP ou Executivo, todos os projetos);
+  relatório de andamento em PDF (Anteprojeto, Executivo, Executivo da marcenaria).
+- **Área da pessoa › Projetos:** itens agrupados por projeto e etapa; o item abre com desenhos e checklists
+  (marcar, renomear, reordenar); ▶ Iniciar no item ou na etapa inteira.
+- **Programa:** Ambientes padrão da Trilha em `gp_config/geral.ambientes` (nascem do catálogo do briefing); em cada
+  ambiente, "+ outra opção" e "+ outra pergunta" (no projeto) e "Salvar no padrão da Trilha" / "Criar ambiente padrão".
+- **Limite de tamanho:** o Gestor avisa acima de 200 KB por projeto e não grava acima de 245 KB (limite do banco 256 KB).
+  Paula e Bruno: ~150 KB em 01/10/2026. Se um projeto chegar perto, dividir os itens (ex.: marcenaria em documento próprio).
+- **Dados migrados (Paula e Bruno, 01/10/2026):** condomínio e prefeitura aprovados; prazos da marcenaria nas etapas
+  (EP 30, Executivo 40); MOB16 do EP religado ao do Executivo; desenhos e checklists do MOB01 aplicados aos outros
+  móveis do EP (situação mantida; MOB16 manteve os seus) e salvos como modelo do EP.
+
 ### Modelo de dados (Gestor e Cadastros)
 - `gp/<projetoId>`: `sigla, etapa, fase, etapas{<etapa>: {inicio, fim, termoEm, prazo}}, legal, marco{}, esperas[],
   suspenso{desde, auto}, arquivado{desde, auto}, pavs[], ambientes[], itens[], reunioes[], eventos[], marc{},
@@ -270,7 +295,14 @@ Quem vê: sócios veem tudo; colaborador vê os projetos em que tem item ou tare
   - reunião: `id, tipo, etapa, data, hora, duracao, participantes[], pauta, decisoes, status (marcada|realizada)`.
   - evento: `data, em (ISO), por, txt, tipo (etapa|reuniao|termo|plano|espera|suspensao|arquivamento)`.
   - marc: `ativo, contrato{numero, data}, contratoOk, parcela, prazos{mep, mex}, etapa (aguardando|mep|espera|mex|fim)`.
-- `gp_config/geral`: `modeloMovel{guia, desenhos[{nome, checklist[]}], checklist[]}`.
+- `gp_config/geral`: `modelos{mep, mex}` (cada um `{guia, desenhos[{nome, checklist[]}], checklist[]}`; `modeloMovel`
+  antigo vale como modelo do Executivo) e `ambientes[]` (Ambientes padrão: `{id, n, s, a, amp, banc, campos[{k, l, t,
+  o[]}]}`).
+- `gp/<projetoId>` ganhou: `leg{cond?, pref}` (cada um `{sit: nao_iniciado|preparo|protocolado|exigencia|aprovado,
+  hist[{sit, em}], prazoDev?, prazoExig?}`; `legal` vira resumo), `esperas[].trilha` ("arq" | "marc"), `esperas[].quem`
+  pode ser "interna" com `motivo`, `descricao`, `marc.valor`, `marc.proximo`, `etapas.<e>.prazo`; ambiente pode ter
+  `campos[]` próprios; item de móvel tem `mob` (vínculo EP ↔ Executivo); grupos do Legal `pl-cond` e `pl-pref`;
+  situação de item `rev_cliente`.
 - `projetos/<id>` ganha: `codigo, sigla, clienteIds[], categorias{}, endereco, contrato{numero, data, cidade}`.
 - `contatos/<id>`: `tipos[], categoria, nome, contato, empresa, email, doc, razaoSocial, endereco, descricao, observacao`.
 - `obras/<id>`: `nome, projetoId, endereco, situacao, observacao`.
@@ -296,7 +328,8 @@ Quem vê: sócios veem tudo; colaborador vê os projetos em que tem item ou tare
 
 - `pessoas/{id}`: `nome`, `perfil` ("socio" | "colaborador"), `custoHora`, `valorHora`, `ativo`, `ordem`.
 - `config/escritorio`: `etapas[{id,nome}]`, `areas[{id,nome}]`, `obraTopicos[{id,nome}]`, `tipos[{id,nome}]`,
-  `custosFixosMensais`, `horasProdutivasMes`, `pesosEtapas{ep, ap, pl, pe, mep, mex}` (% concluído do Gestor).
+  `custosFixosMensais`, `horasProdutivasMes`, `pesosEtapas{ep, ap, pl, pe, mep, mex}` (% concluído do Gestor; o `pl` se
+  divide igualmente entre condomínio e prefeitura), `prazosPadrao{ep, ap, pe, mep, mex, plDev, plExig}` (d.u.).
 - `projetos/{id}`: `nome`, `cliente`, `tipo`, `area`, `honorario`, `status`, `horasPrevistas{etapaId: h}`, `criadoEm`.
 - `timers/{pessoaId}`: `pessoaId`, `atividadeId`, `tipo`, `alvoId`, `etapaId`, `topicoId`, `descricao`, `inicio`, `dispositivo{id,nome}`.
 - `atividades/{pessoaId}`: `itens[]` com `id`, `tipo`, `alvoId`, `etapaId`, `descricao`, `status`
@@ -312,7 +345,7 @@ Quem vê: sócios veem tudo; colaborador vê os projetos em que tem item ou tare
   `id`, `pessoaId`, `tipo` ("projeto" | "area"), `alvoId`, `etapaId`, `descricao`, `inicio`, `fim` (ISO),
   `min`, `atividadeId`, `topicoId`, `motivo`, `paradoEm{id,nome,em}`, `origem` ("cronometro" | "manual"), `criadoEm`, `editadoEm`, `excluido`, `ajustes[]`.
 
-## Ajustes pendentes (pedidos para a próxima rodada)
+## Ajustes pendentes (pedidos para a próxima rodada) — feitos na rodada de 01/10/2026
 
 Registrados em 29/09/2026 a pedido do Luan, para fazer quando houver um novo ajuste no app:
 
@@ -360,7 +393,7 @@ Anotadas quando a Elisa (Lili) pede. Não são processadas até o Luan confirmar
    (✕) não pergunta, mas mostra "Desfazer" por 10 segundos; remover um desenho/subitem (✕) não pergunta nem tem
    "Desfazer"; remover um ambiente já pede confirmação.
 
-## Rodada aprovada pelo Luan em 01/10/2026 (a processar — aguardando mais pedidos antes de mexer no app)
+## Rodada aprovada pelo Luan em 01/10/2026 — PROCESSADA e publicada em 01/10/2026 (teste e oficial)
 
 Junta os "Ajustes pendentes" acima e as sugestões 1–7 da Elisa, com as decisões do Luan. Fazer numa rodada só,
 testando antes na cópia de teste (mudança grande).

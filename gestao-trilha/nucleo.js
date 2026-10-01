@@ -32,6 +32,9 @@
     ],
     // Peso de cada etapa no % concluído do Gestor (Abertura não conta). Marcenaria: EP e Executivo.
     pesosEtapas: { ep: 30, ap: 30, pl: 10, pe: 30, mep: 50, mex: 50 },
+    // Prazos padrão em dias úteis (Configurações › Prazos padrão). Cada projeto pode ter o seu (Configurações do projeto).
+    // Legal: desenvolvimento até o 1º protocolo (contrato 3.3.3) e prazo para atender cada exigência.
+    prazosPadrao: { ep: 40, ap: 70, pe: 60, mep: 30, mex: 40, plDev: 20, plExig: 10 },
     custosFixosMensais: null, horasProdutivasMes: 112
   };
   T.MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];

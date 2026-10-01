@@ -12,6 +12,10 @@
 
   var PESOS_ARQ = [["ep", "Estudo Preliminar"], ["ap", "Anteprojeto"], ["pl", "Projeto Legal"], ["pe", "Projeto Executivo"]];
   var PESOS_MARC = [["mep", "Estudo Preliminar"], ["mex", "Executivo"]];
+  var PRAZOS = [["Projeto arquitetônico", [["ep", "Estudo Preliminar"], ["ap", "Anteprojeto"], ["pe", "Projeto Executivo"]]],
+    ["Projeto de marcenaria", [["mep", "Estudo Preliminar"], ["mex", "Executivo"]]],
+    ["Projeto Legal (condomínio e prefeitura)", [["plDev", "Desenvolver e protocolar"], ["plExig", "Atender cada exigência"]]]];
+  function prazosAtuais() { return Object.assign({}, T.DEFAULT_CONFIG.prazosPadrao, T.cfg().prazosPadrao || {}); }
   function campoPeso(o) { return '<div class="field col-3"><label for="pw-' + o[0] + '">' + o[1] + ' (%)</label><input type="number" min="0" max="100" step="1" id="pw-' + o[0] + '" data-peso="' + o[0] + '"></div>'; }
   function pesosAtuais() { return Object.assign({}, T.DEFAULT_CONFIG.pesosEtapas, T.cfg().pesosEtapas || {}); }
   function somaPesos() {
@@ -38,6 +42,11 @@
         '<div class="col-12 cfg-pesos-t">Projeto de marcenaria</div>' + PESOS_MARC.map(campoPeso).join("") +
         '<div class="col-12 form-actions"><button class="btn btn-primary" id="btn-save-pesos">Salvar pesos</button><span class="hint" id="cfg-pesos-soma"></span></div>' +
         '<div class="col-12 hint">A Abertura não conta. Etapa encerrada vale o peso inteiro; etapa em curso vale a parte dos itens prontos. Quando o projeto não tem uma etapa (Reforma e Interiores não têm Anteprojeto nem Legal), os pesos das outras são redistribuídos na mesma proporção. Ajuste quando houver horas reais registradas.</div>' +
+      "</div></div>" +
+    '<div><div class="section-head"><h2 class="section-title">Prazos padrão</h2><span class="section-meta">Dias úteis · valem para os projetos novos</span></div>' +
+      '<div class="card grid-form" id="cfg-prazos">' + PRAZOS.map(function (gr) { return '<div class="col-12 cfg-pesos-t">' + gr[0] + "</div>" + gr[1].map(function (o) { return '<div class="field col-3"><label for="pz-' + o[0] + '">' + o[1] + ' (d.u.)</label><input type="number" min="1" step="1" id="pz-' + o[0] + '" data-pz="' + o[0] + '"></div>'; }).join(""); }).join("") +
+        '<div class="col-12 form-actions"><button class="btn btn-primary" id="btn-save-prazos">Salvar prazos</button></div>' +
+        '<div class="col-12 hint">Cada projeto guarda os prazos que tinha ao ser criado (ou ao ativar a marcenaria); mudar aqui não altera projetos em andamento. Para mudar o prazo de um projeto: Gestor › projeto › Configurações. Aviso de prazo: 10 d.u. antes do fim; no Projeto Legal, 5 d.u.</div>' +
       "</div></div>" +
     '<div class="grid-form" style="gap:28px">' + LISTAS.map(function (l) {
       return '<div class="col-6"><div class="section-head"><h2 class="section-title">' + l.t + '</h2></div><div class="card"><div class="list-edit" id="cfg-' + l.k + '"></div>' +
@@ -67,11 +76,13 @@
     $("cfg-office-meta").innerHTML = r != null ? "Rateio dos custos fixos: <b>" + fmtBRL(r) + "</b> por hora" : "Preencha para calcular o custo fixo por hora";
     var pw = pesosAtuais();
     if (!$("cfg-pesos").contains(document.activeElement) && $("cfg-pesos").dataset.dirty !== "1") { T.each("[data-peso]", function (i) { i.value = pw[i.dataset.peso] != null ? pw[i.dataset.peso] : ""; }); somaPesos(); }
+    var pzs = prazosAtuais();
+    if (!$("cfg-prazos").contains(document.activeElement) && $("cfg-prazos").dataset.dirty !== "1") T.each("[data-pz]", function (i) { i.value = pzs[i.dataset.pz] != null ? pzs[i.dataset.pz] : ""; });
     LISTAS.forEach(function (l) { var box = $("cfg-" + l.k); if (box.dataset.dirty !== "1") box.innerHTML = (c[l.k] || []).map(listRow).join(""); });
   }
   function init() {
     var view = $("view-config");
-    view.addEventListener("input", function (e) { var le = e.target.closest(".list-edit"); if (le) marcarAlterado(le); if (e.target.dataset.peso) { $("cfg-pesos").dataset.dirty = "1"; somaPesos(); } });
+    view.addEventListener("input", function (e) { var le = e.target.closest(".list-edit"); if (le) marcarAlterado(le); if (e.target.dataset.peso) { $("cfg-pesos").dataset.dirty = "1"; somaPesos(); } if (e.target.dataset.pz) $("cfg-prazos").dataset.dirty = "1"; });
     view.addEventListener("click", async function (e) {
       var t = e.target.closest("button"); if (!t) return;
       if (t.dataset.rm) { var le = t.closest(".list-edit"); t.closest(".list-edit-row").remove(); marcarAlterado(le); return; }
@@ -99,6 +110,16 @@
       }
       if (t.id === "btn-add-person") {
         await T.saveWith(t, function () { return T.db.doc("pessoas/pessoa-" + Date.now().toString(36)).set({ nome: "Nova pessoa", perfil: "colaborador", custoHora: null, valorHora: null, ativo: true, ordem: T.state.pessoas.length + 1 }); });
+        return;
+      }
+      if (t.id === "btn-save-prazos") {
+        var pz = {}, at = prazosAtuais(), mud = [], falta = false;
+        T.each("[data-pz]", function (i) { var v = T.numOrNull(i.value); if (!v || v < 1) falta = true; pz[i.dataset.pz] = Math.round(v || 0); if (pz[i.dataset.pz] !== at[i.dataset.pz]) mud.push(({ ep: "Estudo Preliminar", ap: "Anteprojeto", pe: "Projeto Executivo", mep: "EP da marcenaria", mex: "Executivo da marcenaria", plDev: "Legal · desenvolver e protocolar", plExig: "Legal · atender exigência" })[i.dataset.pz] + ": " + at[i.dataset.pz] + " → " + pz[i.dataset.pz] + " d.u."); });
+        if (falta) { T.toast("Preencha todos os prazos com 1 dia útil ou mais."); return; }
+        if (!mud.length) { T.toast("Nada mudou."); return; }
+        if (!(await T.confirmar({ titulo: "Mudar os prazos padrão?", texto: '<ul class="cf-list">' + mud.map(function (m) { return "<li>" + T.esc(m) + "</li>"; }).join("") + "</ul>Valem para os projetos novos.", ok: "Salvar prazos" }))) return;
+        var okz = await T.saveWith(t, function () { return T.saveConfig({ prazosPadrao: pz }); });
+        if (okz) $("cfg-prazos").dataset.dirty = "";
         return;
       }
       if (t.id === "btn-save-pesos") {
