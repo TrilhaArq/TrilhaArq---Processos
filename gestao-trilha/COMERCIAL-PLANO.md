@@ -288,8 +288,9 @@ chance de fechar) para o Financeiro, valor calculado × valor praticado.
 ## Pendências para começar a construir
 
 - Formulário de briefing de residência: as perguntas (PDF "Imprimir" do Forms) e uma resposta real preenchida.
-- Modelos de proposta do Canva exportados em PDF, indicando páginas fixas e variáveis.
-- 2–3 textos de propostas anteriores considerados os melhores (base do "jeito Trilha de escrever").
+- ~~Propostas de referência~~ — recebidas em 01/10 (Gustavo, Paula e Bruno residência e marcenaria, Heitor);
+  análise em `referencias-comercial/PROPOSTAS.md`. Falta só exportar do Canva as páginas fixas (por ora, recortadas dos PDFs).
+- ~~Textos de referência do "jeito Trilha"~~ — tirados das três propostas (ver `PROPOSTAS.md`).
 - Contrato padrão e derivações (já prontos, no documento com códigos).
 - Percentuais de referência: CAU por tipo, faixa de mercado R$/m², meta anual (simples; definir com o Luan).
 - Horas de referência iniciais por ambiente e horas gerais (sugestão do Claude, validada pelo Luan).
