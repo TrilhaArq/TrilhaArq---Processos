@@ -61,12 +61,16 @@ assinatura no gov.br.
 - Técnica: o .docx é um pacote zip; o app usa JSZip (cdnjs) para abrir, substituir e baixar (capacidade `downloads`).
   Os 47–49 campos de cada modelo estão inteiros no XML (conferido), o que torna a troca segura.
 
-## Pontos para conferir com o Luan
+## Divergências contrato × app (a decidir com o Luan)
 
-1. **Pesos das etapas:** o contrato usa EP 50 · AP 25 · PE 25 para rescisão; o app usa `pesosEtapas` EP 30 · AP 30 ·
-   Legal 10 · PE 30 para o % concluído e para distribuir horas/valor na proposta. São usos diferentes — manter os
-   dois, ou alinhar?
-2. **Prazo do Anteprojeto:** contrato 20–30 + 15 + 15 + 15–20 (+ rodadas) ≈ 65–85 dias úteis; proposta mostra
-   30 + 10 + 20 = 60; Configurações tem 70. Sugestão: manter 70 como padrão do app.
-3. **Proposta × contrato de reforma:** a reforma no contrato tem Levantamento e não tem Anteprojeto; o Gestor já
-   trata REF/INT como "reforma" (sem AP). Conferir se o Gestor tem a etapa de Levantamento.
+Regra: o app vale; onde o contrato se sobrepõe ao app, perguntar. Em aberto em 01/10/2026:
+
+| Tema | App | Contrato |
+|---|---|---|
+| Prazo do Anteprojeto | 70 dias úteis (um número) | fases em amarelo: 20–30 + 15 + 15 + 15–20, mais rodadas de compatibilização |
+| Prazo do Executivo | 60 | "40 a 60" |
+| Exigências do Legal | 10 dias úteis por exigência | não fixa prazo após o protocolo |
+| Pesos das etapas | EP 30 · AP 30 · Legal 10 · PE 30 (% concluído) | EP 50 · AP 25 · PE 25 (rescisão) |
+| Levantamento (reforma e marcenaria avulsa) | não existe no Gestor | etapa própria, 5 dias úteis |
+
+Iguais nos dois: EP 40, Legal 20 para desenvolver e protocolar, EP marcenaria 30, Executivo marcenaria 40.

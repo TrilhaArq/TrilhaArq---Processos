@@ -110,6 +110,6 @@ Base inicial do estilo, a partir das três propostas:
    opcionais ligadas por proposta (Marcenaria, Administração de Obra, Bônus). Índice gerado pela sequência.
 2. Os valores que aparecem na proposta e mudam pouco ficam em Configurações do comercial: acréscimo de NF (17%),
    validade (30 dias), percentual de Administração de Obra (12%), textos de "incluso / não incluso".
-3. **A conferir com o Luan:** o Anteprojeto aparece na proposta como 30 + 10 + 20 = 60 dias úteis; em
-   Configurações o prazo padrão é 70. O PE aparece como "40 a 60 dias".
+3. Prazos na proposta: **valem os do app** (`config/escritorio.prazosPadrao`), não os textos das propostas antigas
+   (decisão de 01/10/2026).
 4. Enquanto o Canva não for exportado, as páginas fixas podem ser recortadas da proposta do Gustavo (padrão atual).

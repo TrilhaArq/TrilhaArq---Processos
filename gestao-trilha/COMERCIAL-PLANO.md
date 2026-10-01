@@ -29,6 +29,10 @@ Futuro: área restrita a Luan e Elisa (a mesma ideia vale para Configurações e
    "rápido". No desenvolvimento: ler só o necessário, registrar decisões aqui, testar na cópia de teste e
    publicar uma vez por rodada.
 
+**Regra de prevalência (Luan, 01/10/2026):** o que já está decidido e configurado no app vale (prazos, pesos,
+faixas, etapas). Propostas antigas não geram divergência: seguem o app. Só os **contratos** podem divergir do app;
+nesses casos, perguntar ao Luan antes de decidir.
+
 ## Fluxo da oportunidade (etapas e botão principal)
 
 | Etapa | Botão principal | O que acontece |
