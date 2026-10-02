@@ -26,7 +26,7 @@ depois levar ao oficial. Não excluir a cópia: o banco dela guarda os dados fic
 
 Publicar sempre com `url` = link acima, `file_path` = `index.html`, `root` = esta pasta e `files` listando
 **todos** os arquivos (estilo.css, nucleo.js, logo.png e cada `modulos/*.js`). Não mudar `capabilities` sem
-necessidade (hoje: `db`, `downloads`, `mcp` Google Calendar com `create_event`/`update_event`); para declarar
+necessidade (hoje: `db`, `downloads`, `mcp` Google Calendar com `create_event`/`update_event`; com o Gestor Comercial fase 2 entram `assets` e `sample`); para declarar
 uma nova capacidade, repetir as existentes.
 
 **Um chat por vez** publicando neste artefato. Antes de começar, ler a versão publicada (Artifact `read`) ou o
@@ -101,7 +101,7 @@ checklists de um item fora do Gestor, como faz a área da pessoa).
   campos a `projetos` (ex.: `perfil`, usado na precificação), mas nunca renomear ou apagar os existentes.
 - Coleções de módulos em uso: `lancamentos`, `atividades`, `timers` (Tempo); `tarefas` (Tarefas);
   `fin_config`, `fin_contratos`, `fin_mov`, `fin_recorrentes` (Financeiro);
-  `fechamentos` (Relatórios); `gp`, `gp_config` (Gestor de Projetos); `contatos`, `obras` (Cadastros). `com_oport` (uma oportunidade por documento) e `com_config/geral` (Gestor Comercial). Um módulo novo usa coleções com o próprio prefixo/nome e as documenta aqui.
+  `fechamentos` (Relatórios); `gp`, `gp_config` (Gestor de Projetos); `contatos`, `obras` (Cadastros). `com_oport` (uma oportunidade por documento), `com_config/geral` (percentuais, horas, mensagens) e `com_config/modelos` (modelos de proposta e de contrato, textos exemplares) (Gestor Comercial). Arquivos (páginas fixas, logos, contratos em base64) ficam no armazenamento de arquivos do artefato (capacidade `assets`); o banco guarda só o id. Um módulo novo usa coleções com o próprio prefixo/nome e as documenta aqui.
 - Toda gravação feita pelo Claude no chat (ArtifactData) usa `if_version` do documento lido.
 - **Documentos do banco chegam somente-leitura** (`d.data()` é congelado no app real): nunca alterar o objeto
   recebido; copiar com `T.clone` antes de ajustar formatos antigos. Nos testes, o banco simulado deve congelar os
@@ -146,4 +146,5 @@ checklists de um item fora do Gestor, como faz a área da pessoa).
 | Relatórios | `modulos/relatorios.js` | admin | em uso |
 | Configurações | `modulos/config.js` | admin | em uso |
 | Gestor Comercial (oportunidades, briefing, simulador) | `modulos/comercial.js` | admin | v1 em teste na cópia de teste (02/10/2026); expõe `T.comercial` |
+| Documentos do Comercial (proposta PDF, contrato .docx, IA) | `modulos/comercial-docs.js` | — | não se registra; expõe `T.comercialDocs`, carregado antes de `comercial.js` |
 | Gestor de obras (orçamento de obras) | — | admin | "Em breve" na capa — portar o app de orçamento (skill orcamento-obra-trilha), itens agrupados por obra |

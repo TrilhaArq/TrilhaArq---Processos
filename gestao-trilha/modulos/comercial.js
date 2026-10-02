@@ -70,7 +70,7 @@
       followup: "Olá, {nome}! Tudo bem? Conseguiu ver a proposta do seu projeto? Se quiser, marcamos uma conversa para tirar dúvidas."
     }
   };
-  var S = { ops: [], cfg: null, fin: null, loaded: false, view: "lista", opId: null, tab: "resumo", acao: null, ed: null, dirty: false, ano: new Date().getFullYear(), verFim: false, imp: null, novo: null, cfgEd: null };
+  var S = { ops: [], cfg: null, fin: null, loaded: false, view: "lista", opId: null, tab: "resumo", acao: null, ed: null, dirty: false, ano: new Date().getFullYear(), verFim: false, imp: null, novo: null, cfgEd: null, mod: null, modEd: null, prev: null, ia: null };
 
   function C() {
     var c = S.cfg || {}, o = Object.assign({}, DEF, c);
@@ -113,6 +113,27 @@
     if (m[2] === "k" || m[2] === "mil") v *= 1000; else if (m[2]) v *= 1000000;
     return v;
   }
+
+  // ---------- modelos (com_config/modelos): proposta = sequência de páginas; contratos = .docx oficial ----------
+  var CONTRATOS = [
+    { id: "01", nome: "Projeto do zero com aprovação", grupo: "zero", legal: true }, { id: "02", nome: "Projeto do zero sem aprovação", grupo: "zero", legal: false },
+    { id: "03", nome: "Reforma com aprovação", grupo: "reforma", legal: true }, { id: "04", nome: "Reforma sem aprovação", grupo: "reforma", legal: false },
+    { id: "05", nome: "Marcenaria avulsa", grupo: "marc", vinculada: false }, { id: "06", nome: "Marcenaria vinculada", grupo: "marc", vinculada: true }
+  ];
+  function MOD() { return S.mod || {}; }
+  function modeloProposta(o) { var l = MOD().propostas || []; return l.filter(function (m) { return !m.tipos || !m.tipos.length || m.tipos.indexOf(o.tipo) >= 0; })[0] || l[0] || null; }
+  function contratoInfo(id) { var c = (MOD().contratos || []).filter(function (x) { return x.id === id; })[0] || {}; return Object.assign({}, T.byId(CONTRATOS.map(function (x) { return Object.assign({ id: x.id }, x); }), id) || {}, c); }
+  // sugestão do modelo de contrato: tipo (RES/COM/HOT = do zero; REF/INT = reforma; MARC = marcenaria) e Projeto Legal
+  function contratoSugerido(o) {
+    if (o.tipo === "MARC") return (o.ctr && o.ctr.projArq) ? "06" : "05";
+    if (o.tipo === "SERV") return null;
+    var leg = legalDe(o); return doZero(o.tipo) ? (leg ? "01" : "02") : (leg ? "03" : "04");
+  }
+  function ctxProposta(o) {
+    var c = C(), op = Object.assign({ admPct: c.admObraPct }, o.prop || {});
+    return { o: o, r: calc(o), marca: MOD().marca || {}, setores: SETORES, opc: op, legal: legalDe(o) && o.tipo !== "MARC", validade: c.validadeDias, nf: c.nfPct, modelo: modeloProposta(o) };
+  }
+  function nomeArquivoProposta(o) { var p = o.proposta || {}, d = p.enviadaEm || hoje(); return (p.numero || proxNumero()) + "_" + T.comercialDocs.ddmmaa(d) + " - Proposta " + tipoNome(o.tipo) + " " + nome0(o) + ".pdf"; }
 
   // ---------- cálculo do simulador ----------
   function custoHora() {
@@ -463,7 +484,7 @@
     var n = S.novo, nome = $("cn-nome").value.trim(); if (!nome) { T.toast("Informe o nome do cliente."); return; }
     var tel = $("cn-tel").value.trim(), email = $("cn-email").value.trim(), cliId = $("cn-cli").value, novoId = null;
     await T.saveWith($("cn-salvar"), async function () {
-      if (!cliId && T.cadastros) cliId = await T.cadastros.criarContato({ tipos: ["cliente"], nome: nome, contato: tel, email: email, categoria: "Comercial", endereco: $("cn-end").value.trim() });
+      if (!cliId && T.cadastros) cliId = await T.cadastros.criarContato({ tipos: ["cliente"], nome: nome, contato: tel, email: email, categoria: "Comercial" });
       var agora = new Date().toISOString(), obs = $("cn-obs").value.trim();
       var body = { tipo: n.tipo, etapa: "contato", etapaEm: agora, etapaMax: 0, criadoEm: agora, atualizadoEm: agora, clienteId: cliId || null, cliente: { nome: nome, telefone: tel, email: email },
         endereco: $("cn-end").value.trim(), origem: $("cn-origem").value, indicadoPor: $("cn-ind").value.trim(), notas: obs, cat: { dimensao: "confortavel", cliente: "normal" },
@@ -474,8 +495,8 @@
   }
 
   // ---------- oportunidade ----------
-  var ABAS = [["resumo", "Resumo"], ["briefing", "Briefing"], ["programa", "Programa"], ["simulador", "Simulador"], ["proposta", "Proposta"], ["historico", "Histórico"]];
-  function abrir(id, tab) { S.view = "op"; S.opId = id; S.tab = tab || "resumo"; S.acao = null; S.ed = null; S.dirty = false; S.imp = null; render(); window.scrollTo(0, 0); }
+  var ABAS = [["resumo", "Resumo"], ["briefing", "Briefing"], ["programa", "Programa"], ["simulador", "Simulador"], ["proposta", "Proposta"], ["contrato", "Contrato"], ["historico", "Histórico"]];
+  function abrir(id, tab) { S.view = "op"; S.opId = id; S.tab = tab || "resumo"; S.acao = null; S.ed = null; S.dirty = false; S.imp = null; S.ctrEd = null; S.prev = null; S.ia = null; render(); window.scrollTo(0, 0); }
   function ed() { var o = op(S.opId); if (!o) return null; if (!S.ed || S.ed.id !== o.id) S.ed = T.clone(o); return S.ed; }
   function renderOp() {
     var o = op(S.opId); if (!o) { $("com-op").innerHTML = '<div class="empty">' + (S.loaded ? "Oportunidade não encontrada." : "Carregando…") + '</div><button class="btn" data-act="voltar">← Comercial</button>'; return; }
@@ -522,14 +543,15 @@
       return (falta.length ? '<p class="hint warn">Antes de apresentar: ' + falta.join(" e ") + ".</p>" : "") +
         (exp ? '<div class="gp-aviso bad">O cliente informou ' + BRL(r.disp) + " para a obra; a estimativa é " + BRL(r.obra) + " (" + T.fmtNum(r.razao, 1) + "×). Alinhe a expectativa com o cliente antes de apresentar (aba Simulador).</div>" : "") +
         '<div class="grid-form"><div class="field col-4"><label for="ca-num">Nº da proposta</label><input id="ca-num" type="number" min="1" value="' + proxNumero() + '"></div><div class="field col-4"><label for="ca-dt">Apresentada em</label><input type="date" id="ca-dt" value="' + hoje() + '"></div><div class="field col-4"><label for="ca-val">Válida até</label><input type="date" id="ca-val" value="' + addDiasYmd(c.validadeDias) + '"></div></div>' +
-        '<p class="hint">O PDF da proposta chega na próxima versão; por enquanto, a proposta segue pelo Canva com os números do Simulador.</p>' +
+        '<div class="form-actions"><button class="btn btn-small" data-act="pdf">Baixar PDF da proposta</button><span class="hint" id="cpp-pdf-st"></span></div>' +
         msgBox("ca-msg", preencher(c.msgs.proposta, o, { validade: T.fmtYmd(addDiasYmd(c.validadeDias)) }), tel) +
         '<div class="form-actions"><button class="btn btn-primary" data-act="ok-apresentar"' + (falta.length ? " disabled" : "") + '>Proposta apresentada</button><button class="btn" data-act="cancelar">Cancelar</button></div>';
     }
     if (a === "followup") return msgBox("ca-msg", preencher(c.msgs.followup, o), tel) + '<div class="form-actions"><button class="btn btn-primary" data-act="ok-followup">Registrar follow-up</button><button class="btn" data-act="cancelar">Fechar</button></div>';
-    if (a === "assinado") return '<div class="grid-form"><div class="field col-4"><label for="ca-cnum">Nº do contrato</label><input id="ca-cnum" placeholder="nº do projeto + DDMMAA"></div><div class="field col-4"><label for="ca-cdt">Data</label><input type="date" id="ca-cdt" value="' + hoje() + '"></div><div class="field col-4"><label for="ca-ccid">Cidade</label><input id="ca-ccid" value="Juiz de Fora/MG"></div>' +
-      '<div class="field col-6"><label for="ca-cval">Valor fechado (R$)</label><input id="ca-cval" type="number" min="0" step="0.01" value="' + (r.final ? r2(r.final) : "") + '"></div>' +
-      '<p class="hint col-12">O contrato .docx preenchido e as parcelas no Financeiro chegam na próxima versão.</p><div class="col-12 form-actions"><button class="btn btn-primary" data-act="ok-assinado">Contrato assinado</button><button class="btn" data-act="cancelar">Cancelar</button></div></div>';
+    if (a === "assinado") { var dc = dadosContrato(o), tot = dc.parcelas.reduce(function (s, p) { return s + (+p.valor || 0); }, 0); return '<div class="grid-form"><div class="field col-4"><label for="ca-cnum">Nº do contrato</label><input id="ca-cnum" value="' + esc(dc.numero) + '" placeholder="nº do projeto + DDMMAA"></div><div class="field col-4"><label for="ca-cdt">Data</label><input type="date" id="ca-cdt" value="' + esc(dc.data) + '"></div><div class="field col-4"><label for="ca-ccid">Cidade</label><input id="ca-ccid" value="' + esc(dc.cidade) + '"></div>' +
+      '<div class="field col-6"><label for="ca-cval">Valor fechado (R$)</label><input id="ca-cval" type="number" min="0" step="0.01" value="' + (tot ? r2(tot) : r.final ? r2(r.final) : "") + '"></div>' +
+      '<p class="hint col-12">' + dc.parcelas.length + (dc.parcelas.length === 1 ? " parcela" : " parcelas") + " (aba Contrato) entram no Financeiro quando a oportunidade virar projeto.</p>" +
+      '<div class="col-12 form-actions"><button class="btn btn-primary" data-act="ok-assinado">Contrato assinado</button><button class="btn" data-act="cancelar">Cancelar</button></div></div>'; }
     if (a === "perder") return '<div class="grid-form"><div class="field col-12"><span class="label">Motivo</span><div class="segmented">' + c.motivos.map(function (m) { return '<button type="button" class="seg-pill" data-motivo="' + esc(m) + '">' + esc(m) + "</button>"; }).join("") + '</div></div><div class="field col-12"><label for="ca-pnota">Observação (opcional)</label><input id="ca-pnota"></div><div class="col-12 form-actions"><button class="btn" data-act="cancelar">Cancelar</button></div></div>';
     if (a === "virar") {
       var dz = doZero(o.tipo) || o.tipo === "REF" || o.tipo === "INT";
@@ -551,6 +573,7 @@
     if (S.tab === "programa") return abaPrograma(x, r);
     if (S.tab === "simulador") return abaSimulador(x, r);
     if (S.tab === "proposta") return abaProposta(o, x, r);
+    if (S.tab === "contrato") return abaContrato(o, x, r);
     if (S.tab === "historico") return abaHistorico(o);
     return abaResumo(o, x, r);
   }
@@ -686,15 +709,107 @@
   }
 
   function abaProposta(o, x, r) {
-    var p = o.proposta || {}, am = (x.programa || {}).amb || [];
-    return '<div class="gp-cols"><form class="card gp-box" id="cpp-form"><h3 class="panel-title">Sua demanda</h3><p class="hint">Texto da proposta sobre o cliente e a casa (3ª pessoa, no jeito Trilha). Vira também a descrição do projeto no Gestor. A redação pela IA chega na próxima versão.</p>' +
-      '<div class="field"><label for="cpp-dem">Texto</label><textarea id="cpp-dem" rows="12" placeholder="Residência para moradia…">' + esc(o.demanda || "") + "</textarea></div>" +
-      '<div class="form-actions"><button class="btn btn-primary" id="cpp-salvar" type="submit">Salvar texto</button></div>' +
-      (o.impressoes ? '<div class="cfg-pesos-t">Impressões do arquiteto</div><p class="hint">' + esc(o.impressoes) + "</p>" : "") + "</form>" +
-      '<div class="card gp-box"><h3 class="panel-title">Resumo para a proposta</h3>' + kv("Nº", p.numero ? p.numero + "_" + (p.enviadaEm ? p.enviadaEm.slice(8, 10) + p.enviadaEm.slice(5, 7) + p.enviadaEm.slice(2, 4) : "") : "definido ao apresentar") +
+    var p = o.proposta || {}, am = (x.programa || {}).amb || [], op = o.prop || {}, c = C(), mod = modeloProposta(o), ia = S.ia;
+    var temIA = !!(window.claude && window.claude.use);
+    var h = '<div class="gp-cols"><form class="card gp-box" id="cpp-form"><h3 class="panel-title">Sua demanda</h3><p class="hint">Texto da proposta sobre o cliente e a casa (3ª pessoa, no jeito Trilha). Vira também a descrição do projeto no Gestor.</p>' +
+      '<div class="field"><label for="cpp-dem">Texto</label><textarea id="cpp-dem" rows="14" placeholder="Residência para moradia…">' + esc(ia && ia.texto != null ? ia.texto : o.demanda || "") + "</textarea></div>" +
+      (temIA ? '<div class="com-ia"><button type="button" class="btn btn-small" data-act="ia-escrever"' + (ia && ia.rodando ? " disabled" : "") + '>✨ Escrever com o Claude</button>' +
+        '<input class="ctl com-in-n" id="cpp-ori" placeholder="Orientação: mais curto, cite a vista para a serra…" aria-label="Orientação para reescrever"><button type="button" class="btn btn-small" data-act="ia-reescrever"' + (ia && ia.rodando ? " disabled" : "") + '>Reescrever</button></div>' +
+        '<p class="hint">' + (ia && ia.rodando ? "O Claude está escrevendo…" : "A IA usa o briefing, as impressões do arquiteto e os textos exemplares (Configurações do comercial). Cada pedido consome uso da conta Claude de quem clica. O texto é rascunho: revise antes de salvar.") + "</p>" : "") +
+      (o.tipo === "MARC" ? '<div class="field"><label for="cpp-mov">Móveis (um ambiente por linha — Ambiente: móvel, móvel)</label><textarea id="cpp-mov" rows="6" placeholder="Cozinha: armário da bancada, ilha, despensa">' + esc(o.moveis || "") + "</textarea></div>" : "") +
+      '<div class="form-actions"><button class="btn btn-primary" id="cpp-salvar" type="submit">Salvar texto</button><button type="button" class="btn btn-small" data-act="ia-exemplo">Guardar como exemplo</button></div>' +
+      (o.impressoes ? '<div class="cfg-pesos-t">Impressões do arquiteto</div><p class="hint">' + esc(o.impressoes) + "</p>" : "") + "</form>";
+    h += '<div class="gp-box"><form class="card gp-box" id="cpo-form"><h3 class="panel-title">Opções da proposta</h3>' +
+      (o.tipo !== "MARC" ? '<label class="gp-check"><input type="checkbox" id="cpo-marc"' + (op.marc ? " checked" : "") + '> Incluir Projeto de Marcenaria</label><div class="field"><label for="cpo-marcv">Valor da marcenaria (R$)</label><input type="number" min="0" step="0.01" id="cpo-marcv" value="' + (op.marcValor != null ? op.marcValor : "") + '" placeholder="vazio = a combinar"></div>' +
+        '<label class="gp-check"><input type="checkbox" id="cpo-adm"' + (op.adm ? " checked" : "") + '> Incluir Administração de Obra</label><div class="field"><label for="cpo-admp">Percentual (%)</label><input type="number" min="0" step="0.5" id="cpo-admp" value="' + (op.admPct != null ? op.admPct : c.admObraPct) + '"></div>'
+        : '<label class="gp-check"><input type="checkbox" id="cpo-apos"' + (op.aposArq ? " checked" : "") + '> Pagamento começa depois do pagamento da arquitetura</label>') +
+      '<div class="form-actions"><button class="btn btn-small btn-primary" id="cpo-salvar" type="submit">Salvar opções</button></div></form>' +
+      '<div class="card gp-box"><h3 class="panel-title">PDF da proposta</h3><p class="hint">Modelo: <b>' + esc(mod ? mod.nome : "sem modelo (só as páginas variáveis)") + "</b>" + (mod && !(mod.paginas || []).some(function (pg) { return pg.t === "fixa" && pg.img; }) ? " · sem páginas fixas ainda" : "") + ". Troque páginas e ordem em Configurações do comercial › Modelos.</p>" +
+      '<div class="form-actions"><button class="btn" data-act="prev">' + (S.prev && S.prev.id === o.id ? "Atualizar prévia" : "Pré-visualizar") + '</button><button class="btn btn-primary" data-act="pdf">Baixar PDF</button><span class="hint" id="cpp-pdf-st"></span></div></div>' +
+      '<div class="card gp-box"><h3 class="panel-title">Resumo</h3>' + kv("Nº", p.numero ? p.numero + "_" + T.comercialDocs.ddmmaa(p.enviadaEm) : "definido ao apresentar") +
       kv("Área estimada", m2(r.area)) + kv("Ambientes", am.length) + kv("Padrão", r.pad ? T.padraoRotulo(r.pad) : "—") + kv("Custo da obra", r.obra ? BRL(r.obra) + (r.obraAlta ? " a " + BRL(r.obraAlta) : "") : "—") +
-      r.etapas.map(function (e) { return kv(e.nome, horas(e.h)); }).join("") + kv("Investimento", BRL(r.final) + (r.valor && r.tabela && r.valor < r.tabela ? " (de " + BRL(r.tabela) + ")" : "")) +
-      kv("% do custo da obra", pct(r.pctObra, 2)) + (r.parcela ? kv("Pagamento", "entrada de " + BRL(r.entrada) + " + " + r.np + " × " + BRL(r.parcela)) : "") + kv("Válida até", p.validadeAte ? T.fmtYmd(p.validadeAte) : "—") + "</div></div>";
+      kv("Investimento", BRL(r.final) + (r.valor && r.tabela && r.valor < r.tabela ? " (de " + BRL(r.tabela) + ")" : "")) + kv("% do custo da obra", pct(r.pctObra, 2)) + (r.parcela ? kv("Pagamento", "entrada de " + BRL(r.entrada) + " + " + r.np + " × " + BRL(r.parcela)) : "") + kv("Válida até", p.validadeAte ? T.fmtYmd(p.validadeAte) : "—") + "</div></div></div>";
+    if (S.prev && S.prev.id === o.id) h += '<div class="card gp-box"><h3 class="panel-title">Prévia · ' + S.prev.pags.length + ' páginas</h3><div class="pp-prev">' + S.prev.pags.map(function (pg, i) { return '<div class="pp-mini-w" title="Página ' + (i + 1) + '">' + (pg.img ? '<img src="' + T.comercialDocs.blob(pg.img) + '" alt="Página ' + (i + 1) + '">' : pg.html) + "</div>"; }).join("") + "</div></div>";
+    return h;
+  }
+  // ---------- aba Contrato ----------
+  function dadosContrato(o) {
+    var c = o.ctr || {}, cli = Object.assign({}, c.cli || {}), ct = o.clienteId && T.cadastros ? T.cadastros.contato(o.clienteId) : null, d = o.dados || {}, r = calc(o);
+    if (!cli.nome) cli.nome = (o.cliente && o.cliente.nome) || ""; if (!cli.telefone) cli.telefone = (o.cliente && o.cliente.telefone) || ""; if (!cli.email) cli.email = (o.cliente && o.cliente.email) || "";
+    if (!cli.profissao && d.profissao) cli.profissao = d.profissao; if (!cli.doc && ct && ct.doc) cli.doc = ct.doc; if (!cli.endereco && ct && ct.endereco) cli.endereco = ct.endereco;
+    if (!cli.nacionalidade) cli.nacionalidade = "brasileiro(a)";
+    var data = c.data || hoje(), numero = c.numero || ((o.proposta && o.proposta.numero) ? o.proposta.numero + T.comercialDocs.ddmmaa(data) : "");
+    var parcelas = c.parcelas && c.parcelas.length ? c.parcelas : parcelasSim(o, r, data);
+    return { modelo: c.modelo || contratoSugerido(o), tipoEdif: c.tipoEdif || ({ RES: "uma residência", COM: "um espaço comercial", HOT: "um empreendimento hoteleiro", REF: "uma residência", INT: "uma residência", MARC: "uma residência" }[o.tipo] || ""),
+      matricula: c.matricula || "", cli: cli, numero: numero, data: data, cidade: c.cidade || "Juiz de Fora/MG", projArq: c.projArq || "", escopo: c.escopo != null ? c.escopo : (o.demanda || ""), parcelas: parcelas };
+  }
+  function parcelasSim(o, r, data) {
+    if (!r.final) return []; var out = [], ini = T.parseYmd(data);
+    if (!r.np) return [{ valor: Math.round(r.final * 100) / 100, vencimento: data }];
+    if (r.entrada) out.push({ valor: r.entrada, vencimento: data });
+    for (var i = 1; i <= r.np; i++) { var dd = new Date(ini.getFullYear(), ini.getMonth() + i, Math.min(ini.getDate(), 28)); out.push({ valor: Math.round(r.parcela * 100) / 100, vencimento: T.ymd(dd) }); }
+    var soma = out.reduce(function (s, p) { return s + p.valor; }, 0), dif = Math.round((r.final - soma) * 100) / 100; if (dif && out.length) out[out.length - 1].valor = Math.round((out[out.length - 1].valor + dif) * 100) / 100;
+    return out;
+  }
+  function abaContrato(o, x, r) {
+    if (o.tipo === "SERV") return '<div class="card gp-box"><p>Serviços menores terão proposta e contrato simplificados (3–4 páginas), montados pela IA a partir de um modelo curto — na próxima rodada.</p></div>';
+    var d = S.ctrEd && S.ctrEd.id === o.id ? S.ctrEd.d : (S.ctrEd = { id: o.id, d: dadosContrato(o) }).d, cli = d.cli, info = contratoInfo(d.modelo), sug = contratoSugerido(o);
+    function f(id, l, v, cls, extra) { return '<div class="field ' + (cls || "col-4") + '"><label for="' + id + '">' + l + '</label><input id="' + id + '" data-ctr="' + id + '" value="' + esc(v || "") + '"' + (extra || "") + "></div>"; }
+    var soma = d.parcelas.reduce(function (s, p) { return s + (+p.valor || 0); }, 0);
+    var projs = T.state.projetos.filter(function (p) { return (p.status || "ativo") !== "concluido"; }).sort(function (a, b) { return a.nome.localeCompare(b.nome); });
+    return '<form class="card gp-box" id="ctr-form"><h3 class="panel-title">Dados do contrato</h3><div class="grid-form">' +
+      '<div class="field col-8"><label for="ctr-modelo">Modelo de contrato</label><select id="ctr-modelo" data-ctr="ctr-modelo">' + CONTRATOS.map(function (m) { var i2 = contratoInfo(m.id); return '<option value="' + m.id + '"' + (m.id === d.modelo ? " selected" : "") + ">" + m.id + " · " + esc(m.nome) + (i2.asset ? "" : " (arquivo não carregado)") + (m.id === sug ? " — sugerido" : "") + "</option>"; }).join("") + "</select>" +
+        '<span class="hint">' + (info.asset ? "Versão " + esc(info.versao || "—") + ". As cláusulas não mudam; o app só preenche os campos." : "Carregue o .docx em Configurações do comercial › Modelos.") + (d.modelo !== sug && sug ? " O sugerido pelo tipo e pelo Projeto Legal é o " + sug + "." : "") + "</span></div>" +
+      f("ctr-num", "Nº do contrato", d.numero, "col-4", ' placeholder="nº do projeto + DDMMAA"') +
+      f("ctr-edif", "Edificação (\"…para uma residência\")", d.tipoEdif, "col-4") + f("ctr-matr", "Matrícula do imóvel (opcional)", d.matricula, "col-4") + f("ctr-data", "Data do contrato", d.data, "col-4", ' type="date"') +
+      '<div class="col-12 cfg-pesos-t">Contratante</div>' +
+      f("ctr-cnome", "Nome", cli.nome, "col-6") + f("ctr-cnac", "Nacionalidade", cli.nacionalidade, "col-3") + f("ctr-cciv", "Estado civil", cli.estadoCivil, "col-3") +
+      f("ctr-cprof", "Profissão", cli.profissao, "col-4") + f("ctr-cdoc", "CPF/CNPJ", cli.doc, "col-4") + f("ctr-crg", "RG", cli.rg, "col-4") +
+      f("ctr-cend", "Endereço residencial", cli.endereco, "col-12") + f("ctr-cmail", "E-mail", cli.email, "col-6") + f("ctr-ctel", "Telefone", cli.telefone, "col-6") +
+      (o.tipo === "MARC" ? '<div class="field col-12"><label for="ctr-parq">Projeto de arquitetura da Trilha (marcenaria vinculada)</label><select id="ctr-parq" data-ctr="ctr-parq"><option value="">— Nenhum (marcenaria avulsa) —</option>' + projs.map(function (p) { return '<option value="' + esc(p.id) + '"' + (p.id === d.projArq ? " selected" : "") + ">" + esc(p.nome) + (p.contrato && p.contrato.numero ? " · contrato " + esc(p.contrato.numero) : "") + "</option>"; }).join("") + "</select></div>" : "") +
+      '<div class="field col-12"><label for="ctr-esc">Escopo (conceito do projeto)</label><textarea id="ctr-esc" data-ctr="ctr-esc" rows="6">' + esc(d.escopo) + "</textarea></div>" +
+      f("ctr-cid", "Cidade (assinatura)", d.cidade, "col-6") + "</div>" +
+      '<div class="cfg-pesos-t">Honorários: ' + BRL(soma) + (r.final && Math.abs(soma - r.final) > 1 ? ' <span class="hint warn">(o simulador diz ' + BRL(r.final) + ")</span>" : "") + '</div><div class="com-parc">' +
+      d.parcelas.map(function (p, i) { return '<span class="hint">' + (i + 1) + 'ª</span><input class="ctl" type="number" min="0" step="0.01" data-parc="' + i + '" data-k="valor" value="' + p.valor + '" aria-label="Valor da parcela ' + (i + 1) + '"><input class="ctl" type="date" data-parc="' + i + '" data-k="vencimento" value="' + esc(p.vencimento || "") + '" aria-label="Vencimento da parcela ' + (i + 1) + '"><button type="button" class="link danger" data-rmparc="' + i + '">Remover</button>'; }).join("") + "</div>" +
+      '<div class="form-actions"><button type="button" class="btn btn-small" data-act="parc-add">+ Parcela</button><button type="button" class="btn btn-small" data-act="parc-sim">Refazer pelo simulador</button></div>' +
+      '<p class="hint">Os prazos em amarelo do contrato vêm do modelo; os que você negociou na aba Simulador substituem o número do Estudo Preliminar, do Executivo e do Legal. Anexos: programa e respostas do briefing entram sozinhos.</p>' +
+      '<div class="form-actions"><button class="btn btn-primary" id="ctr-salvar" type="submit">Salvar dados</button><button type="button" class="btn" data-act="ctr-gerar"' + (info.asset ? "" : " disabled") + '>Gerar contrato (.docx)</button><span class="hint" id="ctr-st"></span></div></form>';
+  }
+  function lerFormContrato() {
+    var e = S.ctrEd; if (!e) return null; var d = e.d, v = function (id) { var el = $(id); return el ? el.value.trim() : null; };
+    if ($("ctr-modelo")) d.modelo = $("ctr-modelo").value;
+    d.numero = v("ctr-num"); d.tipoEdif = v("ctr-edif"); d.matricula = v("ctr-matr"); d.data = v("ctr-data") || hoje(); d.cidade = v("ctr-cid"); d.escopo = $("ctr-esc").value;
+    if ($("ctr-parq")) d.projArq = $("ctr-parq").value;
+    d.cli = { nome: v("ctr-cnome"), nacionalidade: v("ctr-cnac"), estadoCivil: v("ctr-cciv"), profissao: v("ctr-cprof"), doc: v("ctr-cdoc"), rg: v("ctr-crg"), endereco: v("ctr-cend"), email: v("ctr-cmail"), telefone: v("ctr-ctel") };
+    return d;
+  }
+  async function gerarContratoOp(o, btn) {
+    var d = lerFormContrato(), info = contratoInfo(d.modelo), st = $("ctr-st"), r = calc(o);
+    if (!info.asset) { T.toast("Carregue o .docx deste modelo em Configurações do comercial."); return; }
+    if (!T.downloads) { T.toast("Esta visualização não permite baixar arquivos."); return; }
+    var D = T.comercialDocs, total = d.parcelas.reduce(function (s, p) { return s + (+p.valor || 0); }, 0);
+    var amb = (o.programa || {}).amb || [], prog = SETORES.map(function (sx) { var l = amb.filter(function (a) { return (a.setor || "social") === sx[0]; }); return l.length ? sx[1] + ": " + l.map(function (a) { return a.nome + (a.qtd > 1 ? " (" + a.qtd + ")" : "") + (a.area ? " – " + T.fmtNum((+a.area) * (+a.qtd || 1), 1) + " m²" : ""); }).join("; ") + "." : ""; }).filter(Boolean);
+    if (amb.length) prog.push("Área total estimada: " + T.fmtNum(r.area || areaProg(o) * 1.2, 1) + " m² (ambientes + 10% de circulação + 10% de paredes e estrutura).");
+    var moveis = String(o.moveis || "").split("\n").map(function (l) { var m = l.split(":"); return m.length > 1 ? [m[0].trim(), m.slice(1).join(":").trim()] : null; }).filter(Boolean);
+    var parq = d.projArq ? T.projeto(d.projArq) : null, pzPad = Object.assign({}, T.DEFAULT_CONFIG.prazosPadrao, T.cfg().prazosPadrao || {}), pz = {};
+    Object.keys(o.prazos || {}).forEach(function (k) { var v = (o.prazos || {})[k]; if (v && v !== pzPad[k] && v !== pzPad["ref" + k.charAt(0).toUpperCase() + k.slice(1)]) pz[k] = v; });
+    var campos = { contrato_numero: d.numero, tipo_edificacao: d.tipoEdif, area_estimada: r.area ? T.fmtNum(Math.round(r.area), 0) : "", projeto_endereco: o.endereco || "", imovel_matricula: d.matricula,
+      cliente_nome: d.cli.nome, cliente_nacionalidade: d.cli.nacionalidade, cliente_estado_civil: d.cli.estadoCivil, cliente_profissao: d.cli.profissao, cliente_cpf_cnpj: d.cli.doc, cliente_rg: d.cli.rg, cliente_endereco: d.cli.endereco, cliente_email: d.cli.email, cliente_telefone: d.cli.telefone,
+      proposta_numero: (o.proposta && o.proposta.numero) || "", valor_total: D.numBR(total), valor_total_extenso: D.reaisExtenso(total), cidade: d.cidade, contrato_data_extenso: D.dataExtenso(d.data),
+      ambientes_marcenaria: moveis.map(function (m) { return m[0]; }).join(", "), contrato_arquitetura_numero: parq && parq.contrato ? parq.contrato.numero || "" : "" };
+    var falta = ["cliente_nome", "cliente_cpf_cnpj", "contrato_numero", "projeto_endereco"].filter(function (k) { return !campos[k]; });
+    if (falta.length && !(await T.confirmar({ titulo: "Faltam dados", texto: "Campos vazios: " + falta.map(function (k) { return k.replace(/_/g, " "); }).join(", ") + ". Gerar mesmo assim (ficam em branco no documento)?", ok: "Gerar" }))) return;
+    btn.disabled = true; st.textContent = "Gerando…";
+    try {
+      var b64 = await D.lerAsset(info.asset);
+      var ab = await D.gerarContrato(b64, { campos: campos, parcelas: d.parcelas, escopoLinhas: String(d.escopo || "").split(/\n\s*\n|\n/).map(function (x) { return x.trim(); }).filter(Boolean), programaLinhas: prog,
+        briefingLinhas: ((o.briefing || {}).resp || []).map(function (x) { return x.p + ": " + x.r; }), moveis: moveis, prazos: pz });
+      st.textContent = "Salvando…";
+      await T.downloads.save({ filename: "Contrato " + (d.numero || "") + " - " + (d.cli.nome || nome0(o)) + ".docx", data: ab });
+      st.textContent = "Contrato gerado ✓";
+      await salvarOp(o.id, function (x) { x.ctr = d; hist(x, "Contrato gerado (modelo " + d.modelo + (info.versao ? ", versão " + info.versao : "") + ")"); });
+    } catch (e) { st.textContent = e && e.code === "declined" ? "Download cancelado" : "Não foi possível gerar: " + (e && e.message || e); }
+    finally { btn.disabled = false; }
   }
   function abaHistorico(o) {
     return '<div class="card gp-box"><form class="form-actions" id="ch-form"><input class="ctl com-in-n" id="ch-txt" placeholder="Registrar uma conversa, ligação, decisão…" aria-label="Novo registro"><button class="btn btn-small btn-primary" id="ch-salvar" type="submit">Registrar</button></form>' +
@@ -721,7 +836,77 @@
       '<div class="grid-form"><div class="field col-6"><label for="cc-origens">Origens (uma por linha)</label><textarea rows="5" id="cc-origens">' + esc(c.origens.join("\n")) + '</textarea></div><div class="field col-6"><label for="cc-motivos">Motivos de perda (um por linha)</label><textarea rows="5" id="cc-motivos">' + esc(c.motivos.join("\n")) + "</textarea></div></div>" +
       '<div class="form-actions"><button class="btn btn-primary" id="cc-salvar" type="submit">Salvar configurações</button></div>' +
       '<p class="hint">Faixas de R$/m² dos padrões de obra: Configurações › Padrões de obra. Custo-hora da equipe: Configurações › Pessoas. Imposto: Financeiro.</p></form>';
-    $("com-cfg").innerHTML = h;
+    $("com-cfg").innerHTML = h + cfgModelos();
+  }
+  // Modelos: páginas da proposta (ordem, ligar/desligar, opcional, trocar imagem), contratos (.docx) e textos exemplares.
+  function cfgModelos() {
+    var m = S.modEd || (S.modEd = T.clone(MOD())), D = T.comercialDocs;
+    m.propostas = m.propostas || []; m.contratos = m.contratos || []; m.exemplos = m.exemplos || []; m.marca = m.marca || {};
+    var k = Math.min(S.modSel || 0, Math.max(0, m.propostas.length - 1)), pm = m.propostas[k];
+    var vn = {}; D.VARIAVEIS.forEach(function (v) { vn[v[0]] = v[1]; });
+    var h = '<div class="card gp-box" id="cm-box"><h3 class="panel-title">Modelos de proposta</h3><p class="hint">Um modelo é uma sequência de páginas: <b>fixas</b> (imagens exportadas do Canva — apresentação, portfólio, etapas) e <b>variáveis</b> (desenhadas pelo app com os dados da oportunidade). Trocar o design = trocar as imagens; mudar a ordem = setas. Páginas opcionais só entram quando a opção está marcada na proposta.</p>';
+    if (!pm) h += '<div class="empty">Nenhum modelo ainda.</div><div class="form-actions"><button class="btn btn-small" data-cm="novo-mod">+ Novo modelo</button></div>';
+    else {
+      h += '<div class="form-actions">' + (m.propostas.length > 1 ? '<select class="ctl" id="cm-sel">' + m.propostas.map(function (x, i) { return '<option value="' + i + '"' + (i === k ? " selected" : "") + ">" + esc(x.nome) + "</option>"; }).join("") + "</select>" : "") + '<button class="btn btn-small" data-cm="copiar-mod">Duplicar modelo</button></div>' +
+        '<div class="grid-form"><div class="field col-6"><label for="cm-nome">Nome do modelo</label><input id="cm-nome" data-cmf="nome" value="' + esc(pm.nome || "") + '"></div><div class="field col-6"><span class="label">Tipos de projeto</span><div class="gp-multi">' +
+        TIPOS.map(function (t) { return '<label class="gp-check"><input type="checkbox" data-cmtipo="' + t[0] + '"' + ((pm.tipos || []).indexOf(t[0]) >= 0 ? " checked" : "") + "> " + t[1] + "</label>"; }).join("") + "</div></div></div>" +
+        '<div class="com-pags">' + (pm.paginas || []).map(function (pg, i) {
+          return '<div class="com-pag' + (pg.off ? " off" : "") + '"><span class="com-pag-n">' + (i + 1) + '</span><div class="com-pag-img">' + (pg.t === "fixa" ? (pg.img ? '<img src="' + D.blob(pg.img) + '" alt="">' : '<span class="hint">sem imagem</span>') : '<span class="com-pag-var">variável</span>') + "</div>" +
+            '<div class="com-pag-c">' + (pg.t === "fixa" ? '<input class="ctl com-in-n" data-pgn="' + i + '" value="' + esc(pg.n || "") + '" aria-label="Nome da página">' : "<b>" + esc(vn[pg.t] || pg.t) + "</b>") +
+            '<div class="com-pag-a"><select class="ctl" data-pgopc="' + i + '" aria-label="Quando entra">' + T.optHtml([["", "sempre"], ["marcenaria", "só com marcenaria"], ["adm", "só com adm. de obra"], ["legal", "só com Projeto Legal"]], pg.opc || "") + "</select>" +
+            '<label class="gp-check"><input type="checkbox" data-pgoff="' + i + '"' + (pg.off ? "" : " checked") + "> ligada</label>" +
+            '<button type="button" class="link" data-pgmv="' + i + '|-1"' + (i ? "" : " disabled") + ' aria-label="Subir">↑</button><button type="button" class="link" data-pgmv="' + i + '|1" aria-label="Descer">↓</button>' +
+            (pg.t === "fixa" || pg.t === "capa" ? '<label class="link">Trocar imagem<input type="file" accept="image/png,image/jpeg,image/webp" data-pgimg="' + i + '" hidden></label>' : "") +
+            (pg.t === "fixa" ? '<button type="button" class="link danger" data-pgrm="' + i + '">Remover</button>' : "") + "</div></div></div>";
+        }).join("") + "</div>" +
+        '<div class="form-actions"><label class="btn btn-small">+ Página fixa (imagem)<input type="file" accept="image/png,image/jpeg,image/webp" id="cm-addfixa" multiple hidden></label><select class="ctl" id="cm-addvar">' + T.optHtml(D.VARIAVEIS, "") + '</select><button type="button" class="btn btn-small" data-cm="add-var">+ Página variável</button></div>';
+      h += '<div class="cfg-pesos-t">Marca nas páginas variáveis</div><div class="com-marca">' + [["logoEscuro", "Logo (páginas claras)"], ["logoVerde", "Logo (páginas escuras)"], ["trilhaEscuro", "Assinatura (claras)"], ["trilhaVerde", "Assinatura (escuras)"], ["capa", "Fundo da capa"]].map(function (x) {
+        return '<label class="com-marca-i"><span class="com-pag-img">' + (m.marca[x[0]] ? '<img src="' + D.blob(m.marca[x[0]]) + '" alt="">' : '<span class="hint">—</span>') + '</span><span class="hint">' + x[1] + '</span><span class="link">Trocar<input type="file" accept="image/png,image/jpeg,image/webp" data-marca="' + x[0] + '" hidden></span></label>'; }).join("") + "</div>";
+    }
+    h += '<div class="form-actions"><button class="btn btn-primary" data-cm="salvar">Salvar modelos</button><span class="hint" id="cm-st"></span></div></div>';
+    h += '<div class="card gp-box"><h3 class="panel-title">Modelos de contrato</h3><p class="hint">O app preenche o próprio .docx oficial (campos marcados com {chaves}); as cláusulas nunca mudam. Para trocar um modelo, envie o .docx novo. Cada contrato gerado registra a versão usada.</p><div class="com-ctrs">' +
+      CONTRATOS.map(function (c0) { var c = m.contratos.filter(function (x) { return x.id === c0.id; })[0] || {}; return '<div class="com-ctr"><b>' + c0.id + " · " + esc(c0.nome) + '</b><span class="hint">' + (c.asset ? "carregado" + (c.arquivo ? " · " + esc(c.arquivo) : "") : "sem arquivo") + '</span><input class="ctl" data-ctrv="' + c0.id + '" value="' + esc(c.versao || "") + '" placeholder="versão (ex.: 30/09/2026)" aria-label="Versão do contrato ' + c0.id + '"><label class="btn btn-small">Enviar .docx<input type="file" accept=".docx" data-ctrdoc="' + c0.id + '" hidden></label></div>'; }).join("") +
+      '</div><div class="form-actions"><button class="btn btn-primary" data-cm="salvar">Salvar modelos</button></div></div>';
+    h += '<div class="card gp-box"><h3 class="panel-title">Jeito Trilha de escrever</h3><p class="hint">Textos exemplares que a IA usa como referência de estilo no "Sua demanda" (2 a 4 é o ideal). "Guardar como exemplo", na proposta, acrescenta aqui.</p>' +
+      m.exemplos.map(function (e, i) { return '<div class="field"><label for="cm-ex' + i + '">Exemplo ' + (i + 1) + '</label><textarea id="cm-ex' + i + '" data-ex="' + i + '" rows="6">' + esc(e) + '</textarea><button type="button" class="link danger" data-exrm="' + i + '">Remover</button></div>'; }).join("") +
+      '<div class="form-actions"><button type="button" class="btn btn-small" data-cm="add-ex">+ Exemplo</button><button class="btn btn-primary" data-cm="salvar">Salvar modelos</button></div></div>';
+    return h;
+  }
+  async function enviarArquivo(file, tipo) {
+    var assets = window.claude && window.claude.use ? await window.claude.use("assets") : null;
+    if (!assets) throw new Error("Só quem edita o app pode enviar arquivos (e nesta visualização o armazenamento não está disponível).");
+    var r = await assets.upload(file, tipo ? { type: tipo } : undefined); return r.id;
+  }
+  function lerCfgModelos() {
+    var m = S.modEd; if (!m) return; var pm = m.propostas[Math.min(S.modSel || 0, m.propostas.length - 1)];
+    if (pm) { var nm = $("cm-nome"); if (nm) pm.nome = nm.value.trim() || pm.nome; pm.tipos = []; T.each("[data-cmtipo]", function (i) { if (i.checked) pm.tipos.push(i.dataset.cmtipo); });
+      T.each("[data-pgn]", function (i) { pm.paginas[+i.dataset.pgn].n = i.value.trim(); }); T.each("[data-pgopc]", function (i) { pm.paginas[+i.dataset.pgopc].opc = i.value || null; }); T.each("[data-pgoff]", function (i) { pm.paginas[+i.dataset.pgoff].off = !i.checked; }); }
+    T.each("[data-ctrv]", function (i) { var c = m.contratos.filter(function (x) { return x.id === i.dataset.ctrv; })[0]; if (c) c.versao = i.value.trim(); else if (i.value.trim()) m.contratos.push({ id: i.dataset.ctrv, versao: i.value.trim() }); });
+    T.each("[data-ex]", function (i) { m.exemplos[+i.dataset.ex] = i.value; });
+  }
+  async function acaoModelos(t) {
+    var m = S.modEd, a = t.dataset.cm; lerCfgModelos(); var pm = m.propostas[Math.min(S.modSel || 0, m.propostas.length - 1)];
+    if (a === "salvar") { var st = $("cm-st"); m.exemplos = m.exemplos.map(function (e) { return String(e || "").trim(); }).filter(Boolean); if (await T.saveWith(t, function () { return T.db.doc("com_config/modelos").set(T.clone(m)); })) { S.modEd = null; } return; }
+    if (a === "novo-mod") { m.propostas.push({ id: T.novoId(), nome: "Residência", tipos: ["RES", "COM", "HOT", "REF", "INT"], paginas: T.comercialDocs.VARIAVEIS.map(function (v) { return { t: v[0] }; }) }); }
+    if (a === "copiar-mod" && pm) { var cp = T.clone(pm); cp.id = T.novoId(); cp.nome = pm.nome + " (cópia)"; cp.tipos = []; m.propostas.push(cp); S.modSel = m.propostas.length - 1; }
+    if (a === "add-var" && pm) pm.paginas.push({ t: $("cm-addvar").value });
+    if (a === "add-ex") m.exemplos.push("");
+    renderCfg();
+  }
+  async function arquivoModelos(el) {
+    var m = S.modEd; lerCfgModelos(); var pm = m.propostas[Math.min(S.modSel || 0, m.propostas.length - 1)], fs = Array.prototype.slice.call(el.files || []); if (!fs.length) return;
+    T.toast("Enviando arquivo…");
+    try {
+      if (el.id === "cm-addfixa") { for (var i = 0; i < fs.length; i++) pm.paginas.push({ t: "fixa", img: await enviarArquivo(fs[i]), n: fs[i].name.replace(/\.[a-z]+$/i, "") }); }
+      else if (el.dataset.pgimg != null) { var pg = pm.paginas[+el.dataset.pgimg], id = await enviarArquivo(fs[0]); if (pg.t === "capa") pg.img = id; else pg.img = id; }
+      else if (el.dataset.marca) m.marca[el.dataset.marca] = await enviarArquivo(fs[0]);
+      else if (el.dataset.ctrdoc) {
+        var b64 = await T.comercialDocs.arquivoBase64(fs[0]), aid = await enviarArquivo(new Blob([b64], { type: "text/plain" }), "text/plain"), c = m.contratos.filter(function (x) { return x.id === el.dataset.ctrdoc; })[0];
+        if (!c) { c = { id: el.dataset.ctrdoc }; m.contratos.push(c); } c.asset = aid; c.arquivo = fs[0].name; c.enviadoEm = new Date().toISOString();
+      }
+      T.toast("Arquivo enviado ✓ — clique em Salvar modelos");
+    } catch (e) { T.toast(e && e.message ? e.message : "Não foi possível enviar o arquivo."); }
+    renderCfg();
   }
   async function salvarCfg() {
     var c = S.cfgEd, body = {};
@@ -773,11 +958,20 @@
     }
     if (a === "ok-assinado") {
       var cn = $("ca-cnum").value.trim(), cd = $("ca-cdt").value || hoje(), cc = $("ca-ccid").value.trim(), cv = T.numOrNull($("ca-cval").value);
-      if (await T.saveWith(btn, function () { return salvarOp(o.id, function (x) { x.contrato = { numero: cn, data: cd, cidade: cc }; if (cv) x.valor = cv; x.fechadoEm = new Date(cd + "T12:00:00").toISOString(); mudarEtapa(x, "fechado", "Contrato assinado" + (cn ? " nº " + cn : "") + (cv ? ": " + BRL(cv) : "")); }); })) S.acao = null;
+      if (await T.saveWith(btn, function () { return salvarOp(o.id, function (x) { x.contrato = { numero: cn, data: cd, cidade: cc }; if (cv) x.valor = cv; x.ctr = Object.assign({}, dadosContrato(x), x.ctr || {}, { numero: cn, data: cd, cidade: cc }); x.fechadoEm = new Date(cd + "T12:00:00").toISOString(); mudarEtapa(x, "fechado", "Contrato assinado" + (cn ? " nº " + cn : "") + (cv ? ": " + BRL(cv) : "")); }); })) S.acao = null;
       return;
     }
-    if (a === "marc-feito") { if (await T.saveWith(btn, function () { return salvarOp(o.id, function (x) { x.projetoId = x.projetoId || "marcenaria"; hist(x, "Marcenaria ativada no projeto existente"); }); })) S.acao = null; return; }
+    if (a === "marc-feito") { if (await T.saveWith(btn, async function () { var d = dadosContrato(o), fin = d.projArq ? await contratoFinanceiro(o, d.projArq) : null; await salvarOp(o.id, function (x) { x.projetoId = d.projArq || "marcenaria"; if (fin) x.finContrato = fin; hist(x, "Marcenaria no projeto existente" + (fin ? " · parcelas no Financeiro" : "")); }); })) S.acao = null; return; }
     if (a === "ok-virar") { await virarProjeto(o, btn); return; }
+  }
+  // Contrato e parcelas no Financeiro (mesmo formato do "+ Contrato" do Financeiro); honorário no projeto.
+  async function contratoFinanceiro(o, pid) {
+    var d = dadosContrato(o), ps = (d.parcelas || []).filter(function (p) { return +p.valor > 0; }); if (!ps.length || !pid) return null;
+    var total = Math.round(ps.reduce(function (s, p) { return s + (+p.valor || 0); }, 0) * 100) / 100, id = "c-" + T.novoId();
+    await T.db.doc("fin_contratos/" + id).set({ projetoId: pid, cliente: d.cli.nome || nome0(o), clienteDoc: d.cli.doc || "", servico: o.tipo === "MARC" ? "Projeto de marcenaria" : o.tipo === "SERV" ? "Serviço" : "Projeto " + tipoNome(o.tipo).toLowerCase(), valorTotal: total, status: "ativo",
+      parcelas: ps.map(function (p, k) { return { id: T.novoId(), descricao: k === 0 && ps.length > 1 ? "Entrada" : "Parcela " + (k + 1), vencimento: p.vencimento || hoje(), valor: +p.valor, recibo: null }; }), criadoEm: new Date().toISOString(), origem: { comercial: o.id } });
+    var pj = T.projeto(pid); if (!pj || pj.honorario == null) await T.db.doc("projetos/" + pid).update({ honorario: total }).catch(function () {});
+    return id;
   }
   async function virarProjeto(o, btn) {
     var nomeP = ($("cv-nome") || {}).value, pid = null;
@@ -796,7 +990,8 @@
           pavs: pavs, ambientes: amb, areaTotal: r.area, legal: legalDe(o), cond: !!(o.sim && o.sim.cond), prazos: pz, descricao: (o.demanda || o.impressoes || "").trim(), diretrizes: dir, origem: { comercial: o.id, proposta: o.proposta && o.proposta.numero || null } });
         if (o.contrato) await T.db.doc("projetos/" + pid).update({ contrato: { numero: o.contrato.numero || "", data: o.contrato.data || null, cidade: o.contrato.cidade || "" } });
       }
-      await salvarOp(o.id, function (x) { x.projetoId = pid; hist(x, "Virou projeto: " + (nomeP || nome0(o))); });
+      var fin = await contratoFinanceiro(o, pid);
+      await salvarOp(o.id, function (x) { x.projetoId = pid; if (fin) x.finContrato = fin; hist(x, "Virou projeto: " + (nomeP || nome0(o)) + (fin ? " · parcelas no Financeiro" : "")); });
     });
     if (ok) { S.acao = null; T.toast("Projeto criado ✓", T.gestor && T.gestor.gp(pid) ? { label: "Abrir no Gestor", fn: function () { T.gestor.abrir(pid); } } : null); }
   }
@@ -850,7 +1045,7 @@
     v.addEventListener("click", async function (e) {
       var t = e.target.closest("button, a"); if (!t) return;
       if (t.dataset.open) { abrir(t.dataset.open); return; }
-      if (t.dataset.tab) { if (S.dirty && !(await T.confirmar({ titulo: "Sair sem salvar?", texto: "As alterações desta aba ainda não foram salvas.", ok: "Sair sem salvar", perigo: true }))) return; S.tab = t.dataset.tab; S.dirty = false; S.ed = null; renderOp(); return; }
+      if (t.dataset.tab) { if (S.dirty && !(await T.confirmar({ titulo: "Sair sem salvar?", texto: "As alterações desta aba ainda não foram salvas.", ok: "Sair sem salvar", perigo: true }))) return; S.tab = t.dataset.tab; S.dirty = false; S.ed = null; S.ctrEd = null; renderOp(); return; }
       if (t.dataset.ano) { S.ano = +t.dataset.ano; renderLista(); return; }
       if (t.dataset.ntipo) { S.novo.tipo = t.dataset.ntipo; T.each("[data-ntipo]", function (b) { b.classList.toggle("is-selected", b === t); }); return; }
       if (t.dataset.copiar) { var ta = $(t.dataset.copiar); try { await navigator.clipboard.writeText(ta.value); T.toast("Mensagem copiada ✓"); } catch (x) { ta.select(); T.toast("Selecione e copie a mensagem."); } return; }
@@ -862,11 +1057,16 @@
         }
         return;
       }
+      if (t.dataset.cm) { await acaoModelos(t); return; }
+      if (t.dataset.pgmv) { lerCfgModelos(); var mv = t.dataset.pgmv.split("|"), pm0 = S.modEd.propostas[Math.min(S.modSel || 0, S.modEd.propostas.length - 1)], i0 = +mv[0], j0 = i0 + +mv[1]; if (j0 >= 0 && j0 < pm0.paginas.length) { var tmp = pm0.paginas[i0]; pm0.paginas[i0] = pm0.paginas[j0]; pm0.paginas[j0] = tmp; } renderCfg(); return; }
+      if (t.dataset.pgrm != null) { lerCfgModelos(); var pm1 = S.modEd.propostas[Math.min(S.modSel || 0, S.modEd.propostas.length - 1)]; if (await T.confirmar({ titulo: "Remover a página?", texto: "Sai do modelo ao salvar (a imagem continua guardada).", ok: "Remover", perigo: true })) { pm1.paginas.splice(+t.dataset.pgrm, 1); renderCfg(); } return; }
+      if (t.dataset.exrm != null) { lerCfgModelos(); S.modEd.exemplos.splice(+t.dataset.exrm, 1); renderCfg(); return; }
+      if (t.dataset.rmparc != null) { lerFormContrato(); S.ctrEd.d.parcelas.splice(+t.dataset.rmparc, 1); renderOp(); return; }
       if (t.dataset.rmamb != null) { var x = ed(); x.programa.amb.splice(+t.dataset.rmamb, 1); S.dirty = true; renderOp(); return; }
       var a = t.dataset.act; if (!a) return;
       if (a === "novo") { S.novo = { tipo: "RES" }; renderLista(); var nn = $("cn-nome"); if (nn) nn.focus(); return; }
       if (a === "novo-x") { S.novo = null; renderLista(); return; }
-      if (a === "cfg") { S.view = "cfg"; S.cfgEd = null; render(); window.scrollTo(0, 0); return; }
+      if (a === "cfg") { S.view = "cfg"; S.cfgEd = null; S.modEd = null; render(); window.scrollTo(0, 0); return; }
       if (a === "voltar") { if (S.dirty && !(await T.confirmar({ titulo: "Sair sem salvar?", texto: "As alterações ainda não foram salvas.", ok: "Sair sem salvar", perigo: true }))) return; S.view = "lista"; S.opId = null; S.dirty = false; S.ed = null; S.acao = null; S.imp = null; render(); window.scrollTo(0, 0); return; }
       if (a === "verfim") { S.verFim = !S.verFim; renderLista(); return; }
       if (a === "passo") { await passo(); return; }
@@ -875,6 +1075,30 @@
       if (a === "reabrir") { var o2 = op(S.opId); if (await T.confirmar({ titulo: "Reabrir a oportunidade?", texto: "Volta para " + etapaNome((o2.perda && o2.perda.etapa) || "contato") + ".", ok: "Reabrir" })) { try { await salvarOp(o2.id, function (x) { mudarEtapa(x, (x.perda && x.perda.etapa) || "contato", "Oportunidade reaberta"); delete x.perda; }); } catch (err) { T.showError(err); } renderOp(); } return; }
       if (a === "ir-gestor") { var o3 = op(S.opId); T.gestor.abrir(o3.projetoId); return; }
       if (a.indexOf("ok-") === 0 || a === "marc-feito") { await confirmarAcao(a); if (!S.acao) renderOp(); return; }
+      if (a === "parc-add") { lerFormContrato(); var ps0 = S.ctrEd.d.parcelas, ult = ps0[ps0.length - 1]; ps0.push({ valor: ult ? ult.valor : 0, vencimento: ult && ult.vencimento ? T.ymd(new Date(T.parseYmd(ult.vencimento).getFullYear(), T.parseYmd(ult.vencimento).getMonth() + 1, T.parseYmd(ult.vencimento).getDate())) : hoje() }); renderOp(); return; }
+      if (a === "parc-sim") { lerFormContrato(); var oo = op(S.opId); S.ctrEd.d.parcelas = parcelasSim(oo, calc(oo), S.ctrEd.d.data || hoje()); renderOp(); return; }
+      if (a === "ctr-gerar") { await gerarContratoOp(op(S.opId), t); return; }
+      if (a === "prev") { var o5 = op(S.opId); try { S.prev = { id: o5.id, pags: T.comercialDocs.paginasProposta(ctxProposta(o5)) }; } catch (err) { T.toast("Não foi possível montar a prévia."); } renderOp(); return; }
+      if (a === "pdf") {
+        var o6 = op(S.opId), st6 = $("cpp-pdf-st"); if (!T.downloads) { T.toast("Esta visualização não permite baixar arquivos."); return; }
+        if (!(o6.demanda || "").trim() && !(await T.confirmar({ titulo: "Sem o texto \"Sua demanda\"", texto: "A página Sua demanda sairá vazia. Baixar mesmo assim?", ok: "Baixar" }))) return;
+        t.disabled = true;
+        try { await T.comercialDocs.baixarProposta(ctxProposta(o6), nomeArquivoProposta(o6), function (m) { if (st6) st6.textContent = m; }); if (st6) st6.textContent = "PDF pronto ✓"; await salvarOp(o6.id, function (x) { hist(x, "PDF da proposta gerado"); }); }
+        catch (err) { if (st6) st6.textContent = err && err.code === "declined" ? "Download cancelado" : "Não foi possível gerar o PDF: " + (err && err.message || err); }
+        finally { t.disabled = false; }
+        return;
+      }
+      if (a === "ia-escrever" || a === "ia-reescrever") {
+        var o7 = op(S.opId), atual = $("cpp-dem").value, ori = ($("cpp-ori") || {}).value || "";
+        if (a === "ia-reescrever" && !atual.trim()) { T.toast("Escreva ou gere um texto primeiro."); return; }
+        S.ia = { id: o7.id, rodando: true, texto: atual }; renderOp();
+        try {
+          var txt = await T.comercialDocs.escreverDemanda(Object.assign({}, o7, { sim: Object.assign({}, o7.sim || {}, { area: calc(o7).area ? Math.round(calc(o7).area) : null }) }), MOD().exemplos || [], ori, a === "ia-reescrever" ? atual : "", function (tx) { var ta = $("cpp-dem"); if (ta) ta.value = tx; });
+          S.ia = { id: o7.id, rodando: false, texto: txt }; T.toast("Texto pronto — revise e clique em Salvar texto.");
+        } catch (err) { S.ia = { id: o7.id, rodando: false, texto: atual }; T.toast(err && err.code === "not_granted" ? "A IA não foi autorizada." : err && err.code === "rate_limited" ? "Limite de uso atingido; tente mais tarde." : (err && err.message) || "A IA não respondeu."); }
+        renderOp(); return;
+      }
+      if (a === "ia-exemplo") { var tx2 = $("cpp-dem").value.trim(); if (!tx2) { T.toast("Não há texto para guardar."); return; } var mm = T.clone(MOD()); mm.exemplos = (mm.exemplos || []).concat([tx2]); try { await T.db.doc("com_config/modelos").set(mm); T.toast("Guardado como exemplo ✓"); } catch (err) { T.showError(err); } return; }
       if (a === "imp-ler") { var txt = $("cb-txt").value; if (!txt.trim()) { T.toast("Cole as respostas primeiro."); return; } lerImport(txt); return; }
       if (a === "imp-x") { S.imp = null; renderOp(); return; }
       if (a === "imp-ok") { await importar(); if (!S.imp) renderOp(); return; }
@@ -901,6 +1125,10 @@
     v.addEventListener("change", function (e) {
       var el = e.target;
       if (el.id === "cs-exp" || el.dataset.simb || (el.tagName === "SELECT" && el.closest("#cs-in"))) { campoSim(el); return; }
+      if (el.closest && el.closest("#cm-box, .com-ctrs") && el.type === "file") { arquivoModelos(el); return; }
+      if (el.dataset && el.dataset.ctrdoc) { arquivoModelos(el); return; }
+      if (el.id === "cm-sel") { lerCfgModelos(); S.modSel = +el.value; renderCfg(); return; }
+      if (el.dataset && el.dataset.parc != null) { var pc = S.ctrEd.d.parcelas[+el.dataset.parc]; pc[el.dataset.k] = el.dataset.k === "valor" ? (T.numOrNull(el.value) || 0) : el.value; return; }
       if (el.id === "cb-linha") { S.imp.k = +el.value; renderOp(); return; }
       if (el.id === "cb-csv" && el.files && el.files[0]) { var fr = new FileReader(); fr.onload = function () { lerImport(String(fr.result || "")); }; fr.readAsText(el.files[0]); return; }
       if (el.id === "cn-cli") { var cl = T.cadastros && T.cadastros.contato(el.value); if (cl) { $("cn-nome").value = cl.nome || ""; $("cn-tel").value = cl.contato || ""; $("cn-email").value = cl.email || ""; } S.novo.clienteId = el.value; }
@@ -913,7 +1141,9 @@
         await T.saveWith($("cr-salvar"), function () { return salvarOp(o.id, function (x) { x.cliente = Object.assign({}, x.cliente || {}, { nome: $("cr-nome").value.trim(), telefone: $("cr-tel").value.trim(), email: $("cr-email").value.trim() }); x.tipo = $("cr-tipo").value; x.endereco = $("cr-end").value.trim(); x.origem = $("cr-origem").value; x.indicadoPor = $("cr-ind").value.trim(); x.responsavel = $("cr-resp").value || null; x.impressoes = $("cr-imp").value.trim(); x.notas = $("cr-notas").value.trim(); }); });
         return;
       }
-      if (f.id === "cpp-form") { await T.saveWith($("cpp-salvar"), function () { return salvarOp(o.id, function (x) { x.demanda = $("cpp-dem").value.trim(); }); }); return; }
+      if (f.id === "cpp-form") { if (await T.saveWith($("cpp-salvar"), function () { return salvarOp(o.id, function (x) { x.demanda = $("cpp-dem").value.trim(); if ($("cpp-mov")) x.moveis = $("cpp-mov").value.trim(); }); })) S.ia = null; return; }
+      if (f.id === "cpo-form") { await T.saveWith($("cpo-salvar"), function () { return salvarOp(o.id, function (x) { x.prop = $("cpo-apos") ? { aposArq: $("cpo-apos").checked } : { marc: $("cpo-marc").checked, marcValor: T.numOrNull($("cpo-marcv").value), adm: $("cpo-adm").checked, admPct: T.numOrNull($("cpo-admp").value) }; }); }); S.prev = null; return; }
+      if (f.id === "ctr-form") { var dd = lerFormContrato(); if (await T.saveWith($("ctr-salvar"), function () { return salvarOp(o.id, function (x) { x.ctr = T.clone(dd); }); })) S.ctrEd = null; return; }
       if (f.id === "ch-form") { var tx = $("ch-txt").value.trim(); if (!tx) return; if (await T.saveWith($("ch-salvar"), function () { return salvarOp(o.id, function (x) { hist(x, tx); }); })) $("ch-txt").value = ""; return; }
     });
     v.addEventListener("mousemove", function (e) {
@@ -942,6 +1172,7 @@
     connect: function (db) {
       db.collection("com_oport").onSnapshot(function (s) { S.ops = T.snapList(s); if (!s.metadata || !s.metadata.fromCache) S.loaded = true; T.loaded("com_oport", s); T.scheduleRender(); }, T.onErr);
       db.doc("com_config/geral").onSnapshot(function (d) { S.cfg = d.exists ? T.clone(d.data()) : null; T.scheduleRender(); }, T.onErr);
+      db.doc("com_config/modelos").onSnapshot(function (d) { S.mod = d.exists ? T.clone(d.data()) : null; T.scheduleRender(); }, T.onErr);
       db.doc("fin_config/geral").onSnapshot(function (d) { S.fin = d.exists ? d.data() : null; }, function () {});
     }
   });

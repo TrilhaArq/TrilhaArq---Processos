@@ -580,9 +580,39 @@ Planejamento completo: `COMERCIAL-PLANO.md`; referências (propostas, contratos,
   CAU 8%; mercado R$ 70–120/m²; meta anual R$ 300 mil; validade 30 dias; adm. de obra 12%; cobrar briefing após 5
   dias; follow-up após 7; nº inicial da proposta 81. Faixas de R$/m² dos padrões: Configurações › Padrões de obra
   (valores de mercado de 2026, editáveis).
-- **Ainda não faz (próximas rodadas):** proposta em PDF (modelo híbrido), contrato .docx preenchido, parcelas no
-  Financeiro, IA (texto "Sua demanda", "Peça ao Claude"), Levantamento e "Registrar rodada" no Gestor, relatórios
-  do comercial, versões da proposta.
+- **Fase 2 (em teste desde 02/10/2026):**
+  - **Proposta em PDF (modelo híbrido):** o modelo é uma sequência de páginas em `com_config/modelos.propostas[]`
+    (`{t: "fixa", img: <id do arquivo>, n, opc?}` ou `{t: capa|demanda|programa|plano|horas|investimento}`, `off`
+    para desligar, `opc` = só com marcenaria / adm. de obra / Projeto Legal). Páginas fixas = imagens (hoje recortadas
+    da proposta do Gustavo, 120 dpi); variáveis = HTML 810 × 1440 com a identidade das propostas (grafite #383135,
+    bege #E9DED6, verde #88AC67, Comfortaa), convertidas em imagem (html2canvas) e montadas em PDF (jsPDF) no formato
+    das propostas atuais. Programa e plano quebram em várias páginas; numeração contínua. Prévia em miniaturas na aba
+    Proposta; "Baixar PDF" também no passo "Aprovar e apresentar". Nome do arquivo: `<nº>_<DDMMAA> - Proposta <tipo> <cliente>.pdf`.
+  - **Opções da proposta:** incluir Projeto de Marcenaria (valor ou "a combinar") e Administração de Obra (%);
+    na marcenaria, "pagamento após a arquitetura" e lista de móveis por ambiente.
+  - **Plano de projeto da proposta:** gerado do programa e dos pavimentos (EP AP01…, séries 100–400 por pavimento,
+    500 = uma ampliação por cozinha, banheiros, lavanderia, gourmet, piscina, escada, sauna…, 600–800, xxx), com a
+    contagem de entregáveis por etapa e as horas por etapa (pesos das etapas, arredondadas a 10 h).
+  - **Contrato .docx:** os 6 modelos oficiais ficam no armazenamento de arquivos como texto base64 (o armazenamento não
+    aceita .docx) em `com_config/modelos.contratos[] {id, asset, arquivo, versao}`. Aba Contrato: modelo sugerido
+    (tipo + Projeto Legal; marcenaria vinculada quando há projeto de arquitetura escolhido), dados do contratante
+    (puxa Cadastros e briefing), nº (nº da proposta + DDMMAA), escopo (texto "Sua demanda"), parcelas (do Simulador,
+    editáveis). "Gerar contrato" preenche os {campos}, repete as linhas de parcela, monta programa, anexo do briefing
+    e móveis, apaga a página de instruções, tira o amarelo e troca só os prazos negociados (EP, Executivo, Legal).
+    Valores e datas por extenso em código.
+  - **Financeiro:** ao virar projeto, cria `fin_contratos/c-…` (mesmo formato do "+ Contrato" do Financeiro) com as
+    parcelas da aba Contrato ("Entrada", "Parcela 2"…) e grava o honorário no projeto. Marcenaria vinculada: o contrato
+    vai para o projeto de arquitetura escolhido.
+  - **IA (capacidade `sample`):** "✨ Escrever com o Claude" e "Reescrever" com orientação no texto "Sua demanda";
+    usa briefing, impressões, programa e os textos exemplares (`com_config/modelos.exemplos`, editáveis; "Guardar
+    como exemplo"). Só roda no clique; nível "padrão"; o texto é rascunho até "Salvar texto".
+  - **Configurações do comercial › Modelos:** páginas (ordem, ligar/desligar, opcional, trocar imagem, + página fixa,
+    + página variável, duplicar modelo, tipos de projeto), marca (logo e assinatura para páginas claras/escuras, fundo
+    da capa), contratos (enviar .docx novo, versão) e textos exemplares. Enviar arquivos exige a capacidade `assets`
+    (só quem edita o app).
+- **Ainda não faz:** "Peça ao Claude" (barra de conversa), proposta e contrato simplificados de serviços menores,
+  Levantamento e "Registrar rodada" no Gestor, relatórios do comercial, versões da proposta, mais de um contratante
+  no contrato.
 
 ## Próximos passos previstos
 
