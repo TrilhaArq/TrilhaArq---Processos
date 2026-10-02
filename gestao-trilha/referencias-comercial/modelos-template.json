@@ -1,0 +1,173 @@
+{
+ "propostas": [
+  {
+   "id": "res",
+   "nome": "Residência (padrão atual · páginas da proposta do Gustavo)",
+   "tipos": [
+    "RES",
+    "COM",
+    "HOT",
+    "REF",
+    "INT",
+    "MARC"
+   ],
+   "paginas": [
+    {
+     "t": "capa"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-02",
+     "n": "Trilha · Arquitetura · Brasileira"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-03",
+     "n": "Quem somos"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-04",
+     "n": "Atuação e índice"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-05",
+     "n": "Projetos em destaque 1"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-06",
+     "n": "Projetos em destaque 2"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-07",
+     "n": "Projetos em destaque 3"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-08",
+     "n": "Projetos em destaque 4"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-09",
+     "n": "Nosso serviço"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-10",
+     "n": "Projeto Arquitetônico"
+    },
+    {
+     "t": "demanda"
+    },
+    {
+     "t": "programa"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-14",
+     "n": "Processo de projeto"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-15",
+     "n": "Etapas: Briefing e Estudo Preliminar"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-16",
+     "n": "Etapas: Anteprojeto"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-17",
+     "n": "Etapas: Legal e Executivo"
+    },
+    {
+     "t": "plano"
+    },
+    {
+     "t": "horas"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-21",
+     "n": "Projeto de Marcenaria",
+     "opc": "marcenaria"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-22",
+     "n": "Administração de Obra",
+     "opc": "adm"
+    },
+    {
+     "t": "investimento"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-24",
+     "n": "Serviços extras"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-25",
+     "n": "Contatos"
+    }
+   ]
+  }
+ ],
+ "marca": {
+  "capa": "ID_capa-fundo",
+  "logoEscuro": "ID_logo-escuro",
+  "logoVerde": "ID_logo-verde",
+  "trilhaEscuro": "ID_trilha-escuro",
+  "trilhaVerde": "ID_trilha-verde"
+ },
+ "contratos": [
+  {
+   "id": "01",
+   "asset": "ID_contrato-01",
+   "arquivo": "Contrato_01_Projeto_do_Zero_com_Aprovacao.docx",
+   "versao": "30/09/2026"
+  },
+  {
+   "id": "02",
+   "asset": "ID_contrato-02",
+   "arquivo": "Contrato_02_Projeto_do_Zero_sem_Aprovacao.docx",
+   "versao": "30/09/2026"
+  },
+  {
+   "id": "03",
+   "asset": "ID_contrato-03",
+   "arquivo": "Contrato_03_Reforma_com_Aprovacao.docx",
+   "versao": "30/09/2026"
+  },
+  {
+   "id": "04",
+   "asset": "ID_contrato-04",
+   "arquivo": "Contrato_04_Reforma_sem_Aprovacao.docx",
+   "versao": "30/09/2026"
+  },
+  {
+   "id": "05",
+   "asset": "ID_contrato-05",
+   "arquivo": "Contrato_05_Marcenaria_Avulsa.docx",
+   "versao": "30/09/2026"
+  },
+  {
+   "id": "06",
+   "asset": "ID_contrato-06",
+   "arquivo": "Contrato_06_Marcenaria_Vinculada.docx",
+   "versao": "30/09/2026"
+  }
+ ],
+ "exemplos": [
+  "Residência para moradia no alto de uma montanha, imersa nos mares de morros de Minas Gerais. O desejo é uma casa de campo contemporânea e arrojada, que privilegie a conexão com a paisagem e a amplitude visual. Seguindo uma lógica de pavilhão com aspecto rústico e brutalista pela força dos materiais, o projeto deve diluir os limites entre interior e exterior, reinterpretando o aconchego e as sensações de uma autêntica casa de roça.\n\nA edificação explorará o terreno através de uma estrutura metálica leve e cobertura em telha térmica, buscando máxima eficiência construtiva. O grande destaque é a área social: a cozinha é o ambiente protagonista a ser servido pela arquitetura, funcionando os demais espaços como apoio. Totalmente integrada à sala de estar e voltada para a vista, a área deve acomodar confortavelmente cerca de 10 pessoas em cada ambiente.\n\nA cozinha será totalmente preparada para o hobby do cliente, integrando uma ilha central de cocção, fogão a lenha e parrilla. Essa experiência se estende para a área externa imediata, que contará com uma piscina de aspecto natural com vegetação tropical e prainha de areia. A proximidade permite o acesso direto da cozinha para a água, integrando também um espaço para redes e local para fogueira à noite.\n\nA sensação de refúgio, de liberdade visual e de pertencimento à nossa cultura mineira é o esperado. A demanda consiste em uma casa-pavilhão altamente eficiente, que traga a robustez do metal e do concreto preenchida pelo aconchego, bem estar e presença de amigos e família na montanha. Uma cabana pavilhão mineira no \"arto\" do morro.",
+  "Residência para moradia, onde o desejo principal é uma casa confortável, funcional e agradável, que rompa com o modismo tradicional. Seguindo uma linha mais minimalista, mas que tenha expressão própria, que combine soluções em busca de um equilíbrio entre a pureza estética e o aconchego. Seja exclusiva, mas sem deixar de lado a visão comercial (não tão exclusiva a ponto de não possuir liquidez num futuro possível).\n\nDeve explorar a topografia natural do terreno da melhor maneira, buscando menor intervenção. Deve trabalhar soluções que contemplem o aproveitamento da vista para a pedreira e o pôr do sol. É importante a boa relação com as condicionantes ambientais naturais, aproveitando da maneira correta a insolação e a ventilação natural.\n\nÉ indispensável que o projeto garanta áreas externas ao ar livre, não ocupando totalmente o terreno, concebendo uma espécie de quintal que se conecte diretamente com o interior da residência, principalmente com a cozinha, ambiente que deve ter destaque no projeto e se conectar diretamente com essa área externa que será o lazer da residência.\n\nA sensação de natureza, de estar morando em uma casa de fato, com a presença de vegetação é o esperado. A demanda em si consiste em uma casa que permita o viver bem, em que os ambientes entreguem boas experiências aos clientes. Não menos importante, deve ser privativa em relação à rua, mas integrada ao exterior do terreno.",
+  "Projeto de residência para moradia em condomínio fechado fora da cidade em Viçosa/MG. Terreno em aclive de 2.000m². É desejo uma casa confortável e ampla, que explore o conceito de simplicidade, buscando harmonia entre o rústico e o moderno, utilizando-se de materiais expressivos em seu aspecto natural.\n\nOs sistemas construtivos devem prezar pelo melhor custo-benefício aliado à qualidade e ao aconchego. A presença da natureza é algo importante, assim como a relação com o exterior, com a paisagem circundante. O espaço de maior atenção e utilização será a cozinha integrada com as salas e varandas.\n\nExiste uma ideia de implantação: casa na porção frontal do terreno, área de lazer na porção central e floresta e pomar na porção posterior do terreno (já existe uma área de floresta no interior do terreno). A residência será construída num primeiro momento e, somente num outro momento, haverá a construção da área de lazer.\n\nO projeto deve considerar economia de recursos, estratégias de sustentabilidade e conforto passivas. Deveremos considerar estratégias construtivas para enquadramento da casa em linhas de financiamento da Caixa Econômica."
+ ]
+}

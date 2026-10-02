@@ -217,7 +217,8 @@
   }
   // .docx escolhido pelo usuário → texto base64 (para guardar no armazenamento de arquivos do app)
   function arquivoBase64(file) { return new Promise(function (ok, erro) { var fr = new FileReader(); fr.onload = function () { ok(String(fr.result).split(",")[1]); }; fr.onerror = erro; fr.readAsDataURL(file); }); }
-  async function lerAsset(id) { var r = await fetch(blob(id)); if (!r.ok) throw new Error("Arquivo do modelo não encontrado"); return (await r.text()).trim(); }
+  // aceita o base64 puro (text/plain) ou embrulhado num script ("…";), forma usada quando só se pode enviar scripts
+  async function lerAsset(id) { var r = await fetch(blob(id)); if (!r.ok) throw new Error("Arquivo do modelo não encontrado"); var t = (await r.text()).trim(), m = t.match(/"([A-Za-z0-9+\/=\s]+)"/); return (m ? m[1] : t).replace(/\s+/g, ""); }
 
   // ---------- IA: texto "Sua demanda" ----------
   function promptDemanda(o, exemplos, orientacao, atual) {

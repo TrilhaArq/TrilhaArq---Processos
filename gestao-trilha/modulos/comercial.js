@@ -120,7 +120,8 @@
     { id: "03", nome: "Reforma com aprovação", grupo: "reforma", legal: true }, { id: "04", nome: "Reforma sem aprovação", grupo: "reforma", legal: false },
     { id: "05", nome: "Marcenaria avulsa", grupo: "marc", vinculada: false }, { id: "06", nome: "Marcenaria vinculada", grupo: "marc", vinculada: true }
   ];
-  function MOD() { return S.mod || {}; }
+  // Sem modelos salvos no banco, usa o arquivo modelos-padrao.json publicado com o app (ids dos arquivos deste artefato).
+  function MOD() { return S.mod || S.modPadrao || {}; }
   function modeloProposta(o) { var l = MOD().propostas || []; return l.filter(function (m) { return !m.tipos || !m.tipos.length || m.tipos.indexOf(o.tipo) >= 0; })[0] || l[0] || null; }
   function contratoInfo(id) { var c = (MOD().contratos || []).filter(function (x) { return x.id === id; })[0] || {}; return Object.assign({}, T.byId(CONTRATOS.map(function (x) { return Object.assign({ id: x.id }, x); }), id) || {}, c); }
   // sugestão do modelo de contrato: tipo (RES/COM/HOT = do zero; REF/INT = reforma; MARC = marcenaria) e Projeto Legal
@@ -844,7 +845,7 @@
     m.propostas = m.propostas || []; m.contratos = m.contratos || []; m.exemplos = m.exemplos || []; m.marca = m.marca || {};
     var k = Math.min(S.modSel || 0, Math.max(0, m.propostas.length - 1)), pm = m.propostas[k];
     var vn = {}; D.VARIAVEIS.forEach(function (v) { vn[v[0]] = v[1]; });
-    var h = '<div class="card gp-box" id="cm-box"><h3 class="panel-title">Modelos de proposta</h3><p class="hint">Um modelo é uma sequência de páginas: <b>fixas</b> (imagens exportadas do Canva — apresentação, portfólio, etapas) e <b>variáveis</b> (desenhadas pelo app com os dados da oportunidade). Trocar o design = trocar as imagens; mudar a ordem = setas. Páginas opcionais só entram quando a opção está marcada na proposta.</p>';
+    var h = '<div class="card gp-box" id="cm-box"><h3 class="panel-title">Modelos de proposta</h3>' + (!S.mod && S.modPadrao ? '<div class="gp-aviso warn">Modelos iniciais (arquivo padrão do app). Clique em <b>Salvar modelos</b> para guardá-los no banco e poder editá-los.</div>' : "") + '<p class="hint">Um modelo é uma sequência de páginas: <b>fixas</b> (imagens exportadas do Canva — apresentação, portfólio, etapas) e <b>variáveis</b> (desenhadas pelo app com os dados da oportunidade). Trocar o design = trocar as imagens; mudar a ordem = setas. Páginas opcionais só entram quando a opção está marcada na proposta.</p>';
     if (!pm) h += '<div class="empty">Nenhum modelo ainda.</div><div class="form-actions"><button class="btn btn-small" data-cm="novo-mod">+ Novo modelo</button></div>';
     else {
       h += '<div class="form-actions">' + (m.propostas.length > 1 ? '<select class="ctl" id="cm-sel">' + m.propostas.map(function (x, i) { return '<option value="' + i + '"' + (i === k ? " selected" : "") + ">" + esc(x.nome) + "</option>"; }).join("") + "</select>" : "") + '<button class="btn btn-small" data-cm="copiar-mod">Duplicar modelo</button></div>' +
@@ -901,7 +902,10 @@
       else if (el.dataset.pgimg != null) { var pg = pm.paginas[+el.dataset.pgimg], id = await enviarArquivo(fs[0]); if (pg.t === "capa") pg.img = id; else pg.img = id; }
       else if (el.dataset.marca) m.marca[el.dataset.marca] = await enviarArquivo(fs[0]);
       else if (el.dataset.ctrdoc) {
-        var b64 = await T.comercialDocs.arquivoBase64(fs[0]), aid = await enviarArquivo(new Blob([b64], { type: "text/plain" }), "text/plain"), c = m.contratos.filter(function (x) { return x.id === el.dataset.ctrdoc; })[0];
+        var b64 = await T.comercialDocs.arquivoBase64(fs[0]), aid, c = m.contratos.filter(function (x) { return x.id === el.dataset.ctrdoc; })[0];
+        // texto base64; quem não pode enviar texto (convidado de fora da organização) envia o mesmo conteúdo como script
+        try { aid = await enviarArquivo(new Blob([b64], { type: "text/plain" }), "text/plain"); }
+        catch (e1) { aid = await enviarArquivo(new Blob(['/* Gestão Trilha · modelo de contrato */\n"' + b64 + '";\n'], { type: "text/javascript" }), "text/javascript"); }
         if (!c) { c = { id: el.dataset.ctrdoc }; m.contratos.push(c); } c.asset = aid; c.arquivo = fs[0].name; c.enviadoEm = new Date().toISOString();
       }
       T.toast("Arquivo enviado ✓ — clique em Salvar modelos");
@@ -1173,6 +1177,7 @@
       db.collection("com_oport").onSnapshot(function (s) { S.ops = T.snapList(s); if (!s.metadata || !s.metadata.fromCache) S.loaded = true; T.loaded("com_oport", s); T.scheduleRender(); }, T.onErr);
       db.doc("com_config/geral").onSnapshot(function (d) { S.cfg = d.exists ? T.clone(d.data()) : null; T.scheduleRender(); }, T.onErr);
       db.doc("com_config/modelos").onSnapshot(function (d) { S.mod = d.exists ? T.clone(d.data()) : null; T.scheduleRender(); }, T.onErr);
+      fetch("modelos-padrao.json").then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { if (j) { S.modPadrao = j; T.scheduleRender(); } }).catch(function () {});
       db.doc("fin_config/geral").onSnapshot(function (d) { S.fin = d.exists ? d.data() : null; }, function () {});
     }
   });
