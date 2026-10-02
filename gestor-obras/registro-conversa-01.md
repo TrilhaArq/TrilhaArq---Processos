@@ -415,7 +415,19 @@ profunda será feita no chat específico de contratos. Principais pontos levanta
   honorário × **avanço físico medido** + compensação (hoje 9.2: próxima parcela integral). Prever também rescisão
   pela Trilha (falta de aportes ou de pagamento).
 
-**Próximo passo**: seguir na gestão da execução da obra.
+**Parâmetros editáveis (DECIDIDO)**: todos os números padrão (sinal 1%, mínimo, escala 2%/3%, percentual de
+administração etc.) são **padrões editáveis por obra**, conforme a negociação e o trabalho previsto.
+
+**Caso de referência — restaurante funcionando (contexto e argumento comercial)**
+- Única obra até hoje com tempo real para planejar como deveria: **3 meses de planejamento**.
+- Execução: prazo de contrato de **68 dias úteis**, entregue em **66 dias úteis**.
+- Restaurante aberto de meio-dia à meia-noite, 7 dias por semana. Combinado de gestão (não contratual): **toda
+  sexta-feira uma etapa entregue** para o restaurante funcionar 100% sexta, sábado e domingo.
+- Lição: o planejamento teve o tamanho do tempo da obra — e foi isso que permitiu entregar antes do prazo.
+- Este mapeamento também servirá de **material comercial** ("é assim que a gente faz; eu tenho um aplicativo que faz
+  isso; eu te entrego tais relatórios").
+
+**Próximo passo**: resumo estruturado em PDF (gestor-obras/resumo-gestor-obras-01.pdf); depois, organização do app.
 
 ---
 
