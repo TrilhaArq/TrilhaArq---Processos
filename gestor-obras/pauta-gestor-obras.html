@@ -1,0 +1,255 @@
+<title>Pauta do Gestor de Obras</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: coluna única de leitura no celular; pauta numerada por código (D, T, S) com recomendação e marcação local de "conversado". */
+:root{
+  --bg:#f7f8f4; --surface:#ffffff; --sunken:#eef1e8; --ink:#23241d; --ink-2:#55574b; --muted:#878a7c;
+  --line:#dde1d4; --accent:#6f8f4c; --accent-strong:#4f6a35; --accent-soft:#e6eedb;
+  --amber:#8a5a12; --amber-soft:#fbefd9; --blue:#2f5590; --blue-soft:#e4ecf8;
+  --display:'Comfortaa', ui-rounded, system-ui, sans-serif;
+  --body:'Work Sans', system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#141511; --surface:#1c1d18; --sunken:#24261f; --ink:#f1f2ea; --ink-2:#c6c8b8; --muted:#94978a;
+  --line:#33362c; --accent:#9dc17f; --accent-strong:#b8d69d; --accent-soft:#273421;
+  --amber:#f0c988; --amber-soft:#3b2f18; --blue:#a9c2ea; --blue-soft:#1f2b3f; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#141511; --surface:#1c1d18; --sunken:#24261f; --ink:#f1f2ea; --ink-2:#c6c8b8; --muted:#94978a;
+  --line:#33362c; --accent:#9dc17f; --accent-strong:#b8d69d; --accent-soft:#273421;
+  --amber:#f0c988; --amber-soft:#3b2f18; --blue:#a9c2ea; --blue-soft:#1f2b3f; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.55;margin:0}
+.wrap{max-width:720px;margin:0 auto;padding-inline:18px;padding-block:28px 64px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.005em}
+.eyebrow{font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+header h1{font-size:27px;line-height:1.2;margin-top:8px}
+header p{color:var(--ink-2);margin:10px 0 0;max-width:60ch}
+.how{margin-top:18px;background:var(--accent-soft);border-radius:12px;padding:14px 16px;font-size:14.5px;color:var(--ink)}
+.how code{font-family:ui-monospace,Menlo,monospace;font-size:13px;background:var(--surface);padding:1px 6px;border-radius:5px;border:1px solid var(--line)}
+.progress{display:flex;align-items:center;gap:12px;margin-top:16px;font-size:13.5px;color:var(--ink-2)}
+.bar{flex:1;height:8px;background:var(--sunken);border-radius:8px;overflow:hidden}
+.bar>i{display:block;height:100%;width:0;background:var(--accent);border-radius:8px;transition:width .3s}
+nav.jump{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+nav.jump a{font-size:13.5px;font-weight:600;text-decoration:none;color:var(--accent-strong);border:1px solid var(--line);background:var(--surface);padding:7px 12px;border-radius:999px}
+section{margin-top:38px}
+section>h2{font-size:20px;display:flex;align-items:baseline;gap:10px}
+section>h2 .k{font-size:13px;color:var(--muted);font-family:var(--body);font-weight:500}
+section>p.intro{color:var(--ink-2);margin:8px 0 0;font-size:14.5px}
+.group{margin-top:22px}
+.group h3{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin-bottom:10px}
+.items{display:flex;flex-direction:column;gap:10px}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 15px;display:grid;grid-template-columns:auto 1fr;gap:4px 12px}
+.item.done{opacity:.55}
+.code{font-family:var(--display);font-weight:700;font-size:14px;color:var(--accent-strong);background:var(--accent-soft);border-radius:8px;padding:4px 0;width:42px;text-align:center;height:fit-content}
+.item .body{min-width:0}
+.item .q{font-weight:600;font-size:15.5px}
+.item .ctx{color:var(--ink-2);font-size:14px;margin-top:4px}
+.rec{margin-top:9px;font-size:14px;border-left:3px solid var(--accent);padding:2px 0 2px 10px;color:var(--ink)}
+.rec b{font-family:var(--display);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-strong);display:block;margin-bottom:1px}
+.qs{margin:8px 0 0;padding-left:18px;font-size:14px;color:var(--ink-2)}
+.qs li{margin-bottom:3px}
+.chk{grid-column:2;display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--muted);cursor:pointer;width:fit-content}
+.chk input{width:18px;height:18px;accent-color:var(--accent)}
+.where{display:inline-block;font-size:12px;color:var(--blue);background:var(--blue-soft);border-radius:999px;padding:1px 9px;margin-top:8px}
+.route{display:flex;flex-direction:column;gap:0;margin-top:14px;border-left:2px solid var(--line);margin-left:9px}
+.step{position:relative;padding:0 0 18px 22px}
+.step::before{content:"";position:absolute;left:-7px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:2px solid var(--accent)}
+.step h3{font-size:15.5px}
+.step p{margin:4px 0 0;color:var(--ink-2);font-size:14px}
+.step .codes{font-size:13px;color:var(--accent-strong);font-weight:600;margin-top:4px}
+footer{margin-top:44px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.bar>i{transition:none}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Trilha · Gestor de Obras</div>
+  <h1>O que falta decidir</h1>
+  <p>Pauta para continuar a conversa, a partir do Resumo da concepção 01. Cada item traz a minha recomendação, para você só confirmar, ajustar ou recusar.</p>
+  <div class="how">Responda no chat pelo código. Exemplo: <code>D1 ok</code> · <code>D5 sim, 5%</code> · <code>D9 não, quero diferente…</code>. Pode responder vários de uma vez.</div>
+  <div class="progress"><div class="bar"><i id="bar"></i></div><span id="count">0 de 0 conversados</span></div>
+  <nav class="jump" aria-label="Ir para">
+    <a href="#decidir">Decidir (D)</a><a href="#conversar">Conversar (T)</a><a href="#sugestoes">Sugestões (S)</a><a href="#roteiro">Roteiro</a>
+  </nav>
+</header>
+
+<section id="decidir">
+  <h2>Decisões pendentes <span class="k">D1–D15</span></h2>
+  <p class="intro">Perguntas que já surgiram e dependem de você. Muitas são rápidas: basta concordar com a recomendação.</p>
+
+  <div class="group"><h3>Remuneração e contrato</h3><div class="items">
+    <div class="item" data-id="D1"><div class="code">D1</div><div class="body">
+      <div class="q">A escala 1% → 2% → 3% é cobrada por marco?</div>
+      <div class="ctx">Ou só é devida se o cliente desistir.</div>
+      <div class="rec"><b>Recomendo</b>Por marco: 1% na assinatura, complemento até 2% na entrega do preliminar, até 3% no aceite do executivo. Você nunca trabalha a descoberto e não precisa cobrar de quem desiste.</div>
+    </div></div>
+    <div class="item" data-id="D2"><div class="code">D2</div><div class="body">
+      <div class="q">Qual valor do preliminar serve de base para os 2%?</div>
+      <div class="ctx">O preliminar tem várias opções por item.</div>
+      <div class="rec"><b>Recomendo</b>Um "valor de referência" impresso no documento: a soma das opções que a Trilha recomenda em cada item. O app calcula sozinho.</div>
+    </div></div>
+    <div class="item" data-id="D3"><div class="code">D3</div><div class="body">
+      <div class="q">Imprevisto de obra incide honorário?</div>
+      <div class="ctx">Ex.: infiltração descoberta ao abrir a parede. Aditivo do cliente já incide; variação de preço não.</div>
+      <div class="rec"><b>Recomendo</b>Sim, quando o serviço extra for aprovado pelo cliente. Gera trabalho a mais e passa pela decisão dele.</div>
+    </div></div>
+    <div class="item" data-id="D4"><div class="code">D4</div><div class="body">
+      <div class="q">O que entra e o que fica fora da base do honorário?</div>
+      <div class="rec"><b>Recomendo</b>Entram mão de obra, insumos, mão de obra + insumo, aluguel, frete, caçamba, limpeza e consumíveis. Ficam fora o honorário da Trilha, impostos, taxas e alvarás, INSS da obra, RRT e consumo de água e luz.</div>
+    </div></div>
+    <div class="item" data-id="D5"><div class="code">D5</div><div class="body">
+      <div class="q">Usar reserva técnica?</div>
+      <div class="ctx">Valor recomendado ao cliente para imprevistos, mostrado junto do executivo.</div>
+      <div class="rec"><b>Recomendo</b>Sim, sugerida entre 5% e 10%, editável por obra, do cliente e fora da base do honorário. Aparece na curva de desembolso.</div>
+    </div></div>
+    <div class="item" data-id="D6"><div class="code">D6</div><div class="body">
+      <div class="q">Como funciona a rescisão com a obra em andamento?</div>
+      <div class="rec"><b>Recomendo</b>Devido: os 3% do planejamento + a parte de execução do honorário × o avanço físico medido + a próxima parcela como compensação. Prever também a rescisão pela Trilha, se faltar aporte ou pagamento.</div>
+    </div></div>
+    <div class="item" data-id="D7"><div class="code">D7</div><div class="body">
+      <div class="q">Quem é o contratado: a Trilha (empresa) ou pessoas físicas?</div>
+      <div class="ctx">O modelo atual está em nome de duas pessoas físicas, com conta de pessoa física.</div>
+      <div class="rec"><b>Recomendo</b>Decidir com o contador. A tendência é a Trilha como empresa, com os sócios atuais e RRT do arquiteto responsável.</div>
+    </div></div>
+  </div></div>
+
+  <div class="group"><h3>Responsabilidades e escopo</h3><div class="items">
+    <div class="item" data-id="D8"><div class="code">D8</div><div class="body">
+      <div class="q">Que RRT a Trilha emite?</div>
+      <div class="rec"><b>Recomendo</b>RRT de administração e fiscalização de obra, nunca de execução. Corrigir também a cláusula que fala em ART.</div>
+    </div></div>
+    <div class="item" data-id="D9"><div class="code">D9</div><div class="body">
+      <div class="q">De quem é a regularização (alvará, CNO, INSS) e a segurança do trabalho?</div>
+      <div class="rec"><b>Recomendo</b>Do cliente, como dono da obra, e dos prestadores quanto à própria segurança. A Trilha orienta e confere no checklist de início de obra.</div>
+    </div></div>
+    <div class="item" data-id="D10"><div class="code">D10</div><div class="body">
+      <div class="q">O que está incluso na administração?</div>
+      <div class="ctx">Visitas, compras, reuniões, relatórios.</div>
+      <div class="rec"><b>Recomendo</b>Presença definida pelo plano de presença de cada etapa. A Trilha cota e solicita as compras; o cliente aprova e paga. Uma reunião de acompanhamento por semana ou quinzena e um relatório periódico. O que fugir disso é combinado à parte.</div>
+    </div></div>
+  </div></div>
+
+  <div class="group"><h3>Processo da obra e do app</h3><div class="items">
+    <div class="item" data-id="D11"><div class="code">D11</div><div class="body">
+      <div class="q">Como registrar os aceites do cliente?</div>
+      <div class="ctx">Pacote executivo, aditivos, revisões, renegociações.</div>
+      <div class="rec"><b>Recomendo</b>O app gera um termo curto em PDF. O cliente confirma por e-mail ou WhatsApp, e você registra a data e a forma no app. O contrato passa a dizer que vale "por escrito, inclusive por meio eletrônico".</div>
+    </div></div>
+    <div class="item" data-id="D12"><div class="code">D12</div><div class="body">
+      <div class="q">Como liberar pagamentos aos prestadores?</div>
+      <div class="rec"><b>Recomendo</b>Por medição do serviço executado: "liberado pela Trilha" e depois "pago pelo cliente". Retenção de 5% até a entrega final e a correção de pendências.</div>
+    </div></div>
+    <div class="item" data-id="D13"><div class="code">D13</div><div class="body">
+      <div class="q">Memorial e contrato de empreitada gerados no módulo, com o Peça ao Claude?</div>
+      <div class="rec"><b>Recomendo</b>Sim. O memorial nasce do item do orçamento, do cronograma e das regras da obra, vira base da proposta do profissional e depois anexo do contrato.</div>
+    </div></div>
+    <div class="item" data-id="D14"><div class="code">D14</div><div class="body">
+      <div class="q">A Elisa pode ver as obras (sem editar)?</div>
+      <div class="ctx">Hoje só você faz obra: se você adoecer ou viajar, ninguém vê o estado da obra.</div>
+      <div class="rec"><b>Recomendo</b>Sim, acesso de leitura ao painel e ao diário.</div>
+    </div></div>
+    <div class="item" data-id="D15"><div class="code">D15</div><div class="body">
+      <div class="q">A ordem das 6 etapas de desenvolvimento está boa?</div>
+      <div class="ctx">1 Base e orçamento · 2 Planejamento · 3 Obra rodando · 4 Documentos · 5 Flip · 6 Mapa visual.</div>
+      <div class="rec"><b>Recomendo</b>Manter, a não ser que a reforma do restaurante comece logo. Nesse caso, a etapa 2 (cronograma) pode subir junto com a 1.</div>
+    </div></div>
+  </div></div>
+</section>
+
+<section id="conversar">
+  <h2>Temas ainda não conversados <span class="k">T1–T8</span></h2>
+  <p class="intro">Assuntos que precisam da sua explicação de como funciona hoje. Deixo as perguntas que guiam cada conversa.</p>
+  <div class="items" style="margin-top:14px">
+    <div class="item" data-id="T1"><div class="code">T1</div><div class="body">
+      <div class="q">Relatórios ao cliente</div>
+      <ul class="qs"><li>Com que frequência você presta contas hoje?</li><li>O que o cliente mais pergunta?</li><li>Sempre PDF, ou um dia algum acesso de leitura?</li></ul>
+    </div></div>
+    <div class="item" data-id="T2"><div class="code">T2</div><div class="body">
+      <div class="q">Encerramento da obra</div>
+      <ul class="qs"><li>Como é a entrega hoje: vistoria, lista de pendências, termo?</li><li>Você entrega garantias, manual do imóvel?</li><li>Existe algum pós-obra?</li></ul>
+    </div></div>
+    <div class="item" data-id="T3"><div class="code">T3</div><div class="body">
+      <div class="q">Compras</div>
+      <ul class="qs"><li>Quem compra na prática: você ou o cliente?</li><li>Como o cliente aprova uma compra?</li><li>Onde ficam notas e comprovantes? Quem recebe o material na obra?</li></ul>
+    </div></div>
+    <div class="item" data-id="T4"><div class="code">T4</div><div class="body">
+      <div class="q">Fotos e arquivos</div>
+      <ul class="qs"><li>Como organiza hoje as fotos da obra?</li><li>Uma pasta padrão no Drive por obra serve?</li></ul>
+    </div></div>
+    <div class="item" data-id="T5"><div class="code">T5</div><div class="body">
+      <div class="q">O que a obra precisa saber do projeto</div>
+      <ul class="qs"><li>Lista de pranchas e revisões? Prazos do projeto? Mais alguma coisa?</li></ul>
+    </div></div>
+    <div class="item" data-id="T6"><div class="code">T6</div><div class="body">
+      <div class="q">Flipping House — 2ª rodada</div>
+      <ul class="qs"><li>Todas as variáveis de investimento e retorno.</li><li>Como o simulador mostra o lado do investidor e o da Trilha.</li><li>O relatório para investidores.</li></ul>
+    </div></div>
+    <div class="item" data-id="T7"><div class="code">T7</div><div class="body">
+      <div class="q">Diário de obra em detalhe</div>
+      <ul class="qs"><li>Eu trago a proposta das telas e do registro por voz.</li><li>Você me conta o que acontece numa visita típica.</li></ul>
+    </div></div>
+    <div class="item" data-id="T8"><div class="code">T8</div><div class="body">
+      <div class="q">Aprofundar a estrutura das telas</div>
+      <ul class="qs"><li>Painel de obras, as 8 áreas da obra e o modo obra no celular, tela por tela.</li></ul>
+    </div></div>
+  </div>
+</section>
+
+<section id="sugestoes">
+  <h2>Sugestões minhas para avaliar <span class="k">S1–S8</span></h2>
+  <p class="intro">Ideias que ainda não discutimos. Diga "entra", "depois" ou "não".</p>
+  <div class="items" style="margin-top:14px">
+    <div class="item" data-id="S1"><div class="code">S1</div><div class="body"><div class="q">Modelos de obra</div><div class="ctx">Restaurante, loja, apartamento, casa: uma sequência padrão de serviços para começar o mapa conceitual em minutos.</div></div></div>
+    <div class="item" data-id="S2"><div class="code">S2</div><div class="body"><div class="q">Banco de profissionais e fornecedores</div><div class="ctx">Cadastro único, com avaliação (preço, qualidade, prazo, postura) e histórico de preços pagos.</div></div></div>
+    <div class="item" data-id="S3"><div class="code">S3</div><div class="body"><div class="q">Checklist de início de obra</div><div class="ctx">Contrato, sinal, aceite, contratos de empreitada, RRT, alvará, água e luz, regras da obra comunicadas. Nada começa sem estar marcado.</div></div></div>
+    <div class="item" data-id="S4"><div class="code">S4</div><div class="body"><div class="q">Lista de compras inteligente</div><div class="ctx">Gerada do orçamento e do cronograma, com data limite de compra e status (cotado, aprovado, pedido, entregue).</div></div></div>
+    <div class="item" data-id="S5"><div class="code">S5</div><div class="body"><div class="q">Indicadores de cada obra</div><div class="ctx">Desvio de prazo e de custo, horas × honorário (rentabilidade), custo real da fase de planejamento.</div></div></div>
+    <div class="item" data-id="S6"><div class="code">S6</div><div class="body"><div class="q">Campo "responsável pela obra"</div><div class="ctx">Já pronto para um futuro profissional de obra, sem reestruturar nada.</div></div></div>
+    <div class="item" data-id="S7"><div class="code">S7</div><div class="body"><div class="q">Diário funcionando sem sinal</div><div class="ctx">Guarda o registro no celular e envia quando a internet voltar.</div></div></div>
+    <div class="item" data-id="S8"><div class="code">S8</div><div class="body"><div class="q">Material comercial gerado pelo app</div><div class="ctx">Um PDF "Como a Trilha administra a sua obra", com o processo, os argumentos e exemplos de relatórios.</div></div></div>
+  </div>
+</section>
+
+<section id="roteiro">
+  <h2>Roteiro sugerido</h2>
+  <p class="intro">Uma ordem para avançar sem se perder. Cada passo cabe numa conversa curta.</p>
+  <div class="route">
+    <div class="step"><h3>1 · Fechar remuneração e contrato</h3><p>Em geral é só confirmar as recomendações.</p><div class="codes">D1 a D7</div></div>
+    <div class="step"><h3>2 · Responsabilidades e escopo</h3><p>Define o que entra no contrato e no checklist de início.</p><div class="codes">D8 a D10 · S3</div></div>
+    <div class="step"><h3>3 · A obra rodando</h3><p>Aceites, pagamentos, compras e memoriais.</p><div class="codes">D11 a D13 · T3 · S4</div></div>
+    <div class="step"><h3>4 · Diário de obra</h3><p>Eu trago a proposta; você conta como é uma visita.</p><div class="codes">T7 · S7 · D14</div></div>
+    <div class="step"><h3>5 · Relatórios, encerramento e arquivos</h3><p>O que o cliente recebe e como a obra termina.</p><div class="codes">T1 · T2 · T4</div></div>
+    <div class="step"><h3>6 · Telas e ordem de desenvolvimento</h3><p>Fechamos a estrutura e você decide se autoriza a etapa 1.</p><div class="codes">T8 · D15 · S1 · S2 · S5 · S6</div></div>
+    <div class="step" style="padding-bottom:0"><h3>Em paralelo, quando quiser</h3><p>Flip 2ª rodada, integração com Projetos e material comercial.</p><div class="codes">T6 · T5 · S8</div></div>
+  </div>
+</section>
+
+<footer>Trilha Arquitetura Brasileira · Gestor de Obras · pauta da conversa 01 · atualizada em 2 de outubro de 2026. As marcações de "conversado" ficam só neste aparelho.</footer>
+</div>
+
+<script>
+(function(){
+  var KEY="pautaGestorObras:feitos", done={};
+  try{ done=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ done={}; }
+  var items=[].slice.call(document.querySelectorAll(".item[data-id]"));
+  function save(){ try{ localStorage.setItem(KEY,JSON.stringify(done)); }catch(e){} }
+  function update(){
+    var n=items.filter(function(el){return done[el.dataset.id];}).length;
+    document.getElementById("count").textContent=n+" de "+items.length+" conversados";
+    document.getElementById("bar").style.width=(items.length?n/items.length*100:0)+"%";
+  }
+  items.forEach(function(el){
+    var id=el.dataset.id;
+    var lab=document.createElement("label"); lab.className="chk";
+    var cb=document.createElement("input"); cb.type="checkbox"; cb.id="chk-"+id; cb.checked=!!done[id];
+    lab.appendChild(cb); lab.appendChild(document.createTextNode("Conversado"));
+    el.appendChild(lab);
+    el.classList.toggle("done",cb.checked);
+    cb.addEventListener("change",function(){ done[id]=cb.checked; if(!cb.checked) delete done[id]; el.classList.toggle("done",cb.checked); save(); update(); });
+  });
+  update();
+})();
+</script>

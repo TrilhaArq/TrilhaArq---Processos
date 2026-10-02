@@ -427,7 +427,14 @@ administração etc.) são **padrões editáveis por obra**, conforme a negocia�
 - Este mapeamento também servirá de **material comercial** ("é assim que a gente faz; eu tenho um aplicativo que faz
   isso; eu te entrego tais relatórios").
 
-**Próximo passo**: resumo estruturado em PDF (gestor-obras/resumo-gestor-obras-01.pdf); depois, organização do app.
+**Resumo e pauta (02/10/2026)**
+- Resumo estruturado em PDF: `gestor-obras/resumo-gestor-obras-01.pdf`. Luan leu e aprovou; achou a **estrutura do
+  app (Parte 8) ótima** — será aprofundada depois.
+- Pauta do que falta decidir, para o celular: https://claude.ai/artifact/MLeRXMwrswiyAjZfvZj1yR
+  (cópia: `gestor-obras/pauta-gestor-obras.html`). Itens com código: **D1–D15** (decisões), **T1–T8** (temas não
+  conversados), **S1–S8** (sugestões), e um roteiro em 6 passos. Luan responde no chat pelo código.
+
+**Próximo passo**: seguir o roteiro da pauta (passo 1: D1–D7, remuneração e contrato).
 
 ---
 
