@@ -88,6 +88,18 @@ Um único Artifact, organizado em **módulos**, com um único banco de dados com
   pedir que o Luan confirme e analise antes de qualquer processamento. As sugestões ficam em `REGRAS.md`, seção
   "Sugestões da Elisa (aguardando análise do Luan)", até o Luan aprovar, ajustar ou recusar cada uma.
 
+## Dúvidas e aprimoramentos (caixa na capa) — regra fixa (Luan, 02/10/2026)
+
+- Na capa, abaixo dos botões do Escritório, a caixa "Dúvidas e aprimoramentos · Registre aqui" grava cada registro em
+  `aprimoramentos/<AAAA-MM>` (`itens[]`: `id`, `texto`, `app`, `pessoaId`, `criadoEm`, `status`, `resposta`,
+  `atualizadoEm`). O app **só recebe**: não responde, não usa IA, não altera nada.
+- **Nenhum chat processa esses registros por conta própria.** Só quando o **Luan** pedir no chat:
+  1. **Analisar:** ler `aprimoramentos` (ArtifactData `list`), responder cada item no chat e gravar a resposta no
+     registro (`status: "respondido"`, `resposta`, `atualizadoEm`, com `if_version`).
+  2. **Processar:** só os itens que o Luan **autorizar** explicitamente; marcar `status: "aprovado"` ao começar e
+     `"feito"` ao publicar (ou `"recusado"`, com o motivo em `resposta`).
+- Pedidos registrados pela Elisa seguem a mesma regra: dependem da análise e da autorização do Luan.
+
 ## Contas e onde cada coisa acontece (decidido em 01/10/2026)
 
 - **Uso do app:** sempre na conta do escritório (dona do link oficial e do banco de dados).

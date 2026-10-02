@@ -652,3 +652,11 @@ Planejamento completo: `COMERCIAL-PLANO.md`; referências (propostas, contratos,
   horas; custos e relatórios só para sócios). Os lançamentos já guardam `pessoaId` para isso.
 - Integração com o sistema de orçamento de obra (honorários e etapas).
 - Base de precificação: média de horas por etapa e por m², por tipo de projeto.
+
+## Dúvidas e aprimoramentos (capa, desde 02/10/2026)
+
+Caixa na capa, abaixo dos botões do Escritório: quem registra (Luan/Elisa), texto (digitado ou ditado pelo microfone do
+teclado), parte do app e "Registrar". "Ver registros" mostra a lista com a situação (Registrado, Em análise, Respondido,
+Aprovado, Feito, Não será feito) e a resposta. Só registros ainda não analisados podem ser excluídos. O app não responde
+nem processa: a análise e as alterações acontecem no chat do Claude, quando o Luan pedir e autorizar (regra na skill).
+Dados: `aprimoramentos/<AAAA-MM>` com `itens[]`.

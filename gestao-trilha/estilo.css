@@ -1198,3 +1198,15 @@
   .gp-rodada { font-size: 13px; color: var(--body-ink); }
   .gp-rodada summary { cursor: pointer; font-family: 'Comfortaa', sans-serif; font-size: 12.5px; font-weight: 600; color: var(--accent-deep); padding: 4px 0; }
   .gp-rodada .form-actions { margin: 6px 0; }
+
+/* Dúvidas e aprimoramentos (capa) */
+.apr-box { gap: 10px; }
+.apr-quem { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.apr-rodape { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+#apr-lista { display: flex; flex-direction: column; gap: 8px; max-height: 420px; overflow-y: auto; }
+.apr-item { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.apr-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.apr-meta .link { margin-left: auto; }
+.apr-txt { white-space: pre-wrap; overflow-wrap: anywhere; }
+.apr-resp { font-size: 13px; color: var(--muted); white-space: pre-wrap; overflow-wrap: anywhere; }
+.apr-st.apr-feito, .apr-st.apr-aprovado { background: var(--accent-tint); color: var(--accent-deep); }
