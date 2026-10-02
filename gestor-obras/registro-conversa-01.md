@@ -367,7 +367,26 @@ atrasa e mostrando se o atraso **consumiu folga** ou **empurrou o fim da obra**.
 - **Ponto único de falha**: só o Luan faz obra → Elisa com acesso de **visualização** ao diário e ao painel.
 - Campo **"responsável pela obra"** em cada obra, já pronto para um futuro profissional de obra.
 
-**Próximo passo**: leitura geral do modelo de contrato atual do Luan; depois, seguir na gestão da execução.
+**Leitura geral do modelo de contrato de Administração de Obra (02/10/2026)** — só posicionamento; análise
+profunda será feita no chat específico de contratos. Principais pontos levantados:
+- Funciona: cliente decide, autoriza e paga tudo (2.1.3, 2.2.2, 2.3, 3.5, 5.1); responsabilidade pelos serviços
+  contratados é do cliente (2.3); não inclui execução direta (7.2); sem responsabilidade por serviços e prazos de
+  terceiros (2.2.4, 3.4, 7.3); contratado define dias/horários de presença (2.5.1); atendimento em horário comercial
+  (7.4); paralisação (9.2); uso de imagem e placa (7.6–7.8); mediação (10.1).
+- Ajustar: título diz "Administração **e Execução**" (contradiz 7.2); cláusula 2 e 2.4 falam em "contratação de
+  pessoal", "gerenciamento de pessoal" e "responsável por todas as aquisições" (contradiz o posicionamento e aumenta
+  risco trabalhista); 6.6 cita **ART** (CREA) — arquiteto emite **RRT** (CAU); parcelas 1 e 2 da cláusula 4.3 dizem
+  "30% do valor preliminar total **da obra**" (deveria ser do honorário); base dos honorários é o custo final sem piso
+  (4.1) — não reflete o modelo por origem do aumento; nomes dos documentos inconsistentes (Orçamento Preliminar ×
+  Executivo na 9.1); cronograma "com discriminação semanal" (prever diário para obra comercial); numeração pula da
+  Sétima para a Nona; texto em 1ª pessoa ("de nossa responsabilidade"); contratado em nome de pessoas físicas e
+  conta de PF — rever conforme a estrutura atual da Trilha.
+- Falta: definição da base de cálculo (o que entra/fica fora); aditivos e origem do aumento; piso no executivo;
+  plano de pagamento flexível (anexo); tratamento de atraso causado pelo contratante (decisões, aportes); forma dos
+  aceites (por escrito, inclusive meio eletrônico/app); regularização (alvará, CNO, INSS) e segurança do trabalho;
+  liberação de pagamentos por medição e retenção; termo de entrega/encerramento; declaração sobre comissões (RT).
+
+**Próximo passo**: seguir na gestão da execução da obra.
 
 ---
 
