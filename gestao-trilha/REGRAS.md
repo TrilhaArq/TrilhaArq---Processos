@@ -609,7 +609,8 @@ Planejamento completo: `COMERCIAL-PLANO.md`; referências (propostas, contratos,
   - **Configurações do comercial › Modelos:** páginas (ordem, ligar/desligar, opcional, trocar imagem, + página fixa,
     + página variável, duplicar modelo, tipos de projeto), marca (logo e assinatura para páginas claras/escuras, fundo
     da capa), contratos (enviar .docx novo, versão) e textos exemplares. Enviar arquivos exige a capacidade `assets`
-    (só quem edita o app).
+    (só quem edita o app). Sem modelos no banco, o app usa `modelos-padrao.json` publicado junto (ids dos arquivos
+    daquele artefato); o primeiro "Salvar modelos" grava em `com_config/modelos`. Ver `referencias-comercial/paginas/LEIA.md`.
 - **Ainda não faz:** "Peça ao Claude" (barra de conversa), proposta e contrato simplificados de serviços menores,
   Levantamento e "Registrar rodada" no Gestor, relatórios do comercial, versões da proposta, mais de um contratante
   no contrato.
