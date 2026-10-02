@@ -20,23 +20,24 @@ Marcação: `[ ]` aberto · `[x] dd/mm/aaaa (quem)` feito · `[~]` não se aplic
 ## Roteiro para terminar o Gestor Comercial no app oficial (comando do Luan: "terminar o serviço no app oficial")
 
 Situação em 02/10/2026:
-- **Oficial** (https://claude.ai/artifact/N5fGJZBumZy7dyN57w7e8o) tem as **fases 1 e 2** (versão 1790904962-39e8) com
-  `db`, `downloads`, `mcp` Google Calendar (`create_event`, `update_event`), `assets` e `sample`, e o
-  `modelos-padrao.json` da fase 2.
-- **Cópia de teste** (https://claude.ai/artifact/V9bUhPfLyowX83XUz5Zeaw) tem a **fase 3** (versão 1790906297-dd33).
+- **Oficial** (https://claude.ai/artifact/N5fGJZBumZy7dyN57w7e8o) tem as **fases 1, 2 e 3** (versão 1790906972-5cb0,
+  publicada em 02/10/2026 pela conta de desenvolvimento) com `db`, `downloads`, `mcp` Google Calendar (`create_event`,
+  `update_event`), `assets` e `sample`, e o `modelos-padrao.json` com os ids do oficial (modelos Residência e Serviço
+  menor, contratos 01–07, textos exemplares). **Falta só o que compete à conta de origem: Passos 2 a 4.**
+- **Cópia de teste** (https://claude.ai/artifact/V9bUhPfLyowX83XUz5Zeaw) tem a mesma fase 3 (versão 1790906297-dd33).
 - **Código:** repositório `TrilhaArq/TrilhaArq---Processos`, ramo `claude/tender-bell-5u0djo`, pasta `gestao-trilha/`.
 - Os arquivos dos modelos (páginas, logos e os 7 contratos, inclusive o 07) **já estão no armazenamento do oficial**;
   os ids estão em `referencias-comercial/modelos-padrao-oficial.json`.
 
 ### Passo 1 — Publicar a fase 3 no oficial
-- [ ] **1.1** Conferir que nenhum outro chat está publicando no oficial (perguntar ao Luan). 🔐
-- [ ] **1.2** Ler a versão publicada do oficial (Artifact `read` e `list scope files`). Se não for a 1790904962-39e8
+- [x] 02/10/2026 (conta de desenvolvimento, com autorização do Luan) **1.1** Conferir que nenhum outro chat está publicando no oficial (perguntar ao Luan). 🔐
+- [x] 02/10/2026 (conta de desenvolvimento) **1.2** Ler a versão publicada do oficial (Artifact `read` e `list scope files`). Se não for a 1790904962-39e8
   (alguém publicou depois), comparar com o ramo e juntar as mudanças antes de publicar.
-- [ ] **1.3** Publicar no oficial: `file_path` = `gestao-trilha/index.html`, `root` = `gestao-trilha`, `files` = `estilo.css`,
+- [x] 02/10/2026 (conta de desenvolvimento; versão 1790906972-5cb0, arquivos conferidos byte a byte com o ramo) **1.3** Publicar no oficial: `file_path` = `gestao-trilha/index.html`, `root` = `gestao-trilha`, `files` = `estilo.css`,
   `nucleo.js`, `logo.png`, todos os `modulos/*.js` (inclusive `comercial-docs.js` e `comercial.js`) e
   `"modelos-padrao.json": referencias-comercial/modelos-padrao-oficial.json`. **Sem** passar `capabilities` (mantém as
   cinco). 🔐
-- [ ] **1.4** Abrir o oficial e conferir: capa com "Gestor Comercial", oportunidade abre, Configurações do comercial abre.
+- [ ] **1.4** (conta de origem) Abrir o oficial e conferir: capa com "Gestor Comercial", oportunidade abre, Configurações do comercial abre.
 
 ### Passo 2 — Configurações que só a conta de origem faz (no próprio app)
 - [ ] **2.1 Modelos:** Gestor Comercial › Configurações do comercial › Modelos › **Salvar modelos** (grava
@@ -87,6 +88,7 @@ Situação em 02/10/2026:
 - [x] 02/10/2026 (conta de desenvolvimento) Imagens das páginas, logos e os contratos 01–07 enviados ao armazenamento
   do oficial (contratos como script); `modelos-padrao.json` da fase 2 publicado no oficial.
 - [x] 02/10/2026 (conta de desenvolvimento) Fase 3 publicada na cópia de teste, com `modelos-padrao-teste.json`.
+- [x] 02/10/2026 (conta de desenvolvimento) Fase 3 publicada no oficial (versão 1790906972-5cb0) com `modelos-padrao-oficial.json`.
 
 ## Cópia de teste
 - [ ] Clicar uma vez em **Salvar modelos** na cópia de teste (grava os modelos no banco dela).

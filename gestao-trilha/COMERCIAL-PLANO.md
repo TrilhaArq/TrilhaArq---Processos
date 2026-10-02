@@ -1,6 +1,6 @@
 # Gestor Comercial — planejamento
 
-> **Situação (02/10/2026):** fase 3 na cópia de teste (roteiro para o oficial em `PENDENCIAS-CONTA-ORIGEM.md`); v1 e fase 2 publicadas no app oficial (pendências de configuração em
+> **Situação (02/10/2026):** fases 1, 2 e 3 publicadas no app oficial (configurações da conta de origem em `PENDENCIAS-CONTA-ORIGEM.md`) (pendências de configuração em
 > `PENDENCIAS-CONTA-ORIGEM.md`); antes, v1 construída na cópia de teste — funil, oportunidade com próximo passo,
 > importação do briefing pela planilha, programa, simulador com Meu valor e "Virar projeto". Regras da v1 em
 > `REGRAS.md` (seção Gestor Comercial). Próxima rodada: proposta em PDF, contrato .docx, parcelas no Financeiro,

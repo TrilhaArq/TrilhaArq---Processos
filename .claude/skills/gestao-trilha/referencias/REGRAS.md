@@ -611,7 +611,7 @@ Planejamento completo: `COMERCIAL-PLANO.md`; referências (propostas, contratos,
     da capa), contratos (enviar .docx novo, versão) e textos exemplares. Enviar arquivos exige a capacidade `assets`
     (só quem edita o app). Sem modelos no banco, o app usa `modelos-padrao.json` publicado junto (ids dos arquivos
     daquele artefato); o primeiro "Salvar modelos" grava em `com_config/modelos`. Ver `referencias-comercial/paginas/LEIA.md`.
-- **Fase 3 (cópia de teste em 02/10/2026; levar ao oficial pelo roteiro de `PENDENCIAS-CONTA-ORIGEM.md`):**
+- **Fase 3 (no oficial desde 02/10/2026; configurações da conta de origem em `PENDENCIAS-CONTA-ORIGEM.md`):**
   - **Serviços menores (tipo "Serviço"):** sem briefing nem programa — da Reunião o passo é "Montar proposta". Aba
     Proposta › O serviço: o sócio descreve o pedido e "✨ Montar com o Claude" (nível rápido, `sample.json`) organiza
     título, descrição, entregáveis, prazo (d.u.) e horas; tudo editável. Preço = horas × fator do cliente × custo-hora
