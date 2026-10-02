@@ -1218,3 +1218,6 @@
 .apr-box .com-chat-in textarea.ctl { grid-column: 1 / -1; }
 .apr-box .com-chat-h { flex-direction: column; align-items: flex-start; gap: 4px; }
 .apr-box .com-chat-h .hint { min-width: 0; }
+.apr-box .apr-dica { grid-column: 1 / -1; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.apr-box kbd { display: inline-flex; align-items: center; gap: 4px; font: 600 12px 'Work Sans', sans-serif; color: var(--ink); background: var(--surface); border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 6px; padding: 1px 6px; }
+.apr-box .apr-win { width: 11px; height: 11px; fill: currentColor; }

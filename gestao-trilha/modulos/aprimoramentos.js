@@ -23,6 +23,7 @@
     return '<div class="card gp-box com-chat apr-box"><div class="com-chat-h"><b>Dúvidas e aprimoramentos · Registre aqui</b><span class="hint">Um ajuste, uma dúvida ou uma ideia. Fica guardado para o Luan analisar com o Claude; nada é respondido nem alterado automaticamente.</span></div>' +
       '<div class="apr-quem" id="apr-quem"></div>' +
       '<div class="com-chat-in"><textarea class="ctl" id="apr-txt" rows="2" placeholder="Escreva ou dite pelo microfone do teclado…" aria-label="Dúvida ou aprimoramento"></textarea>' +
+      '<span class="hint apr-dica">Dica: no computador, use o microfone com <kbd aria-label="tecla Windows"><svg class="apr-win" viewBox="0 0 16 16" aria-hidden="true"><path d="M0 0h7.5v7.5H0zM8.5 0H16v7.5H8.5zM0 8.5h7.5V16H0zM8.5 8.5H16V16H8.5z"/></svg> Win</kbd> + <kbd>H</kbd> · no celular, o microfone do teclado.</span>' +
       '<select class="ctl" id="apr-app" aria-label="Sobre qual parte do app"></select><button type="button" class="btn btn-small btn-primary" id="apr-ok">Registrar</button></div>' +
       '<div class="apr-rodape"><span class="hint" id="apr-resumo"></span><button type="button" class="link" id="apr-ver" hidden></button></div>' +
       '<div id="apr-lista" hidden></div></div>';
