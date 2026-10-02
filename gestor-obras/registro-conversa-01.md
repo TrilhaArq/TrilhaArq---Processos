@@ -305,7 +305,69 @@ atrasa e mostrando se o atraso **consumiu folga** ou **empurrou o fim da obra**.
 - Caminho: começar pela **linha do tempo visual** (mais simples) e evoluir para o fluxograma e interações (arrastar).
 - **REGRA: primeiro o app funcionando e otimizando o processo. O Mapa da Obra visual só entra quando o Luan pedir.**
 
-**Próximo tema em andamento**: gestão e controle da execução da obra (obra rodando).
+---
+
+## 5B. Obra rodando: ajustes, contratos e diário (3ª parte da conversa)
+
+**Como lidar com mudanças durante a obra (ACEITO pelo Luan)**
+- **Não duplicar**: planejamento, cronograma e orçamento existem **uma vez só** — um **plano vivo**.
+- **Linha de base congelada no aceite** do pacote executivo (cronograma + orçamento + curva de desembolso):
+  fotografia não editável, usada para comparar previsto × real e como base da remuneração (piso).
+- **Revisões formais** para grandes mudanças (aditivo grande, mudança de escopo), com novo aceite do cliente,
+  numeradas como revisão de projeto: **Rev.00, Rev.01, Rev.02…** — as anteriores ficam guardadas.
+- **Registro de alterações** quase automático: ao mudar data/duração/valor, o app pergunta o motivo (opções rápidas:
+  chuva, falta do profissional, material atrasado, decisão do cliente, imprevisto, ajuste de planejamento) e registra
+  o quê / antes → depois / quando / motivo / **causado por** (cliente, fornecedor, Trilha, externo) / impacto.
+  O "causado por" liga ao modelo de remuneração por origem e à cláusula de prazo do contrato.
+- Com a obra rodando: painel da semana/dia (quem deveria estar, atrasos, liberações, **decisões pendentes do cliente**);
+  **data limite de compra** (cronograma − prazo de entrega); **avanço físico** por serviço alimentando as **medições**;
+  previsões atualizadas (término, custo final, desembolso dos próximos meses); alertas só no caminho crítico
+  (comercial) ou quando a folga acaba (residencial).
+
+**Orçamento — as três abas continuam (esclarecimento)**
+- Preliminar / Executivo / Controle de Obra são **três formas de olhar os mesmos itens**, não três cópias
+  (o app atual já funciona assim: a etapa é marcação de cada item).
+- Novidade: no aceite, congela a **linha de base**; daí em diante o controle compara com ela, e item que surgir depois
+  do aceite entra automaticamente como **aditivo ou imprevisto**, com motivo e "causado por".
+
+**Contratação da mão de obra (CORRIGIDO/CONFIRMADO pelo Luan)**
+- A Trilha **não tem funcionários de obra**; toda a mão de obra é contratada **por empreitada** (não por diária).
+- **Quem assina os contratos com os profissionais é o CLIENTE (contratante)**, não a Trilha.
+- **A Trilha também é uma prestadora contratada pelo cliente**, com a função de **administrar e gerir a obra**
+  (define escopo, fiscaliza, mede, libera pagamentos; não é parte pagadora).
+- Cuidado registrado: empreitada **não protege sozinha** contra vínculo trabalhista — vale a prática. Proteção:
+  escopo e resultado definidos (memorial), pagamento por **medição** (não por tempo), profissional organizando
+  equipe e horário dentro do prazo, preferência por prestador formalizado (MEI/empresa). Validar com advogado.
+- Luan vai trazer o **modelo de contrato atual** para uma leitura geral de posicionamento (análise profunda dos
+  contratos modelo será feita em outro chat específico).
+
+**Memorial descritivo do serviço / escopo de contratação (proposta, a confirmar)**
+- Gerado **dentro do módulo de obra**, com o **"Peça ao Claude"** (mesma ideia do Gestor Comercial).
+- Montado a partir dos dados da obra: descrição e "incluso" do item do orçamento; projetos/pranchas de referência;
+  janela no cronograma; **regras da obra** (horário, limpeza, segurança, guarda de material, convivência — crucial em
+  restaurante funcionando); medição e pagamento.
+- Fluxo: gerar memorial → Luan ajusta → envia ao profissional → proposta dele entra como opção no preliminar →
+  escolhido, o mesmo memorial vira **anexo do contrato de empreitada** (cliente × profissional).
+
+**Separação do Gestor Comercial (DECIDIDO pelo Luan)**
+- Memoriais e contratos de obra ficam **no módulo de obra**, não no Gestor Comercial — que segue sendo o gestor
+  comercial de **projetos** da Trilha como escritório de arquitetura (não complicar o outro app).
+- Hoje **só o Luan** assume as funções de obra; a Elisa e futuros arquitetos/estagiários provavelmente não.
+  Se necessário no futuro, a Trilha terá pessoas contratadas especificamente para obra.
+- Ressalva técnica: separar telas e dados, mas **reaproveitar o "motor"** (Peça ao Claude, gerador de documentos/PDF).
+
+**Diário de obra (Luan pediu atenção especial — Claude lidera a concepção)**
+- Visto pelo Luan como chave do app: "facilitar a vida, fazer o app realmente servir".
+- Princípios propostos: (1) **registro em segundos, por voz** — o Peça ao Claude organiza em presença, avanço,
+  ocorrência, aditivo pendente; Luan só confirma; (2) **o diário alimenta o resto** (cronograma, registro de
+  alterações, medições, relatório ao cliente); (3) **feito para celular e correria** — botões grandes, poucas telas.
+- Alerta: obra com sinal fraco — prever guardar no celular e enviar depois, ou avisar claramente que não salvou.
+
+**Sugestões a mais (a confirmar)**
+- **Ponto único de falha**: só o Luan faz obra → Elisa com acesso de **visualização** ao diário e ao painel.
+- Campo **"responsável pela obra"** em cada obra, já pronto para um futuro profissional de obra.
+
+**Próximo passo**: leitura geral do modelo de contrato atual do Luan; depois, seguir na gestão da execução.
 
 ---
 
