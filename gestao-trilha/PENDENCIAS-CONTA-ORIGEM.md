@@ -85,7 +85,7 @@ Situação em 02/10/2026:
 
 - [x] 02/10/2026 (conta de origem) **Teste geral** com cópia dos dados reais do banco (Playwright, banco simulado congelado):
   capa e todos os apps abrem sem erro; Comercial fluxo completo de **Residência** (contato → agenda → briefing colado →
-  programa → simulador → texto com IA → PDF de 23 páginas → contrato 01 .docx → assinado → projeto no Gestor + contrato
+  programa → simulador → texto com IA → PDF da proposta (1,5 MB) → contrato 01 .docx → assinado → projeto no Gestor + contrato
   no Financeiro) e de **Serviço** (proposta curta → contrato 07 → projeto simples + Financeiro); "Peça ao Claude";
   celular 390 px sem rolagem lateral. Acesso da conta de origem confirmado: lê e grava o banco, lê os arquivos do
   armazenamento (29, inclusive os 7 contratos, que abrem como .docx válidos) e publica no oficial.
