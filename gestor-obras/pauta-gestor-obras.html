@@ -44,6 +44,9 @@ section>p.intro{color:var(--ink-2);margin:8px 0 0;font-size:14.5px}
 .item.done{opacity:.55}
 .item.decided{border-color:var(--accent);background:var(--accent-soft)}
 .item.decided .rec{border-left-color:var(--accent-strong)}
+.item.open{border-color:var(--blue)}
+.item.open .rec{border-left-color:var(--blue)}
+.item.open .rec b{color:var(--blue)}
 .badge{display:inline-block;font-size:11.5px;font-weight:600;color:var(--accent-strong);background:var(--surface);border:1px solid var(--accent);border-radius:999px;padding:0 8px;margin-left:6px;vertical-align:2px}
 .code{font-family:var(--display);font-weight:700;font-size:14px;color:var(--accent-strong);background:var(--accent-soft);border-radius:8px;padding:4px 0;width:42px;text-align:center;height:fit-content}
 .item .body{min-width:0}
@@ -103,26 +106,26 @@ a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offs
       <div class="q">O que entra e o que fica fora da base do honorário?<span class="badge">decidido</span></div>
       <div class="rec"><b>Decidido</b>Lista como recomendada.</div>
     </div></div>
-    <div class="item" data-id="D5"><div class="code">D5</div><div class="body">
-      <div class="q">Usar reserva técnica?</div>
+    <div class="item decided" data-id="D5"><div class="code">D5</div><div class="body">
+      <div class="q">Usar reserva técnica?<span class="badge">decidido</span></div>
       <div class="ctx">Valor recomendado ao cliente para imprevistos, mostrado junto do executivo.</div>
-      <div class="rec"><b>Recomendo</b>Sim, sugerida entre 5% e 10%, editável por obra, do cliente e fora da base do honorário. Aparece na curva de desembolso.</div>
+      <div class="rec"><b>Decidido</b>Reserva técnica existe e é configurável no app, mas é <strong>sugerida</strong> ao cliente, que aceita ou não. Não é obrigatória. Sugerida entre 5% e 10%, do cliente, fora da base do honorário.</div>
     </div></div>
-    <div class="item" data-id="D6"><div class="code">D6</div><div class="body">
-      <div class="q">Como funciona a rescisão com a obra em andamento?</div>
-      <div class="rec"><b>Recomendo</b>Devido: os 3% do planejamento + a parte de execução do honorário × o avanço físico medido + a próxima parcela como compensação. Prever também a rescisão pela Trilha, se faltar aporte ou pagamento.</div>
+    <div class="item decided" data-id="D6"><div class="code">D6</div><div class="body">
+      <div class="q">Como funciona a rescisão com a obra em andamento?<span class="badge">decidido</span></div>
+      <div class="rec"><b>Decidido</b>Como recomendado: 3% do planejamento + parte de execução do honorário × avanço físico medido + próxima parcela como compensação. Prever também a rescisão pela Trilha.</div>
     </div></div>
-    <div class="item" data-id="D7"><div class="code">D7</div><div class="body">
-      <div class="q">Quem é o contratado: a Trilha (empresa) ou pessoas físicas?</div>
+    <div class="item decided" data-id="D7"><div class="code">D7</div><div class="body">
+      <div class="q">Quem é o contratado: a Trilha (empresa) ou pessoas físicas?<span class="badge">decidido</span></div>
       <div class="ctx">O modelo atual está em nome de duas pessoas físicas, com conta de pessoa física.</div>
-      <div class="rec"><b>Recomendo</b>Decidir com o contador. A tendência é a Trilha como empresa, com os sócios atuais e RRT do arquiteto responsável.</div>
+      <div class="rec"><b>Decidido</b>Por enquanto, os contratados são os <strong>arquitetos, como pessoas físicas</strong>: a Trilha ainda não tem CNPJ.</div>
     </div></div>
   </div></div>
 
   <div class="group"><h3>Responsabilidades e escopo</h3><div class="items">
-    <div class="item" data-id="D8"><div class="code">D8</div><div class="body">
-      <div class="q">Que RRT a Trilha emite?</div>
-      <div class="rec"><b>Recomendo</b>RRT de administração e fiscalização de obra, nunca de execução. Corrigir também a cláusula que fala em ART.</div>
+    <div class="item open" data-id="D8"><div class="code">D8</div><div class="body">
+      <div class="q">Que RRT a Trilha emite?<span class="badge">em discussão</span></div>
+      <div class="rec"><b>Situação</b>Hoje é emitido <strong>RRT de execução de obra</strong>, difícil de evitar. Falta decidir, no chat de contratos, como o contrato preserva a caracterização de administração.</div>
     </div></div>
     <div class="item" data-id="D9"><div class="code">D9</div><div class="body">
       <div class="q">De quem é a regularização (alvará, CNO, INSS) e a segurança do trabalho?</div>
@@ -230,7 +233,7 @@ a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offs
   </div>
 </section>
 
-<footer>Trilha Arquitetura Brasileira · Gestor de Obras · pauta da conversa 01 · atualizada em 2 de outubro de 2026 (D1–D4 decididos). As marcações de "conversado" ficam só neste aparelho.</footer>
+<footer>Trilha Arquitetura Brasileira · Gestor de Obras · pauta da conversa 01 · atualizada em 2 de outubro de 2026 (D1–D7 decididos; D8 em discussão). As marcações de "conversado" ficam só neste aparelho.</footer>
 </div>
 
 <script>

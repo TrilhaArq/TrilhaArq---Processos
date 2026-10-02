@@ -43,7 +43,7 @@ refletem o modelo de remuneração e os aceites decididos.
 ⚠️ Ajustar
 - **6.6** cita **ART** (registro do CREA, engenharia). Arquiteto emite **RRT** (CAU). Corrigir e definir o tipo de
   RRT (administração/gerenciamento/fiscalização — não execução).
-- **Partes contratadas**: o modelo está em nome de **duas pessoas físicas**, com pagamento em conta de pessoa física.
+- **Partes contratadas** (ver seção 9 — decidido manter pessoas físicas): o modelo está em nome de **duas pessoas físicas**, com pagamento em conta de pessoa física.
   Rever quem deve ser o contratado na estrutura atual da Trilha (empresa × pessoa física, sócios atuais) — afeta
   tributação, responsabilidade e imagem.
 
@@ -133,6 +133,22 @@ refletem o modelo de remuneração e os aceites decididos.
   compensação (hoje a 9.2 prevê a próxima parcela integral).
 - Prever também a **rescisão pela Trilha** (falta de aportes ou inadimplência do contratante).
 - Prever cláusula de **desistência antes da obra** (hoje a 9.2 só trata de paralisação).
+
+## 9. Decisões e pontos novos (02/10/2026)
+- **Partes contratadas (decidido)**: a Trilha **ainda não tem CNPJ**; os contratados continuam sendo os arquitetos como
+  **pessoas físicas**. Atualizar o modelo para os sócios atuais.
+- **Reserva técnica (decidido)**: prever no contrato como **recomendação** ao contratante (5–10%), que pode aceitar ou não;
+  não é obrigatória e fica fora da base do honorário.
+- **Rescisão (decidido)**: 3% (fase de planejamento) + parte de execução do honorário × avanço físico medido + próxima
+  parcela como compensação; prever também rescisão pelo contratado (falta de aportes ou inadimplência).
+- **RRT (em discussão — tema central do chat de contratos)**: hoje é emitido **RRT de execução de obra**. Com contratados
+  pessoas físicas, a responsabilidade técnica recai pessoalmente sobre os arquitetos. A discutir:
+  - verificar no CAU se uma atividade de **gestão** (gerenciamento, fiscalização ou acompanhamento de obra) atende ao
+    serviço, em vez de execução;
+  - se o RRT de execução for mantido, delimitar no contrato que a atuação é de **gestão e fiscalização**, que os serviços
+    são executados por prestadores contratados diretamente pelo contratante, e quem responde pelo quê;
+  - avaliar **seguro de responsabilidade civil profissional**;
+  - validar tudo com advogado.
 
 ## Prioridades
 1. **Urgentes (texto)**: retirar "Execução" do título · corrigir o erro dos 30% na 4.3 · trocar ART por RRT.

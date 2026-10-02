@@ -442,7 +442,20 @@ administração etc.) são **padrões editáveis por obra**, conforme a negocia�
 - **D4** — base do honorário: **entram** mão de obra, insumos, mão de obra + insumo, aluguel, frete, caçamba, limpeza,
   consumíveis; **ficam fora** honorário da Trilha, impostos, taxas e alvarás, INSS da obra, RRT, consumo de água e luz.
 
-**Próximo passo**: D5–D7 (reserva técnica, rescisão, quem é o contratado).
+**Decisões da pauta — D5 a D7 e situação do D8 (02/10/2026)**
+- **D5 (DECIDIDO)** — reserva técnica **existe e é configurável no app**, mas é **sugerida** ao cliente, que aceita ou
+  não (não é obrigatória). Sugestão 5–10%, do cliente, fora da base do honorário; o app registra se o cliente aceitou.
+- **D6 (DECIDIDO)** — rescisão com obra em andamento: 3% (planejamento) + parte de execução × avanço físico medido +
+  próxima parcela como compensação; prever também rescisão pela Trilha.
+- **D7 (DECIDIDO)** — a Trilha **ainda não tem CNPJ**: os contratados são os arquitetos como **pessoas físicas**.
+- **D8 (EM DISCUSSÃO — chat de contratos)** — hoje é emitido **RRT de execução de obra** ("fica complicado de não
+  emitir"). Precisa definir como o contrato preserva a caracterização de **administração** (e não de execução).
+  Pontos levantados pelo Claude: RRT de execução + contratados pessoas físicas = responsabilidade técnica pessoal dos
+  arquitetos (inclusive a de solidez e segurança); verificar no CAU se uma atividade de gestão (gerenciamento,
+  fiscalização ou acompanhamento de obra) atende; avaliar seguro de responsabilidade civil profissional; delimitar no
+  contrato o que a Trilha responde (gestão e fiscalização) e o que é dos prestadores contratados pelo cliente.
+
+**Próximo passo**: D9–D10 (regularização/segurança e escopo da administração).
 
 ---
 
