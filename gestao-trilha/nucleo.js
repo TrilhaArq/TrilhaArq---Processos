@@ -33,8 +33,16 @@
     // Peso de cada etapa no % concluído do Gestor (Abertura não conta). Marcenaria: EP e Executivo.
     pesosEtapas: { ep: 30, ap: 30, pl: 10, pe: 30, mep: 50, mex: 50 },
     // Prazos padrão em dias úteis (Configurações › Prazos padrão). Cada projeto pode ter o seu (Configurações do projeto).
-    // Legal: desenvolvimento até o 1º protocolo (contrato 3.3.3) e prazo para atender cada exigência.
-    prazosPadrao: { ep: 40, ap: 70, pe: 60, mep: 30, mex: 40, plDev: 20, plExig: 10 },
+    // Seguem os modelos de contrato, pelo maior número de cada faixa (decisão de 01/10/2026). Anteprojeto 80 = 30 + 15 + 15 + 20.
+    // Legal: desenvolvimento até o 1º protocolo (contrato 3.3.3) e prazo interno para atender cada exigência.
+    // Reforma e interiores (contratos 03 e 04): refLev (levantamento), refEp e refPe.
+    prazosPadrao: { ep: 40, ap: 80, pe: 60, mep: 30, mex: 40, plDev: 20, plExig: 10, refLev: 5, refEp: 30, refPe: 40 },
+    // Padrões de obra (R$/m²): faixas usadas no Gestor (categorias) e no Comercial (custo estimado da obra). Editáveis em Configurações.
+    padroes: [
+      { id: "medio", nome: "Médio", min: 3000, max: 3500 }, { id: "medio_alto", nome: "Médio Alto", min: 3500, max: 4500 },
+      { id: "alto_1", nome: "Alto", min: 4500, max: 5500 }, { id: "alto_2", nome: "Alto", min: 5500, max: 7000 },
+      { id: "luxo", nome: "Luxo", min: 7000, max: null }
+    ],
     custosFixosMensais: null, horasProdutivasMes: 112
   };
   T.MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
@@ -88,6 +96,10 @@
   T.etapaNome = function (id) { if (id === "obra") return "Obra"; var e = T.byId(T.cfg().etapas, id); return e ? e.nome : (id ? "Etapa removida" : ""); };
   T.areaNome = function (id) { var a = T.byId(T.cfg().areas, id); return a ? a.nome : "Área removida"; };
   T.topicoNome = function (id) { var a = T.byId(T.cfg().obraTopicos, id); return a ? a.nome : (id ? "Tópico removido" : ""); };
+  // Padrões de obra: os da Configuração (se salvos), senão os padrões. Rótulo "Médio Alto (R$ 3.500–4.500/m²)".
+  T.padroes = function () { var c = T.cfg().padroes; return c && c.length ? c : T.DEFAULT_CONFIG.padroes; };
+  T.padraoRotulo = function (p) { if (!p) return ""; var f = function (v) { return "R$ " + Number(v).toLocaleString("pt-BR"); }; return p.nome + " (" + (p.max ? f(p.min) + "–" + Number(p.max).toLocaleString("pt-BR") : "acima de " + f(p.min)) + "/m²)"; };
+  T.padraoOpts = function () { return T.padroes().map(function (p) { return [p.id, T.padraoRotulo(p)]; }); };
   T.tipoNome = function (id) { var t = T.byId(T.cfg().tipos, id); return t ? t.nome : ""; };
   // custo-hora total da pessoa = custo-hora próprio + rateio dos custos fixos pelas horas produtivas
   T.rateioHora = function () {

@@ -15,7 +15,7 @@
   var ETAPAS = {
     abertura: { nome: "Abertura", curto: "Abertura", tempo: ["ab"] },
     ep: { nome: "Estudo Preliminar", curto: "Estudo Preliminar", prazo: 40, tempo: ["ep"], termo: "etapa", clausula: "2.1.7" },
-    ap: { nome: "Anteprojeto", curto: "Anteprojeto", prazo: 70, tempo: ["ap", "comp"], termo: "etapa", clausula: "2.2.9", fases: ["Revisão e lançamentos", "Compatibilização", "Definições"] },
+    ap: { nome: "Anteprojeto", curto: "Anteprojeto", prazo: 80, tempo: ["ap", "comp"], termo: "etapa", clausula: "2.2.9", fases: ["Revisão e lançamentos", "Compatibilização", "Definições"] },
     pl: { nome: "Projeto Legal", curto: "Projeto Legal", tempo: ["pl"] },
     pe: { nome: "Projeto Executivo", curto: "Executivo", prazo: 60, tempo: ["ex"], termo: "projeto", clausula: "2.4.8", fases: ["Desenhos base", "Mapeamentos e detalhamento"] },
     mep: { nome: "Estudo Preliminar da marcenaria", curto: "EP Marcenaria", prazo: 30, tempo: ["mc-ep"], termo: "etapa", marc: true },
@@ -39,7 +39,7 @@
   var LEGAL_AVISO = 5;
   var TIPOS_TAREFA = [["tarefa", "Tarefa"], ["demanda", "Demanda"], ["prioridade", "Prioridade"], ["compromisso", "Compromisso"]];
   var TIPOS_REUNIAO = ["Apresentação ao cliente", "Ajustes com o cliente", "Complementares / engenheiros", "Reunião interna", "Entrega", "Outra"];
-  var PADRAO = [["medio", "Médio (R$ 3.000–3.500/m²)"], ["medio_alto", "Médio Alto (R$ 3.500–4.500/m²)"], ["alto_1", "Alto (R$ 4.500–5.500/m²)"], ["alto_2", "Alto (R$ 5.500–7.000/m²)"], ["luxo", "Luxo (acima de R$ 7.000/m²)"]];
+  // Padrões de obra: faixas editáveis em Configurações (T.padroes no núcleo).
   var DIMENSAO = [["compacta", "Compacta"], ["confortavel", "Confortável"], ["espacosa", "Espaçosa"]];
   var DIFICULDADE = [["baixa", "Baixa"], ["normal", "Normal"], ["dificil", "Difícil"], ["muito_dificil", "Muito difícil"]];
   var MARCO = [["contrato", "Contrato assinado"], ["parcela", "1ª parcela paga"], ["topografico", "Topográfico entregue"], ["documentos", "Documentos do cliente"]];
@@ -161,9 +161,10 @@
   function esperaAlguma(g) { return esperaAberta(g, "arq") || (marcAberta(g) ? esperaAberta(g, "marc") : null); }
   function ativo(g) { return !g.suspenso && !g.arquivado; }
   function etapaLista(g) { return g.etapa === "encerrado" && marcAberta(g) ? "marc" : g.etapa; }
-  function prazoPadrao(k) { var c = T.cfg().prazosPadrao || {}, d = T.DEFAULT_CONFIG.prazosPadrao || {}; return c[k] != null ? c[k] : d[k] != null ? d[k] : (ETAPAS[k] || {}).prazo || null; }
+  // Reforma e interiores (sigla REF/INT) têm prazos próprios de EP e Executivo (contratos 03 e 04).
+  function prazoPadrao(k, sigla) { var c = T.cfg().prazosPadrao || {}, d = T.DEFAULT_CONFIG.prazosPadrao || {}; if (sigla && !doZero(sigla) && (k === "ep" || k === "pe")) { var r = "ref" + k.charAt(0).toUpperCase() + k.slice(1); if (c[r] != null || d[r] != null) return c[r] != null ? c[r] : d[r]; } return c[k] != null ? c[k] : d[k] != null ? d[k] : (ETAPAS[k] || {}).prazo || null; }
   // Prazo da etapa no projeto: o da Configurações do projeto; senão o da ativação da marcenaria (antigo); senão o padrão.
-  function prazoEtapa(g, e) { var info = (g.etapas || {})[e] || {}; if (info.prazo) return info.prazo; if (ETAPAS[e].marc && ((g.marc || {}).prazos || {})[e]) return g.marc.prazos[e]; return prazoPadrao(e); }
+  function prazoEtapa(g, e) { var info = (g.etapas || {})[e] || {}; if (info.prazo) return info.prazo; if (ETAPAS[e].marc && ((g.marc || {}).prazos || {})[e]) return g.marc.prazos[e]; return prazoPadrao(e, g.sigla); }
   function trilhaDe(e) { return ETAPAS[e] && ETAPAS[e].marc ? "marc" : "arq"; }
   function calcPrazo(g, e) {
     var info = (g.etapas || {})[e], prazo = prazoEtapa(g, e);
@@ -928,7 +929,7 @@
         (marcAtiva(g) ? kv("Contrato da marcenaria", mc.numero || mc.data ? "nº " + (mc.numero || "s/ nº") + (mc.data ? " de " + T.fmtYmd(mc.data) : "") : "") + kv("Valor da marcenaria", g.marc.valor != null ? T.fmtBRL(g.marc.valor) : "") : ""),
         '<button type="button" class="btn btn-small" data-act="cad-edit">Editar em Cadastros</button>') +
       sec("Descrição do projeto", '<div class="field col-12"><label for="f-desc">O que o cliente trouxe e o que a Trilha observou da casa e do terreno</label><textarea id="f-desc" rows="6">' + esc(g.descricao || "") + "</textarea></div>") +
-      sec("Categorias", '<div class="field col-4"><label for="f-pad">Padrão</label>' + sel("f-pad", PADRAO, cat.padrao) + "</div>" +
+      sec("Categorias", '<div class="field col-4"><label for="f-pad">Padrão</label>' + sel("f-pad", T.padraoOpts(), cat.padrao) + "</div>" +
         '<div class="field col-4"><label for="f-dim">Dimensão</label>' + sel("f-dim", DIMENSAO, cat.dimensao) + "</div>" +
         '<div class="field col-4"><label for="f-dif">Dificuldade do terreno</label>' + sel("f-dif", DIFICULDADE, cat.dificuldade) + "</div>") +
       sec("Diretrizes do briefing", ta("uso", "Uso, moradores e pets, acessibilidade") + ta("expectativas", "Expectativas do cliente") + ta("estetica", "Estética e materiais") + ta("relacao", "Relação com exterior, paisagismo e rua") + ta("sistemas", "Sistemas (solar, reúso, ar, aquecimento, automação)") + ta("execucao", "Sistema construtivo e execução da obra")) +
@@ -954,12 +955,12 @@
     var datas = ets.map(function (e) {
       var info = (g.etapas || {})[e] || {}, atual = e === g.etapa || (g.marc && g.marc.etapa === e);
       return '<div class="ficha-et"><b>' + esc(ETAPAS[e].curto) + '</b><label>Início<input type="date" data-fet="' + e + '|inicio" value="' + (info.inicio ? T.ymd(new Date(info.inicio)) : "") + '"></label><label>Fim / termo<input type="date" data-fet="' + e + '|fim" value="' + (info.fim ? T.ymd(new Date(info.fim)) : "") + '"' + (atual ? ' disabled title="Etapa em curso: o fim é registrado pelo botão do termo assinado, na Visão geral. Depois de encerrada, a data pode ser corrigida aqui."' : "") + '></label>' +
-        (ETAPAS[e].prazo ? '<label>Prazo (d.u.)<input type="number" min="1" data-fet="' + e + '|prazo" value="' + (prazoEtapa(g, e) || "") + '" placeholder="' + (prazoPadrao(e) || "") + '"></label>' : "<span></span>") + "</div>";
+        (ETAPAS[e].prazo ? '<label>Prazo (d.u.)<input type="number" min="1" data-fet="' + e + '|prazo" value="' + (prazoEtapa(g, e) || "") + '" placeholder="' + (prazoPadrao(e, g.sigla) || "") + '"></label>' : "<span></span>") + "</div>";
     }).join("");
     var legDatas = orgaosLegal(g).map(function (o) { var l = legalDe(g, o); return '<div class="ficha-et"><b>' + esc(ORGAOS[o].curto) + '</b><label>Desenvolvimento (d.u.)<input type="number" min="1" data-legpz="' + o + '|prazoDev" value="' + (l.prazoDev || prazoPadrao("plDev")) + '"></label><label>Atender exigência (d.u.)<input type="number" min="1" data-legpz="' + o + '|prazoExig" value="' + (l.prazoExig || prazoPadrao("plExig")) + '"></label><span></span></div>'; }).join("");
     var legal = doZero(g.sigla) ? '<div class="field col-4"><label for="c-temleg">Projeto Legal</label><select id="c-temleg">' + T.optHtml([["sim", "Tem Projeto Legal (prefeitura)"], ["nao", "Não se aplica"]], temLegal(g) ? "sim" : "nao") + '</select></div><div class="col-8" style="align-self:end"><label class="gp-check"><input type="checkbox" id="c-cond"' + (g.leg && g.leg.cond ? " checked" : "") + (temLegal(g) ? "" : " disabled") + '> Este projeto também tem projeto de condomínio</label></div>' : '<p class="hint col-12">Reforma e Interiores não têm Projeto Legal.</p>';
     return '<form id="gp-cfg" class="ficha"><p class="hint">Mudanças aqui afetam prazos e avisos: o app pede confirmação mostrando o que muda, e tudo fica no Histórico.</p>' +
-      sec("Datas e prazos das etapas", '<div class="col-12 ficha-ets">' + datas + legDatas + '</div><p class="hint col-12">Prazo em dias úteis a partir do início; pausa quando a trilha aguarda alguém de fora ou está em pausa interna. Campo vazio = prazo padrão de Configurações (' + ets.filter(function (e) { return ETAPAS[e].prazo; }).map(function (e) { return ETAPAS[e].curto + " " + prazoPadrao(e); }).join(", ") + " d.u.).</p>") +
+      sec("Datas e prazos das etapas", '<div class="col-12 ficha-ets">' + datas + legDatas + '</div><p class="hint col-12">Prazo em dias úteis a partir do início; pausa quando a trilha aguarda alguém de fora ou está em pausa interna. Campo vazio = prazo padrão de Configurações (' + ets.filter(function (e) { return ETAPAS[e].prazo; }).map(function (e) { return ETAPAS[e].curto + " " + prazoPadrao(e, g.sigla); }).join(", ") + " d.u.).</p>") +
       sec("Projeto Legal", legal) +
       sec("Tipo do projeto", '<div class="field col-4"><label for="c-sig">Tipo</label><select id="c-sig">' + T.optHtml(SIGLAS.map(function (x) { return [x[0], x[0] + " · " + x[1]]; }), g.sigla) + '</select></div><p class="hint col-8" style="align-self:end">Reforma e Interiores pulam Anteprojeto e Projeto Legal.</p>') +
       '<div class="form-actions ficha-save"><button class="btn btn-primary" id="c-save">Salvar configurações</button></div></form>';
@@ -973,7 +974,7 @@
       var d = datas[e], cur = (g0.etapas || {})[e] || {};
       if ((cur.inicio ? T.ymd(new Date(cur.inicio)) : "") !== (d.inicio || "")) mud.push(ETAPAS[e].curto + " · início: " + (cur.inicio ? T.fmtYmd(T.ymd(new Date(cur.inicio))) : "—") + " → " + (d.inicio ? T.fmtYmd(d.inicio) : "—"));
       if (d.fim !== undefined && (cur.fim ? T.ymd(new Date(cur.fim)) : "") !== (d.fim || "") && !(e === g0.etapa || (g0.marc && g0.marc.etapa === e))) mud.push(ETAPAS[e].curto + " · fim: " + (cur.fim ? T.fmtYmd(T.ymd(new Date(cur.fim))) : "—") + " → " + (d.fim ? T.fmtYmd(d.fim) : "—"));
-      if (d.prazo !== undefined) { var nv = T.numOrNull(d.prazo) || prazoPadrao(e), at = prazoEtapa(g0, e); if (nv !== at) mud.push(ETAPAS[e].curto + " · prazo: " + at + " → " + nv + " d.u."); }
+      if (d.prazo !== undefined) { var nv = T.numOrNull(d.prazo) || prazoPadrao(e, g0.sigla), at = prazoEtapa(g0, e); if (nv !== at) mud.push(ETAPAS[e].curto + " · prazo: " + at + " → " + nv + " d.u."); }
     });
     Object.keys(legpz).forEach(function (o) { var l = legalDe(g0, o); [["prazoDev", "desenvolvimento", "plDev"], ["prazoExig", "exigência", "plExig"]].forEach(function (k) { var at = l[k[0]] || prazoPadrao(k[2]), nv = legpz[o][k[0]] || prazoPadrao(k[2]); if (at !== nv) mud.push(ORGAOS[o].curto + " · prazo de " + k[1] + ": " + at + " → " + nv + " d.u."); }); });
     if (temLeg !== temLegal(g0) && doZero(g0.sigla)) mud.push("Projeto Legal: " + (temLeg ? "passa a ter" : "não se aplica (itens não iniciados saem do Plano)"));
@@ -1217,7 +1218,7 @@
         '<div class="field col-6"><label for="w-cod">Código</label><input id="w-cod" data-w="codigo" value="' + esc(w.codigo || codigoDe(w.sigla, w.nome)) + '"><span class="hint">Sigla + nome, sem acentos. Pode ajustar.</span></div>' +
         '<div class="field col-12"><span class="label">Clientes cadastrados</span><div class="gp-multi">' + (cls.length ? cls.map(function (c) { return '<label class="gp-check"><input type="checkbox" data-wcli="' + esc(c.id) + '"' + (w.clienteIds.indexOf(c.id) >= 0 ? " checked" : "") + "> " + esc(c.nome) + "</label>"; }).join("") : '<span class="hint">Nenhum cliente cadastrado ainda.</span>') + "</div></div>" +
         '<div class="field col-4"><label for="w-cn">+ Novo cliente: nome</label><input id="w-cn" data-wn="nome" value="' + esc(w.novoCli.nome) + '"></div><div class="field col-4"><label for="w-cc">Contato</label><input id="w-cc" data-wn="contato" value="' + esc(w.novoCli.contato) + '"></div><div class="field col-4"><label for="w-ce">E-mail</label><input id="w-ce" data-wn="email" value="' + esc(w.novoCli.email) + '"></div>' +
-        '<div class="field col-4"><label for="w-pad">Padrão</label><select id="w-pad" data-w="padrao">' + T.optHtml([["", "—"]].concat(PADRAO), w.padrao) + '</select></div><div class="field col-4"><label for="w-dim">Dimensão</label><select id="w-dim" data-w="dimensao">' + T.optHtml(DIMENSAO, w.dimensao) + '</select></div><div class="field col-4"><label for="w-dif">Dificuldade do terreno</label><select id="w-dif" data-w="dificuldade">' + T.optHtml([["", "A definir após a visita"]].concat(DIFICULDADE), w.dificuldade) + "</select></div></div>";
+        '<div class="field col-4"><label for="w-pad">Padrão</label><select id="w-pad" data-w="padrao">' + T.optHtml([["", "—"]].concat(T.padraoOpts()), w.padrao) + '</select></div><div class="field col-4"><label for="w-dim">Dimensão</label><select id="w-dim" data-w="dimensao">' + T.optHtml(DIMENSAO, w.dimensao) + '</select></div><div class="field col-4"><label for="w-dif">Dificuldade do terreno</label><select id="w-dif" data-w="dificuldade">' + T.optHtml([["", "A definir após a visita"]].concat(DIFICULDADE), w.dificuldade) + "</select></div></div>";
     } else if (w.step === 2) {
       var ets = fluxo(w.sigla).filter(function (e) { return e !== "abertura" && e !== "encerrado"; }), fs = (ETAPAS[w.etapaAtual] || {}).fases;
       h += '<div class="grid-form"><div class="field col-3"><label for="w-npav">Pavimentos</label><input id="w-npav" type="number" min="1" max="12" value="' + w.npav + '"></div><div class="field col-9"><span class="label">Nome de cada pavimento</span><div class="gp-pavs">' + w.pavs.map(function (p, k) { return '<input data-wpav="' + k + '" value="' + esc(p) + '" aria-label="Pavimento ' + (k + 1) + '">'; }).join("") + "</div></div>" +
@@ -1248,7 +1249,7 @@
     var legal = doZero(o.sigla) ? o.legal || "nao_iniciado" : "nao_se_aplica", amb = o.ambientes || [];
     var itens = gerarPlano({ sigla: o.sigla, pavs: o.pavs, ambientes: amb, legal: legal }), agora = new Date().toISOString();
     var g = { sigla: o.sigla, etapa: "abertura", fase: null, etapas: { abertura: { inicio: agora } }, proximo: "", legal: legal, marco: {}, esperas: [], pavs: o.pavs, ambientes: amb, itens: itens, reunioes: [], eventos: [], criadoEm: agora };
-    fluxo(o.sigla).forEach(function (e) { if (ETAPAS[e].prazo) { g.etapas[e] = g.etapas[e] || {}; g.etapas[e].prazo = prazoPadrao(e); } });
+    fluxo(o.sigla).forEach(function (e) { if (ETAPAS[e].prazo) { g.etapas[e] = g.etapas[e] || {}; g.etapas[e].prazo = prazoPadrao(e, o.sigla); } });
     if (legal !== "nao_se_aplica") { var ls0 = { nao_iniciado: "nao_iniciado", em_preparo: "preparo", protocolado: "protocolado", aprovado: "aprovado" }[legal] || "nao_iniciado"; g.leg = { pref: { sit: ls0, hist: ls0 === "nao_iniciado" ? [] : [{ sit: ls0, em: agora }] } }; }
     if (o.inicio === "andamento") {
       var f = fluxo(o.sigla), alvo = f.indexOf(o.etapaAtual), ini = isoDeData(o.dataEtapa || hojeIso());
@@ -1694,6 +1695,29 @@
     novo: function (pj) { if (T.state.view !== "admin" || T.state.sub !== "gestor") T.go("admin", "gestor"); S.wiz = wizInicial(pj); S.view = "novo"; render(); window.scrollTo(0, 0); },
     // Excluir: só pelo Cadastros (com confirmação lá). Remove o processo do Gestor; as horas continuam no Tempo.
     excluir: async function (pid) { await T.db.doc("gp/" + pid).delete(); delete S.gp[pid]; if (S.projId === pid) { S.view = "lista"; S.projId = null; } },
+    // "Virar projeto" do Gestor Comercial: mesma montagem do "+ Novo projeto", com os dados já prontos.
+    // o = { nome, codigo?, sigla, clienteIds, endereco?, categorias, pavs, ambientes[{tipo, nome?, qtd?, area?, pav?, cfg?, obs?}],
+    //       legal (bool), cond (bool), prazos {ep, ap, pe, plDev}, descricao, diretrizes, origem } → id do projeto criado
+    criar: async function (o) {
+      var sigla = o.sigla || "RES", pavs = o.pavs && o.pavs.length ? o.pavs.slice() : ["Térreo"], ids = (o.clienteIds || []).slice();
+      var amb = (o.ambientes || []).map(function (a) { var x = { pav: a.pav || pavs[0], qtd: a.qtd || 1, cfg: a.cfg || {}, obs: a.obs || "", origem: "comercial" }; if (a.nome) x.nome = a.nome; if (a.setor) x.setor = a.setor; if (a.area != null) x.area = a.area; return novoAmbiente(a.tipo, x); });
+      var area = amb.reduce(function (s, a) { return s + (+a.area || 0) * (+a.qtd || 1); }, 0);
+      var nomesCli = ids.map(function (id) { var c = T.cadastros && T.cadastros.contato(id); return c ? c.nome : ""; }).filter(Boolean);
+      var body = { nome: o.nome, codigo: (o.codigo || codigoDe(sigla, o.nome)).trim(), sigla: sigla, tipo: TIPO_ANTIGO[sigla], clienteIds: ids, categorias: o.categorias || {}, status: "ativo", area: Math.round(o.areaTotal || area * 1.2), criadoEm: new Date().toISOString() };
+      if (nomesCli.length) body.cliente = nomesCli.join(" e ");
+      if (o.endereco) body.endereco = o.endereco;
+      var pid = (await T.db.collection("projetos").add(body)).id;
+      var g = montarGp({ sigla: sigla, pavs: pavs, ambientes: amb, inicio: "novo", legal: o.legal ? "nao_iniciado" : "nao_se_aplica" });
+      if (o.legal && o.cond && doZero(sigla)) { g.leg = g.leg || {}; g.leg.cond = { sit: "nao_iniciado", hist: [] }; g.itens = g.itens.concat(itensLegal("cond", pavs)); }
+      var pz = o.prazos || {};
+      Object.keys(pz).forEach(function (e) { if (!pz[e]) return; if (e === "plDev") { Object.keys(g.leg || {}).forEach(function (k) { g.leg[k].prazoDev = pz[e]; }); } else if (g.etapas[e]) g.etapas[e].prazo = pz[e]; });
+      if (o.descricao) g.descricao = o.descricao;
+      if (o.diretrizes) g.diretrizes = o.diretrizes;
+      if (o.origem) g.origem = o.origem;
+      S.gp[pid] = g; await T.db.doc("gp/" + pid).set(g);
+      return pid;
+    },
+    catalogo: function () { return catalogo(); }, setores: SETORES, padraoRes: PADRAO_RES, dimensoes: DIMENSAO, dificuldades: DIFICULDADE, siglas: SIGLAS, doZero: doZero,
     corpoItem: corpoItem, ligarCorpo: ligarCorpo, iniciado: iniciado,
     pct: function (pid) { var g = G(pid); return g ? pctProjeto(g) : null; }, pctMarc: function (pid) { var g = G(pid); return g ? pctMarc(g) : null; },
     gp: G, etapaNome: function (pid) { var g = G(pid); return g ? etapaLinha(g) : ""; }, situacao: function (pid) { var g = G(pid); return g ? situacao(g) : null; },

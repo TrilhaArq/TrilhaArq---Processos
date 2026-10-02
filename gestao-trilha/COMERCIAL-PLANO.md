@@ -1,6 +1,11 @@
 # Gestor Comercial — planejamento
 
-Documento de direção para o futuro módulo **Gestor Comercial** do app Gestão Trilha. **Ainda não é para construir**:
+> **Situação (02/10/2026):** v1 construída e publicada só na cópia de teste — funil, oportunidade com próximo passo,
+> importação do briefing pela planilha, programa, simulador com Meu valor e "Virar projeto". Regras da v1 em
+> `REGRAS.md` (seção Gestor Comercial). Próxima rodada: proposta em PDF, contrato .docx, parcelas no Financeiro,
+> IA, Levantamento e "Registrar rodada" no Gestor.
+
+Documento de direção do módulo **Gestor Comercial** do app Gestão Trilha (escrito antes da construção):
 reúne o que foi combinado com o Luan nas conversas de concepção (set/2026), já ajustado às decisões do chat do
 Gestor de Projetos de 01/10/2026. Quando a construção começar, seguir
 `CONTRATO.md` e as regras da skill `gestao-trilha`, e mover as regras definitivas para `REGRAS.md`.

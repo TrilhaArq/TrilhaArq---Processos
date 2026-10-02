@@ -70,7 +70,7 @@ Um módulo **não** mexe no HTML nem no estado de outro módulo. Para ler dados 
 ele expõe (ex.: `Trilha.tempo.lancAtivos()`, `Trilha.tempo.custoLanc(l)`, `Trilha.tempo.lancar(l)`,
 `Trilha.relatorios.fechamentos()`, `Trilha.relatorios.calcFechamento(pid, mes)`, `Trilha.gestor.*`,
 `Trilha.cadastros.contato(id)`, `Trilha.cadastros.editarProjeto(pid)`, `Trilha.tarefas.criar(pid, item)`,
-`Trilha.gestor.corpoItem(pid, item)` + `Trilha.gestor.ligarCorpo(elemento)` para mostrar e editar desenhos e
+`Trilha.gestor.criar(dados)` (cria projeto + processo, usado pelo "Virar projeto" do Comercial), `Trilha.gestor.corpoItem(pid, item)` + `Trilha.gestor.ligarCorpo(elemento)` para mostrar e editar desenhos e
 checklists de um item fora do Gestor, como faz a área da pessoa).
 
 ## 3. O que o núcleo oferece (`window.Trilha`, abreviado `T`)
@@ -80,6 +80,7 @@ checklists de um item fora do Gestor, como faz a área da pessoa).
 - Dados comuns: `T.pessoa(id)`, `T.pessoasAtivas()`, `T.projeto(id)`, `T.cfg()` (config com padrões),
   `T.etapaNome`, `T.areaNome`, `T.topicoNome`, `T.tipoNome`, `T.custoHoraTotal(pid)`, `T.rateioHora()`,
   `T.DEFAULT_CONFIG.pesosEtapas` (pesos do % concluído; `T.gestor.pct(pid)` e `T.gestor.pctMarc(pid)`),
+  `T.padroes()`, `T.padraoRotulo(p)`, `T.padraoOpts()` (faixas de R$/m² dos padrões de obra, editáveis em Configurações),
   `T.saveConfig(patch)`.
 - Banco e capacidades: `T.db`, `T.downloads`, `T.mcp` (podem ser `null`: esconder o recurso).
 - Navegação e desenho: `T.go(view, sub, pid)`, `T.render()`, `T.scheduleRender()`.
@@ -100,7 +101,7 @@ checklists de um item fora do Gestor, como faz a área da pessoa).
   campos a `projetos` (ex.: `perfil`, usado na precificação), mas nunca renomear ou apagar os existentes.
 - Coleções de módulos em uso: `lancamentos`, `atividades`, `timers` (Tempo); `tarefas` (Tarefas);
   `fin_config`, `fin_contratos`, `fin_mov`, `fin_recorrentes` (Financeiro);
-  `fechamentos` (Relatórios); `gp`, `gp_config` (Gestor de Projetos); `contatos`, `obras` (Cadastros). Um módulo novo usa coleções com o próprio prefixo/nome e as documenta aqui.
+  `fechamentos` (Relatórios); `gp`, `gp_config` (Gestor de Projetos); `contatos`, `obras` (Cadastros). `com_oport` (uma oportunidade por documento) e `com_config/geral` (Gestor Comercial). Um módulo novo usa coleções com o próprio prefixo/nome e as documenta aqui.
 - Toda gravação feita pelo Claude no chat (ArtifactData) usa `if_version` do documento lido.
 - **Documentos do banco chegam somente-leitura** (`d.data()` é congelado no app real): nunca alterar o objeto
   recebido; copiar com `T.clone` antes de ajustar formatos antigos. Nos testes, o banco simulado deve congelar os
@@ -144,5 +145,5 @@ checklists de um item fora do Gestor, como faz a área da pessoa).
 | Horas e custos (antigo "Projetos") | `modulos/projetos.js` | aba de Relatórios | em uso — não se registra como módulo: expõe `T.horasCustos {html, init, render}` e Relatórios o mostra na aba "Horas e custos por projeto" |
 | Relatórios | `modulos/relatorios.js` | admin | em uso |
 | Configurações | `modulos/config.js` | admin | em uso |
-| Gestor Comercial (oportunidades, briefing) | — | admin | "Em breve" na capa; aprovado, para depois (ver REGRAS.md) |
+| Gestor Comercial (oportunidades, briefing, simulador) | `modulos/comercial.js` | admin | v1 em teste na cópia de teste (02/10/2026); expõe `T.comercial` |
 | Gestor de obras (orçamento de obras) | — | admin | "Em breve" na capa — portar o app de orçamento (skill orcamento-obra-trilha), itens agrupados por obra |
