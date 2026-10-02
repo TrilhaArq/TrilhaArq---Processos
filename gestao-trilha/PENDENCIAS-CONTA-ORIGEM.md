@@ -37,16 +37,16 @@ Situação em 02/10/2026:
   `nucleo.js`, `logo.png`, todos os `modulos/*.js` (inclusive `comercial-docs.js` e `comercial.js`) e
   `"modelos-padrao.json": referencias-comercial/modelos-padrao-oficial.json`. **Sem** passar `capabilities` (mantém as
   cinco). 🔐
-- [ ] **1.4** (conta de origem) Abrir o oficial e conferir: capa com "Gestor Comercial", oportunidade abre, Configurações do comercial abre.
+- [x] 02/10/2026 (conta de origem, teste automático com os dados reais do banco) **1.4** Abrir o oficial e conferir: capa com "Gestor Comercial", oportunidade abre, Configurações do comercial abre.
 
 ### Passo 2 — Configurações que só a conta de origem faz (no próprio app)
-- [ ] **2.1 Modelos:** Gestor Comercial › Configurações do comercial › Modelos › **Salvar modelos** (grava
+- [x] 02/10/2026 (conta de origem, pelo chat: `com_config/modelos` gravado com `modelos-padrao-oficial.json`; cópia de teste também) **2.1 Modelos:** Gestor Comercial › Configurações do comercial › Modelos › **Salvar modelos** (grava
   `com_config/modelos` com os modelos "Residência" e "Serviço menor", os 7 contratos e os textos exemplares).
   Se já tinha salvo antes do Passo 1, os modelos novos (Serviço menor e contrato 07) aparecem mesmo assim (o app
   completa com o arquivo padrão); salvar de novo para gravá-los.
 - [ ] **2.2 Contratos como .docx (opcional):** pela conta de origem dá para reenviar cada .docx oficial pelo botão
   "Enviar .docx" (fica como texto). Os enviados pela conta convidada estão como script e funcionam igual.
-- [ ] **2.3 Prazos padrão** 🔐: Configurações › Prazos padrão → **Anteprojeto 70 → 80**; conferir Reforma
+- [~] **2.3 Prazos padrão** 🔐 (não se aplica: o banco não tem `prazosPadrao` salvo, então já valem os do código — Anteprojeto 80, Reforma 5/30/40; conferido em 02/10/2026): Configurações › Prazos padrão → **Anteprojeto 70 → 80**; conferir Reforma
   (Levantamento 5, EP 30, Executivo 40). O valor salvo no banco vale por cima do código. Alternativa pelo chat da conta
   de origem: ArtifactData `update` em `config/escritorio` (`prazosPadrao.ap = 80`, `refLev 5`, `refEp 30`, `refPe 40`),
   com `if_version`. Projetos existentes mantêm os prazos que têm.
@@ -83,6 +83,17 @@ Situação em 02/10/2026:
 
 ## Histórico (já feito)
 
+- [x] 02/10/2026 (conta de origem) **Teste geral** com cópia dos dados reais do banco (Playwright, banco simulado congelado):
+  capa e todos os apps abrem sem erro; Comercial fluxo completo de **Residência** (contato → agenda → briefing colado →
+  programa → simulador → texto com IA → PDF de 23 páginas → contrato 01 .docx → assinado → projeto no Gestor + contrato
+  no Financeiro) e de **Serviço** (proposta curta → contrato 07 → projeto simples + Financeiro); "Peça ao Claude";
+  celular 390 px sem rolagem lateral. Acesso da conta de origem confirmado: lê e grava o banco, lê os arquivos do
+  armazenamento (29, inclusive os 7 contratos, que abrem como .docx válidos) e publica no oficial.
+- [x] 02/10/2026 (conta de origem) Ajustes publicados no oficial (versão 1790909394-e925) e na cópia de teste: no tipo
+  Serviço, a faixa de números mostra horas e prazo (em vez de área e % da obra) e a barra de etapas não mostra as de
+  briefing; o aviso "Faltam dados" do contrato usa nomes legíveis ("CPF/CNPJ do cliente (Cadastros)").
+- Observação: o documento `gp/` do projeto RES-PAULAEBRUNO tem ~140 KB de 256 KB (190 itens); acompanhar se crescer muito.
+
 - [x] 02/10/2026 (conta de desenvolvimento) Fases 1 e 2 publicadas no oficial com as capacidades `db`, `downloads`,
   `mcp` (Google Calendar), `assets` e `sample`.
 - [x] 02/10/2026 (conta de desenvolvimento) Imagens das páginas, logos e os contratos 01–07 enviados ao armazenamento
@@ -91,5 +102,5 @@ Situação em 02/10/2026:
 - [x] 02/10/2026 (conta de desenvolvimento) Fase 3 publicada no oficial (versão 1790906972-5cb0) com `modelos-padrao-oficial.json`.
 
 ## Cópia de teste
-- [ ] Clicar uma vez em **Salvar modelos** na cópia de teste (grava os modelos no banco dela).
+- [x] 02/10/2026 (conta de origem, pelo chat) Clicar uma vez em **Salvar modelos** na cópia de teste (grava os modelos no banco dela).
 - A cópia de teste fica **sem** Agenda Google de propósito (dados fictícios não devem virar eventos reais).

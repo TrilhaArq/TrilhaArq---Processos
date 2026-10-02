@@ -515,15 +515,17 @@
       '<div class="gp-p-nav"><div><h2 class="gp-p-name">' + esc(nome) + '</h2><div class="hint">' + esc(tipoNome(o.tipo)) + (o.endereco ? " · " + esc(o.endereco) : "") + (o.origem ? " · " + esc(o.origem) : "") + "</div></div>" +
       '<div class="form-actions">' + (o.cliente && o.cliente.telefone ? '<span class="hint">' + esc(o.cliente.telefone) + "</span>" + (wa ? '<a class="btn btn-small" href="' + esc(wa) + '" target="_blank" rel="noopener">WhatsApp</a>' : "") : "") + "</div></div>" +
       '<div class="card gp-strip com-strip"><div><small>Etapa</small><b>' + esc(etapaNome(o.etapa)) + "</b><span>há " + dias(o.etapaEm) + (dias(o.etapaEm) === 1 ? " dia" : " dias") + "</span></div>" +
-      "<div><small>Valor</small><b>" + BRL(r.final) + "</b><span>" + (r.valor ? "meu valor" : r.tabela ? "pela tabela de horas" : "monte o programa") + "</span></div>" +
+      "<div><small>Valor</small><b>" + BRL(r.final) + "</b><span>" + (r.valor ? "meu valor" : r.tabela ? "pela tabela de horas" : o.tipo === "SERV" ? "descreva o serviço" : "monte o programa") + "</span></div>" +
+      (o.tipo === "SERV" ? "<div><small>Horas estimadas</small><b>" + (x.serv && x.serv.horas ? T.fmtNum(x.serv.horas, 1) + " h" : "—") + "</b><span>aba Proposta › O serviço</span></div>" +
+        "<div><small>Prazo</small><b>" + (x.serv && x.serv.prazo ? x.serv.prazo + " d.u." : "—") + "</b><span>dias úteis</span></div></div>" :
       "<div><small>Área estimada</small><b>" + m2(r.area) + "</b><span>" + ((x.programa && x.programa.amb || []).length) + " ambientes</span></div>" +
-      "<div><small>% da obra</small><b>" + pct(r.pctObra, 2) + "</b><span>" + (r.obra ? "obra " + BRL(r.obra) : "defina o padrão") + "</span></div></div>" +
+      "<div><small>% da obra</small><b>" + pct(r.pctObra, 2) + "</b><span>" + (r.obra ? "obra " + BRL(r.obra) : "defina o padrão") + "</span></div></div>") +
       (fim ? "" : trilha(o)) + proximoPasso(o, r) + chatHtml(o.id) + "</div>";
     h += '<div class="segmented com-abas">' + ABAS.map(function (a) { return '<button class="seg-pill' + (S.tab === a[0] ? " is-selected" : "") + '" data-tab="' + a[0] + '">' + a[1] + "</button>"; }).join("") + "</div>";
     h += '<div id="com-tab">' + aba(o, x, r) + "</div>";
     $("com-op").innerHTML = h;
   }
-  function trilha(o) { var i = IDX[o.etapa]; return '<div class="com-trilha">' + ETAPAS.map(function (e, k) { return '<span class="' + (k < i ? "on" : k === i ? "cur" : "") + '" title="' + e[1] + '"><i></i><small>' + e[1] + "</small></span>"; }).join("") + "</div>"; }
+  function trilha(o) { var i = IDX[o.etapa]; return '<div class="com-trilha"' + (o.tipo === "SERV" ? ' style="grid-template-columns:repeat(6,minmax(0,1fr))"' : "") + ">" + ETAPAS.map(function (e, k) { if (o.tipo === "SERV" && (e[0] === "briefing_enviado" || e[0] === "briefing_recebido")) return ""; return '<span class="' + (k < i ? "on" : k === i ? "cur" : "") + '" title="' + e[1] + '"><i></i><small>' + e[1] + "</small></span>"; }).join("") + "</div>"; }
   function proximoPasso(o, r) {
     if (o.etapa === "perdido") return '<div class="card gp-box com-next"><p><b>Oportunidade perdida</b>' + (o.perda ? " · " + esc(o.perda.motivo || "") + (o.perda.nota ? " — " + esc(o.perda.nota) : "") : "") + '</p><div class="form-actions"><button class="btn" data-act="reabrir">Reabrir</button></div></div>';
     if (o.etapa === "fechado" && o.projetoId) { var p = T.projeto(o.projetoId); return '<div class="card gp-box com-next"><p><b>Virou projeto</b>: ' + esc(p ? p.nome : "projeto") + '</p><div class="form-actions">' + (T.gestor && T.gestor.gp(o.projetoId) ? '<button class="btn btn-primary" data-act="ir-gestor">Abrir no Gestor de Projetos</button>' : "") + "</div></div>"; }
@@ -844,7 +846,7 @@
       proposta_numero: (o.proposta && o.proposta.numero) || "", valor_total: D.numBR(total), valor_total_extenso: D.reaisExtenso(total), cidade: d.cidade, contrato_data_extenso: D.dataExtenso(d.data),
       ambientes_marcenaria: moveis.map(function (m) { return m[0]; }).join(", "), contrato_arquitetura_numero: parq && parq.contrato ? parq.contrato.numero || "" : "" };
     var falta = ["cliente_nome", "cliente_cpf_cnpj", "contrato_numero", "projeto_endereco"].filter(function (k) { return !campos[k]; });
-    if (falta.length && !(await T.confirmar({ titulo: "Faltam dados", texto: "Campos vazios: " + falta.map(function (k) { return k.replace(/_/g, " "); }).join(", ") + ". Gerar mesmo assim (ficam em branco no documento)?", ok: "Gerar" }))) return;
+    if (falta.length && !(await T.confirmar({ titulo: "Faltam dados", texto: "Campos vazios: " + falta.map(function (k) { return { cliente_nome: "nome do cliente", cliente_cpf_cnpj: "CPF/CNPJ do cliente (Cadastros)", contrato_numero: "nº do contrato", projeto_endereco: "endereço do projeto (aba Resumo)" }[k] || k.replace(/_/g, " "); }).join(", ") + ". Gerar mesmo assim (ficam em branco no documento)?", ok: "Gerar" }))) return;
     btn.disabled = true; st.textContent = "Gerando…";
     try {
       var b64 = await D.lerAsset(info.asset);
