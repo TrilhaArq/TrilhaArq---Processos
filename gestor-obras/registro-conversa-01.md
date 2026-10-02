@@ -473,7 +473,34 @@ administração etc.) são **padrões editáveis por obra**, conforme a negocia�
   o cliente **aprova e paga** → a Trilha **alinha a entrega com o vendedor e confere** o material na obra.
   Quem aprova e paga é sempre o cliente. (Responde boa parte do tema T3.)
 
-**Próximo passo**: decidir o alvará (D9) e seguir para D11–D13.
+**Decisões da pauta — D9 (fechado) e D11 a D16 (02/10/2026, DECIDIDO pelo Luan)**
+- **D9 — alvará**: o **projeto é aprovado com o RRT de projeto** (questão de projeto). Ao iniciar a obra, **o cliente
+  solicita o alvará de obra**, e a prefeitura exige o **RRT de execução** — por isso é difícil não ser o RRT da Trilha.
+  Cada profissional contratado deve ter o **próprio RRT/ART do seu serviço**, quando couber. Impacto pequeno no app;
+  o tema segue para o **chat de contratos** (junto com o D8).
+- **D11** — aceites como recomendado (termo curto gerado pelo app + confirmação por e-mail/WhatsApp, data e forma registradas).
+- **D12** — pagamento aos prestadores **por medição do serviço executado** (no memorial e no contrato de cada um).
+  **Parcelas, percentuais e retenção são EDITÁVEIS por contrato** (ex.: 30%/30%/40% — retém 40% até o fim; ou 50%/50%).
+  A retenção **sempre existe**, mas é a parte final do cronograma de pagamento de cada contrato, não um % fixo.
+- **D13** — memoriais gerados com o **Peça ao Claude** ("é o Claude que vai agilizar a minha vida").
+- **D14** — a **Elisa vê e EDITA** as obras (cobre quando o Luan não puder); no **Flip** ela tem participação maior e
+  também acessa e edita.
+- **D15** — a ordem das 6 etapas está boa. Dúvida do Luan: é a primeira rodada? Resposta: as etapas são **rodadas de
+  desenvolvimento**, cada uma um bloco que funciona por si; depois delas o app continua evoluindo. Luan quer uma
+  **conversa à parte sobre como montar o app em blocos** (arquivos/chats separados, menos peso e menos custo) → **T9**.
+- **D16 (novo, pedido do Luan) — perfil da obra**: ao criar a obra, marcar **o que se aplica** (alvará de obra, impostos
+  e taxas, CNO/INSS, RRT de projeto, RRT de execução…). O que não se aplica **não entra** em cálculos, checklist e
+  documentos. Muitas prefeituras dispensam alvará em **pequenas reformas** (sem acréscimo de área); nesses casos
+  também não há imposto de obra. Exemplos: **Flip** — sem alvará, sem imposto de obra; risco é fiscalização do CAU/CREA
+  atrás de RRT. **Restaurante no Rio de Janeiro** — pequena reforma (revestimentos, estética interna), sem alvará;
+  terá **RRT de projeto e RRT de execução** para apresentar em fiscalização.
+
+**Novos temas**
+- **T9 — montar o app em blocos** (conversa à parte).
+- **T10 — obras que entram já em andamento (URGENTE)**: o **restaurante** (reunião hoje, profissionais a contratar) e o
+  **Flip** entram rodando, sem passar pelo processo completo. Definir como cadastrar uma obra pulando fases.
+
+**Próximo passo**: T10 e T9.
 
 ---
 

@@ -83,7 +83,7 @@ a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offs
 </header>
 
 <section id="decidir">
-  <h2>Decisões pendentes <span class="k">D1–D15</span></h2>
+  <h2>Decisões <span class="k">D1–D16</span></h2>
   <p class="intro">Perguntas que já surgiram e dependem de você. Muitas são rápidas: basta concordar com a recomendação.</p>
 
   <div class="group"><h3>Remuneração e contrato</h3><div class="items">
@@ -127,9 +127,9 @@ a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offs
       <div class="q">Que RRT a Trilha emite?<span class="badge">encaminhado</span></div>
       <div class="rec"><b>Decidido</b>Hoje é emitido RRT de execução de obra. O tema está resolvido aqui e segue para o chat de contratos: como o contrato preserva a caracterização de administração.</div>
     </div></div>
-    <div class="item open" data-id="D9"><div class="code">D9</div><div class="body">
-      <div class="q">De quem é a regularização (alvará, CNO, INSS) e a segurança do trabalho?<span class="badge">quase</span></div>
-      <div class="rec"><b>Situação</b><strong>CNO e INSS</strong>: fora do escopo; serviço à parte, com contador. <strong>Segurança</strong>: de cada profissional contratado; a Trilha impõe o padrão de <strong>EPI obrigatório</strong>, que vai no memorial e no contrato de empreitada. <strong>Falta decidir: o alvará</strong> (ver recomendação no chat).</div>
+    <div class="item decided" data-id="D9"><div class="code">D9</div><div class="body">
+      <div class="q">De quem é a regularização (alvará, CNO, INSS) e a segurança do trabalho?<span class="badge">decidido</span></div>
+      <div class="rec"><b>Decidido</b>CNO e INSS: fora do escopo, com contador. Segurança: de cada profissional, com EPI obrigatório no padrão Trilha. Alvará: o projeto é aprovado com o RRT de projeto; o <strong>alvará de obra é solicitado pelo cliente</strong> e exige o RRT de execução. Isso, e o RRT de cada prestador, segue para o chat de contratos.</div>
     </div></div>
     <div class="item decided" data-id="D10"><div class="code">D10</div><div class="body">
       <div class="q">O que está incluso na administração?<span class="badge">decidido</span></div>
@@ -139,34 +139,39 @@ a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offs
   </div></div>
 
   <div class="group"><h3>Processo da obra e do app</h3><div class="items">
-    <div class="item" data-id="D11"><div class="code">D11</div><div class="body">
-      <div class="q">Como registrar os aceites do cliente?</div>
+    <div class="item decided" data-id="D11"><div class="code">D11</div><div class="body">
+      <div class="q">Como registrar os aceites do cliente?<span class="badge">decidido</span></div>
       <div class="ctx">Pacote executivo, aditivos, revisões, renegociações.</div>
-      <div class="rec"><b>Recomendo</b>O app gera um termo curto em PDF. O cliente confirma por e-mail ou WhatsApp, e você registra a data e a forma no app. O contrato passa a dizer que vale "por escrito, inclusive por meio eletrônico".</div>
+      <div class="rec"><b>Decidido</b>Como recomendado: termo curto gerado pelo app, confirmação por e-mail ou WhatsApp, data e forma registradas.</div>
     </div></div>
-    <div class="item" data-id="D12"><div class="code">D12</div><div class="body">
-      <div class="q">Como liberar pagamentos aos prestadores?</div>
-      <div class="rec"><b>Recomendo</b>Por medição do serviço executado: "liberado pela Trilha" e depois "pago pelo cliente". Retenção de 5% até a entrega final e a correção de pendências.</div>
+    <div class="item decided" data-id="D12"><div class="code">D12</div><div class="body">
+      <div class="q">Como liberar pagamentos aos prestadores?<span class="badge">decidido</span></div>
+      <div class="rec"><b>Decidido</b>Por medição do serviço executado, informado no memorial e no contrato de cada profissional. <strong>Parcelas e retenção são editáveis</strong> por contrato (ex.: 30% / 30% / 40%, ou 50% / 50%). A retenção sempre existe, mas é a parte final do próprio cronograma de pagamento, não um percentual fixo.</div>
     </div></div>
-    <div class="item" data-id="D13"><div class="code">D13</div><div class="body">
-      <div class="q">Memorial e contrato de empreitada gerados no módulo, com o Peça ao Claude?</div>
-      <div class="rec"><b>Recomendo</b>Sim. O memorial nasce do item do orçamento, do cronograma e das regras da obra, vira base da proposta do profissional e depois anexo do contrato.</div>
+    <div class="item decided" data-id="D13"><div class="code">D13</div><div class="body">
+      <div class="q">Memorial e contrato de empreitada gerados no módulo, com o Peça ao Claude?<span class="badge">decidido</span></div>
+      <div class="rec"><b>Decidido</b>Sim. O Peça ao Claude monta os memoriais.</div>
     </div></div>
-    <div class="item" data-id="D14"><div class="code">D14</div><div class="body">
-      <div class="q">A Elisa pode ver as obras (sem editar)?</div>
+    <div class="item decided" data-id="D14"><div class="code">D14</div><div class="body">
+      <div class="q">A Elisa pode ver as obras (sem editar)?<span class="badge">decidido</span></div>
       <div class="ctx">Hoje só você faz obra: se você adoecer ou viajar, ninguém vê o estado da obra.</div>
-      <div class="rec"><b>Recomendo</b>Sim, acesso de leitura ao painel e ao diário.</div>
+      <div class="rec"><b>Decidido</b>A Elisa <strong>vê e edita</strong> as obras, para cobrir quando você não puder. No Flip, ela tem participação maior.</div>
     </div></div>
-    <div class="item" data-id="D15"><div class="code">D15</div><div class="body">
-      <div class="q">A ordem das 6 etapas de desenvolvimento está boa?</div>
+    <div class="item decided" data-id="D15"><div class="code">D15</div><div class="body">
+      <div class="q">A ordem das 6 etapas de desenvolvimento está boa?<span class="badge">decidido</span></div>
       <div class="ctx">1 Base e orçamento · 2 Planejamento · 3 Obra rodando · 4 Documentos · 5 Flip · 6 Mapa visual.</div>
-      <div class="rec"><b>Recomendo</b>Manter, a não ser que a reforma do restaurante comece logo. Nesse caso, a etapa 2 (cronograma) pode subir junto com a 1.</div>
+      <div class="rec"><b>Decidido</b>A ordem fica. Como montar o app em blocos vira uma conversa própria (T9).</div>
+    </div></div>
+    <div class="item decided" data-id="D16"><div class="code">D16</div><div class="body">
+      <div class="q">Perfil da obra: o que se aplica a cada uma<span class="badge">decidido</span></div>
+      <div class="ctx">Pedido seu: nem toda obra tem imposto, alvará ou os mesmos documentos.</div>
+      <div class="rec"><b>Decidido</b>Ao criar a obra, marcar o que se aplica: alvará de obra, impostos e taxas, CNO e INSS, RRT de projeto, RRT de execução, entre outros. O que não se aplica sai dos cálculos, do checklist e dos documentos. Exemplo: pequena reforma sem acréscimo de área, como o restaurante do Rio ou o Flip, não tem alvará nem imposto de obra, mas tem RRT de projeto e de execução para uma eventual fiscalização do CAU ou do CREA.</div>
     </div></div>
   </div></div>
 </section>
 
 <section id="conversar">
-  <h2>Temas ainda não conversados <span class="k">T1–T8</span></h2>
+  <h2>Temas ainda não conversados <span class="k">T1–T10</span></h2>
   <p class="intro">Assuntos que precisam da sua explicação de como funciona hoje. Deixo as perguntas que guiam cada conversa.</p>
   <div class="items" style="margin-top:14px">
     <div class="item" data-id="T1"><div class="code">T1</div><div class="body">
@@ -178,8 +183,8 @@ a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offs
       <ul class="qs"><li>Como é a entrega hoje: vistoria, lista de pendências, termo?</li><li>Você entrega garantias, manual do imóvel?</li><li>Existe algum pós-obra?</li></ul>
     </div></div>
     <div class="item" data-id="T3"><div class="code">T3</div><div class="body">
-      <div class="q">Compras</div>
-      <ul class="qs"><li>Quem compra na prática: você ou o cliente?</li><li>Como o cliente aprova uma compra?</li><li>Onde ficam notas e comprovantes? Quem recebe o material na obra?</li></ul>
+      <div class="q">Compras<span class="badge">em parte</span></div>
+      <ul class="qs"><li>Respondido: a Trilha cota, o cliente aprova e paga, a Trilha alinha a entrega e confere.</li><li>Onde ficam notas e comprovantes? Quem recebe o material na obra?</li></ul>
     </div></div>
     <div class="item" data-id="T4"><div class="code">T4</div><div class="body">
       <div class="q">Fotos e arquivos</div>
@@ -200,6 +205,14 @@ a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offs
     <div class="item" data-id="T8"><div class="code">T8</div><div class="body">
       <div class="q">Aprofundar a estrutura das telas</div>
       <ul class="qs"><li>Painel de obras, as 8 áreas da obra e o modo obra no celular, tela por tela.</li></ul>
+    </div></div>
+    <div class="item" data-id="T9"><div class="code">T9</div><div class="body">
+      <div class="q">Como montar o app em blocos<span class="badge">próximo</span></div>
+      <ul class="qs"><li>Dividir o Gestor de Obras em blocos (arquivos e chats separados) para processar, ajustar e corrigir com menos custo.</li><li>O que entra em cada bloco e em que ordem.</li><li>Como as 6 etapas se tornam rodadas de desenvolvimento, e o app continua evoluindo depois delas.</li></ul>
+    </div></div>
+    <div class="item" data-id="T10"><div class="code">T10</div><div class="body">
+      <div class="q">Obras que entram já em andamento<span class="badge">urgente</span></div>
+      <ul class="qs"><li>O restaurante (reunião hoje, contratações em curso) e o Flip entram sem ter passado pelo processo completo.</li><li>Como cadastrar uma obra pulando fases: o que é obrigatório e o que fica em branco.</li><li>O que dá para usar já, antes de o módulo estar pronto.</li></ul>
     </div></div>
   </div>
 </section>
@@ -223,17 +236,16 @@ a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offs
   <h2>Roteiro sugerido</h2>
   <p class="intro">Uma ordem para avançar sem se perder. Cada passo cabe numa conversa curta.</p>
   <div class="route">
-    <div class="step"><h3>1 · Fechar remuneração e contrato</h3><p>Em geral é só confirmar as recomendações.</p><div class="codes">D1 a D7</div></div>
-    <div class="step"><h3>2 · Responsabilidades e escopo</h3><p>Define o que entra no contrato e no checklist de início.</p><div class="codes">D8 a D10 · S3</div></div>
-    <div class="step"><h3>3 · A obra rodando</h3><p>Aceites, pagamentos, compras e memoriais.</p><div class="codes">D11 a D13 · T3 · S4</div></div>
-    <div class="step"><h3>4 · Diário de obra</h3><p>Eu trago a proposta; você conta como é uma visita.</p><div class="codes">T7 · S7 · D14</div></div>
-    <div class="step"><h3>5 · Relatórios, encerramento e arquivos</h3><p>O que o cliente recebe e como a obra termina.</p><div class="codes">T1 · T2 · T4</div></div>
-    <div class="step"><h3>6 · Telas e ordem de desenvolvimento</h3><p>Fechamos a estrutura e você decide se autoriza a etapa 1.</p><div class="codes">T8 · D15 · S1 · S2 · S5 · S6</div></div>
+    <div class="step"><h3>✓ Remuneração, contrato, responsabilidades e processo</h3><p>Decididos D1 a D16. Os temas jurídicos seguem para o chat de contratos.</p><div class="codes">D1 a D16</div></div>
+    <div class="step"><h3>1 · Obras já em andamento e montagem em blocos</h3><p>Prioridade: o restaurante e o Flip já estão rodando.</p><div class="codes">T10 · T9</div></div>
+    <div class="step"><h3>2 · Diário de obra</h3><p>Eu trago a proposta; você conta como é uma visita.</p><div class="codes">T7 · S7</div></div>
+    <div class="step"><h3>3 · Relatórios, encerramento, compras e arquivos</h3><p>O que o cliente recebe e como a obra termina.</p><div class="codes">T1 · T2 · T3 · T4 · S3 · S4</div></div>
+    <div class="step"><h3>4 · Telas e autorização da etapa 1</h3><p>Fechamos a estrutura tela por tela e você decide se autoriza o início.</p><div class="codes">T8 · S1 · S2 · S5 · S6</div></div>
     <div class="step" style="padding-bottom:0"><h3>Em paralelo, quando quiser</h3><p>Flip 2ª rodada, integração com Projetos e material comercial.</p><div class="codes">T6 · T5 · S8</div></div>
   </div>
 </section>
 
-<footer>Trilha Arquitetura Brasileira · Gestor de Obras · pauta da conversa 01 · atualizada em 2 de outubro de 2026 (D1–D8 e D10 decididos; D9 falta o alvará). As marcações de "conversado" ficam só neste aparelho.</footer>
+<footer>Trilha Arquitetura Brasileira · Gestor de Obras · pauta da conversa 01 · atualizada em 2 de outubro de 2026 (D1–D16 decididos). As marcações de "conversado" ficam só neste aparelho.</footer>
 </div>
 
 <script>

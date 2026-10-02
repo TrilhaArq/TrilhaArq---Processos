@@ -141,9 +141,14 @@ refletem o modelo de remuneração e os aceites decididos.
   não é obrigatória e fica fora da base do honorário.
 - **Rescisão (decidido)**: 3% (fase de planejamento) + parte de execução do honorário × avanço físico medido + próxima
   parcela como compensação; prever também rescisão pelo contratado (falta de aportes ou inadimplência).
-- **Regularização (decidido em parte)**: **CNO e INSS** ficam fora do escopo — serviço à parte, com contador; a Trilha
-  alerta e indica. **Alvará**: em definição (recomendação: serviço de legalização cobrado à parte, executado pela
-  Trilha; taxas pelo contratante). Licenças do negócio ficam com o contratante.
+- **Regularização (decidido)**: **CNO e INSS** ficam fora do escopo — serviço à parte, com contador; a Trilha alerta e
+  indica. **Alvará**: o projeto é aprovado com o RRT de projeto; o **alvará de obra é solicitado pelo contratante** e a
+  prefeitura exige o **RRT de execução** (ligado ao tema RRT abaixo). Pequenas reformas sem acréscimo de área costumam
+  dispensar alvará, mas mantêm RRT de projeto e de execução para fiscalização. Cada prestador deve ter o próprio
+  RRT/ART do serviço, quando couber. Licenças do negócio ficam com o contratante.
+- **Pagamento aos prestadores (decidido)**: por **medição do serviço executado**; parcelas, percentuais e retenção
+  **variam por contrato** (ex.: 30/30/40 ou 50/50) — o contrato de empreitada define o cronograma de pagamento, cuja
+  parcela final funciona como retenção até a entrega.
 - **Segurança (decidido)**: responsabilidade de cada prestador contratado; a Trilha estabelece **padrão próprio com uso
   obrigatório de EPI**, que entra no memorial descritivo e nos contratos de empreitada. Sugestão: prever que a Trilha
   pode suspender a atividade de quem estiver sem EPI até a regularização.
