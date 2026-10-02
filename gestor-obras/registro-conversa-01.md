@@ -163,7 +163,7 @@ evoluir antes de olharmos para o aplicativo.
 |---|---|
 | **Aditivo do cliente** — item novo, mudança de escopo, troca por opção superior, decisão dele | **Sim** (mais trabalho, aprovado por ele) |
 | **Variação de preço/quantidade** de itens já previstos no executivo | **Não** |
-| **Imprevisto de obra** (ex.: infiltração descoberta ao abrir parede) | A definir em contrato — sugestão: **sim** |
+| **Imprevisto de obra** (ex.: infiltração descoberta ao abrir parede) | **Sim** (decidido em 02/10 — responsabilidade do dono da obra) |
 
 - **Remuneração final = % × (executivo + aditivos aprovados [+ imprevistos, se acordado])**, nunca abaixo do executivo.
 - **Bonificação por economia**: ideia guardada para o futuro (ex.: 10% do economizado); hoje considerada complexa.
@@ -434,7 +434,15 @@ administração etc.) são **padrões editáveis por obra**, conforme a negocia�
   (cópia: `gestor-obras/pauta-gestor-obras.html`). Itens com código: **D1–D15** (decisões), **T1–T8** (temas não
   conversados), **S1–S8** (sugestões), e um roteiro em 6 passos. Luan responde no chat pelo código.
 
-**Próximo passo**: seguir o roteiro da pauta (passo 1: D1–D7, remuneração e contrato).
+**Decisões da pauta — D1 a D4 (02/10/2026, DECIDIDO pelo Luan)**
+- **D1** — a escala 1% → 2% → 3% é **cobrada por marco** (complementos na entrega do preliminar e no aceite do executivo).
+- **D2** — base dos 2%: **valor de referência** = soma das opções recomendadas pela Trilha, impresso no Orçamento Preliminar.
+- **D3** — **imprevistos de obra incidem honorário**. Patologias do imóvel e situações que não tinham como ser previstas
+  são responsabilidade do **dono da obra** (proprietário ou locatário do imóvel); se geram serviço a mais, incidem.
+- **D4** — base do honorário: **entram** mão de obra, insumos, mão de obra + insumo, aluguel, frete, caçamba, limpeza,
+  consumíveis; **ficam fora** honorário da Trilha, impostos, taxas e alvarás, INSS da obra, RRT, consumo de água e luz.
+
+**Próximo passo**: D5–D7 (reserva técnica, rescisão, quem é o contratado).
 
 ---
 

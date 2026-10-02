@@ -60,7 +60,7 @@ refletem o modelo de remuneração e os aceites decididos.
 - **Erro de redação na 4.3**: parcelas 1 e 2 = "30% do valor preliminar total **da obra**". Ao pé da letra, seria 30%
   do valor da obra, não do honorário. Corrigir para "30% do honorário calculado sobre o orçamento [preliminar/executivo]".
 - **Modelo de remuneração desatualizado**: hoje o honorário é sobre o custo final (**4.1**), sem piso. Incluir:
-  piso no **Orçamento Executivo**; incidência adicional só sobre **aditivos aprovados** e imprevistos combinados;
+  piso no **Orçamento Executivo**; incidência adicional sobre **aditivos aprovados** e **imprevistos de obra** (decidido: incidem — patologias do imóvel e situações imprevisíveis são responsabilidade do dono da obra);
   variação de preço de itens previstos não altera o honorário.
 - **Pagamento inicial e fase de planejamento** (definido no chat do Gestor de Obras — ver seção 8):
   o contrato vem **antes** do orçamento preliminar e precisa prever o **sinal** e a remuneração da fase de planejamento.
@@ -70,8 +70,8 @@ refletem o modelo de remuneração e os aceites decididos.
   Orçamento Preliminar · Orçamento Executivo (linha de base) · Planejamento e Cronograma · Relatório de Custo Final.
 
 ❌ Falta
-- **Definição da base de cálculo**: o que entra (mão de obra, insumos, mão de obra + insumo, aluguel, frete,
-  caçamba…) e o que fica fora (honorário da Trilha, impostos, taxas, alvarás, INSS, RRT…).
+- **Definição da base de cálculo** (decidida, D4): entram mão de obra, insumos, mão de obra + insumo, aluguel, frete,
+  caçamba, limpeza, consumíveis; ficam fora honorário da Trilha, impostos, taxas e alvarás, INSS da obra, RRT, água e luz.
 
 ## 4. Escopo e presença
 ✅ Funciona
@@ -122,9 +122,9 @@ refletem o modelo de remuneração e os aceites decididos.
   trabalho que a administração da obra já planejada.
 
 **Sugerido, a confirmar**
-- Redigir como **cronograma de pagamento por marco** (complementos até 2% e 3% na entrega de cada fase; restante do
-  honorário durante a execução), e não como multa por desistência.
-- Definir a **base do 2%**: "valor de referência" impresso no Orçamento Preliminar.
+- **Decidido (D1):** redigir como **cronograma de pagamento por marco** (complementos até 2% e 3% na entrega de cada
+  fase; restante do honorário durante a execução), e não como multa por desistência.
+- **Decidido (D2):** base do 2% = "valor de referência" (soma das opções recomendadas pela Trilha), impresso no Orçamento Preliminar.
 - Deixar claro que os percentuais da fase de planejamento **independem** do percentual de administração negociado.
 - Substituir a lógica atual da 4.3 (30% + 30% sobre o "valor preliminar total da obra") por essa escala.
 
