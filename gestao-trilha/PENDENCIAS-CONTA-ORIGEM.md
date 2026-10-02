@@ -16,12 +16,14 @@ pede) e marca cada uma como feita, com a data. Itens novos entram no fim, com da
 
 ---
 
-## A. Ao publicar o Gestor Comercial no app oficial (fases 1 e 2, de 02/10/2026)
+## A. Gestor Comercial no app oficial (fases 1 e 2 publicadas em 02/10/2026, versão 1790904962-39e8)
 
-- [ ] **A1. Capacidades do oficial.** Publicar com `db`, `downloads`, `mcp` (Google Calendar `create_event`,
+- [x] 02/10/2026 (conta de desenvolvimento) **A1. Capacidades do oficial.** Publicar com `db`, `downloads`, `mcp` (Google Calendar `create_event`,
   `update_event`) **e** as novas `assets` (arquivos dos modelos) e `sample` (IA). Ao declarar, repetir todas.
   *Pode ser feito pela conta de desenvolvimento (é editora do oficial).*
-- [ ] **A2. Arquivos dos modelos no oficial.** Enviar ao armazenamento do oficial as imagens de
+- [x] 02/10/2026 (conta de desenvolvimento) **A2. Arquivos dos modelos no oficial.** Imagens e os 6 contratos
+  enviados (contratos como script); `modelos-padrao.json` publicado com os ids do oficial. Se o escritório quiser,
+  a conta de origem pode reenviar cada .docx pelo botão "Enviar .docx" (fica como texto). Enviar ao armazenamento do oficial as imagens de
   `referencias-comercial/paginas/` (capa, páginas fixas, logo e assinatura) e os 6 contratos.
   - Contratos: pela conta de origem, em **Configurações do comercial › Modelos de contrato › Enviar .docx**
     (o app guarda o .docx como texto base64). Pela conta convidada só dá como script (`"<base64>";`), que o app
@@ -52,7 +54,8 @@ pede) e marca cada uma como feita, com a data. Itens novos entram no fim, com da
   residência (entra na mensagem de WhatsApp "Enviar briefing").
 - [ ] **A10. Planilha de respostas.** No Google Forms, ligar o formulário a uma planilha (Respostas › Planilha):
   o app importa colando a linha de títulos + a linha do cliente.
-- [ ] **A11. Agenda Google.** Na primeira reunião agendada pelo Comercial no oficial, confirmar que o evento entrou
+- [ ] **A11. Agenda Google** (integração do Comercial usa os mesmos campos das Tarefas, mas ainda não foi
+  verificada com uma chamada real). Na primeira reunião agendada pelo Comercial no oficial, confirmar que o evento entrou
   na agenda `trilha@trilhaarq.com.br` (a cópia de teste não tem a Agenda). O conector Google Calendar precisa estar
   ligado na conta de quem usa.
 - [ ] **A12. IA (`sample`).** Na primeira vez que alguém clicar em "✨ Escrever com o Claude", o Claude pede

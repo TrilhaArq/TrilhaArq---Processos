@@ -1,6 +1,7 @@
 # Gestor Comercial — planejamento
 
-> **Situação (02/10/2026):** v1 construída e publicada só na cópia de teste — funil, oportunidade com próximo passo,
+> **Situação (02/10/2026):** v1 e fase 2 publicadas no app oficial (pendências de configuração em
+> `PENDENCIAS-CONTA-ORIGEM.md`); antes, v1 construída na cópia de teste — funil, oportunidade com próximo passo,
 > importação do briefing pela planilha, programa, simulador com Meu valor e "Virar projeto". Regras da v1 em
 > `REGRAS.md` (seção Gestor Comercial). Próxima rodada: proposta em PDF, contrato .docx, parcelas no Financeiro,
 > IA, Levantamento e "Registrar rodada" no Gestor.

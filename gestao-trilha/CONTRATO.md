@@ -26,7 +26,7 @@ depois levar ao oficial. Não excluir a cópia: o banco dela guarda os dados fic
 
 Publicar sempre com `url` = link acima, `file_path` = `index.html`, `root` = esta pasta e `files` listando
 **todos** os arquivos (estilo.css, nucleo.js, logo.png e cada `modulos/*.js`). Não mudar `capabilities` sem
-necessidade (hoje: `db`, `downloads`, `mcp` Google Calendar com `create_event`/`update_event`; com o Gestor Comercial fase 2 entram `assets` e `sample`); para declarar
+necessidade (hoje: `db`, `downloads`, `mcp` Google Calendar com `create_event`/`update_event`, `assets` e `sample`); para declarar
 uma nova capacidade, repetir as existentes.
 
 **Um chat por vez** publicando neste artefato. Antes de começar, ler a versão publicada (Artifact `read`) ou o
@@ -145,6 +145,6 @@ checklists de um item fora do Gestor, como faz a área da pessoa).
 | Horas e custos (antigo "Projetos") | `modulos/projetos.js` | aba de Relatórios | em uso — não se registra como módulo: expõe `T.horasCustos {html, init, render}` e Relatórios o mostra na aba "Horas e custos por projeto" |
 | Relatórios | `modulos/relatorios.js` | admin | em uso |
 | Configurações | `modulos/config.js` | admin | em uso |
-| Gestor Comercial (oportunidades, briefing, simulador) | `modulos/comercial.js` | admin | v1 em teste na cópia de teste (02/10/2026); expõe `T.comercial` |
+| Gestor Comercial (oportunidades, briefing, simulador) | `modulos/comercial.js` | admin | em uso (oficial desde 02/10/2026; pendências de configuração em `PENDENCIAS-CONTA-ORIGEM.md`); expõe `T.comercial` |
 | Documentos do Comercial (proposta PDF, contrato .docx, IA) | `modulos/comercial-docs.js` | — | não se registra; expõe `T.comercialDocs`, carregado antes de `comercial.js` |
 | Gestor de obras (orçamento de obras) | — | admin | "Em breve" na capa — portar o app de orçamento (skill orcamento-obra-trilha), itens agrupados por obra |

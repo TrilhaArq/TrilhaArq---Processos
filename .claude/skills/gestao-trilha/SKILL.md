@@ -14,7 +14,7 @@ Um único Artifact, organizado em **módulos**, com um único banco de dados com
 - **Regras de negócio dos módulos atuais:** `referencias/REGRAS.md`
 - **Processo de projeto da Trilha (base do Gestor):** `manual-trilha/` no repositório (MAPEAMENTO.md,
   processo-trilha.json, AJUSTES-TESTE.md com as decisões do Luan, TERMOS.md com os textos dos termos)
-- **Gestor Comercial:** v1 e fase 2 construídas (02/10/2026, `modulos/comercial.js` e `comercial-docs.js`); plano em
+- **Gestor Comercial:** v1 e fase 2 no app oficial (02/10/2026, `modulos/comercial.js` e `comercial-docs.js`); plano em
   `gestao-trilha/COMERCIAL-PLANO.md`, regras em `REGRAS.md` (seção Gestor Comercial), referências em
   `gestao-trilha/referencias-comercial/`.
 - **Pendências para a conta de origem:** `gestao-trilha/PENDENCIAS-CONTA-ORIGEM.md` — **ler sempre antes de mexer no

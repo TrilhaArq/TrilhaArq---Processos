@@ -537,7 +537,7 @@ deixar a Ficha restrita)
 - "Desfazer" em toda remoção pequena (item, desenho, item de checklist); confirmação antes de apagar coisas grandes
   (projeto, etapa, ambiente, pessoa, contato).
 
-## Gestor Comercial (v1 — em teste desde 02/10/2026, só na cópia de teste)
+## Gestor Comercial (v1 e fase 2 — no app oficial desde 02/10/2026)
 
 Planejamento completo: `COMERCIAL-PLANO.md`; referências (propostas, contratos, briefing): `referencias-comercial/`.
 
@@ -580,7 +580,7 @@ Planejamento completo: `COMERCIAL-PLANO.md`; referências (propostas, contratos,
   CAU 8%; mercado R$ 70–120/m²; meta anual R$ 300 mil; validade 30 dias; adm. de obra 12%; cobrar briefing após 5
   dias; follow-up após 7; nº inicial da proposta 81. Faixas de R$/m² dos padrões: Configurações › Padrões de obra
   (valores de mercado de 2026, editáveis).
-- **Fase 2 (em teste desde 02/10/2026):**
+- **Fase 2 (no oficial desde 02/10/2026):**
   - **Proposta em PDF (modelo híbrido):** o modelo é uma sequência de páginas em `com_config/modelos.propostas[]`
     (`{t: "fixa", img: <id do arquivo>, n, opc?}` ou `{t: capa|demanda|programa|plano|horas|investimento}`, `off`
     para desligar, `opc` = só com marcenaria / adm. de obra / Projeto Legal). Páginas fixas = imagens (hoje recortadas
