@@ -611,9 +611,39 @@ Planejamento completo: `COMERCIAL-PLANO.md`; referências (propostas, contratos,
     da capa), contratos (enviar .docx novo, versão) e textos exemplares. Enviar arquivos exige a capacidade `assets`
     (só quem edita o app). Sem modelos no banco, o app usa `modelos-padrao.json` publicado junto (ids dos arquivos
     daquele artefato); o primeiro "Salvar modelos" grava em `com_config/modelos`. Ver `referencias-comercial/paginas/LEIA.md`.
-- **Ainda não faz:** "Peça ao Claude" (barra de conversa), proposta e contrato simplificados de serviços menores,
-  Levantamento e "Registrar rodada" no Gestor, relatórios do comercial, versões da proposta, mais de um contratante
-  no contrato.
+- **Fase 3 (cópia de teste em 02/10/2026; levar ao oficial pelo roteiro de `PENDENCIAS-CONTA-ORIGEM.md`):**
+  - **Serviços menores (tipo "Serviço"):** sem briefing nem programa — da Reunião o passo é "Montar proposta". Aba
+    Proposta › O serviço: o sócio descreve o pedido e "✨ Montar com o Claude" (nível rápido, `sample.json`) organiza
+    título, descrição, entregáveis, prazo (d.u.) e horas; tudo editável. Preço = horas × fator do cliente × custo-hora
+    (Simulador reduzido; entrada padrão 50%). Proposta curta (modelo "Serviço menor": capa, Trilha, Quem somos,
+    O serviço, Investimento com os entregáveis, Contatos). Contrato **07 · Serviço menor (modelo curto)**, montado pelo
+    Claude a partir do contrato padrão (mesmo cabeçalho, rodapé, partes, assinaturas e dados bancários; cláusulas
+    resumidas: objeto e entregáveis, prazo e uma rodada de ajustes, honorários, obrigações, direitos autorais,
+    rescisão, foro) — **revisar com advogado antes do primeiro uso**. Virar projeto = projeto simples + Financeiro.
+  - **"Peça ao Claude"** (capacidade `sample`): barra na tela principal e em cada oportunidade; níveis rápido, padrão
+    e complexo; ditado pelo microfone do teclado. Ferramentas: ler a oportunidade, propor alterações (textos, valor,
+    entrada/parcelas, padrão, dimensão, terreno, perfil, serviço), propor ambientes (+/−), registrar nota; na tela
+    principal, listar oportunidades e propor nova oportunidade. **Nada é gravado sem "Aplicar"** (a proposta aparece
+    em lista; "Descartar" desfaz). A conversa de cada oportunidade fica em `com_oport.chat` (últimas 20 mensagens) e é
+    reenviada a cada pedido (até 10); cada pedido consome uso da conta de quem envia.
+  - **Versões da proposta:** em "Proposta apresentada", "Nova versão" volta para revisão com `proposta.versao` + 1; cada
+    apresentação grava `versoes[] {versao, em, valorTabela, valorFinal, area, ambientes}`; o PDF sai com "v2"…; a aba
+    Proposta mostra a tabela de versões.
+  - **Mais de um contratante:** aba Contrato › "+ Contratante"; o contrato repete o parágrafo CONTRATANTE e a linha de
+    assinatura para cada um; o Financeiro recebe os nomes juntos ("Marta e Paulo").
+  - **Relatórios do comercial** (botão na tela principal, por ano): conversão por etapa, origem dos clientes (oportunidades,
+    fechamentos, valor), motivos de perda, tempo médio até o contrato, custo de captação (horas do Tempo na área
+    "Comercial e captação" × custo ÷ contratos fechados), previsão de receita (revisão 30%, apresentada 50%,
+    contrato 90%) e valor calculado × praticado.
+  - **Gestor de Projetos:** etapa **Levantamento** para reforma e interiores (Abertura → Levantamento → EP → PE; marco
+    zero sem topográfico; itens "Agendar e fazer o levantamento", "Modelar a edificação existente", "Conferir o modelo";
+    prazo `prazosPadrao.refLev`, 5 d.u.; sem termo; peso 0 no % concluído). Projetos de reforma que já existiam ficam
+    com o Levantamento como concluído. **"Registrar rodada"** no quadro da arquitetura (EP: ajustes +15, revisão total
+    +40; AP: compatibilização estrutura/complementares +10; PE: compatibilização +10; ou outro número): soma ao prazo
+    da etapa, grava `gp.rodadas[] {etapa, tipo, nome, dias, n, em}` e o evento no histórico; avisa quando a rodada é
+    adicional pelo contrato (4ª de ajustes, 2ª revisão total).
+- **Ainda não faz:** proposta de marcenaria com páginas próprias (usa o modelo de residência), formulário de briefing
+  para comercial/reforma, leitura direta da planilha pelo conector do Google Drive, microfone próprio no app.
 
 ## Próximos passos previstos
 

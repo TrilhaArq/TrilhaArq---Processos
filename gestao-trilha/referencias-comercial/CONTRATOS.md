@@ -89,3 +89,13 @@ Iguais nos dois: EP 40, Legal 20 para desenvolver e protocolar, EP marcenaria 30
    marcenaria: Levantamento 5 (avulsa) · EP 30 · PE 40. Rodadas somam prazo quando acontecem (ajustes EP +15,
    revisão total +40, compatibilização +10), pelo botão "Registrar rodada" do Gestor. Sem cronômetro por fase do
    Anteprojeto: as esperas do Gestor já descontam o tempo do engenheiro e do cliente.
+
+## Modelo 07 · Serviço menor (montado pelo Claude em 02/10/2026)
+
+Para consultorias, layouts, visitas técnicas, laudos e pequenos projetos. Gerado a partir do contrato 01 (mesmos
+estilos, cabeçalho, rodapé, qualificação do CONTRATADO, assinaturas e dados bancários), com cláusulas resumidas:
+objeto (`{escopo_descricao}`, `{entregaveis}` uma linha por item, proposta nº), prazo (`{prazo_dias}` d.u., recessos,
+entrega digital e 1 rodada de ajustes), honorários (parcelas e atraso como no padrão), obrigações (informações em 10 d.u.,
+LGPD, responsabilidade só pelo serviço, horário de atendimento), direitos autorais, rescisão proporcional e foro.
+Campos novos: `{servico_titulo}`, `{entregaveis}`, `{prazo_dias}`. **Precisa de revisão jurídica antes do uso.**
+O .docx não fica no repositório (dados dos sócios); está no armazenamento do app (teste e oficial) e foi entregue ao Luan.

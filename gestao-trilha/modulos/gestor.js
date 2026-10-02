@@ -14,6 +14,7 @@
   // tempo: etapa da aba Tempo em que as horas são lançadas; prazo: dias úteis padrão (editável por projeto na Ficha)
   var ETAPAS = {
     abertura: { nome: "Abertura", curto: "Abertura", tempo: ["ab"] },
+    lev: { nome: "Levantamento", curto: "Levantamento", prazo: 5, tempo: ["ab"] },
     ep: { nome: "Estudo Preliminar", curto: "Estudo Preliminar", prazo: 40, tempo: ["ep"], termo: "etapa", clausula: "2.1.7" },
     ap: { nome: "Anteprojeto", curto: "Anteprojeto", prazo: 80, tempo: ["ap", "comp"], termo: "etapa", clausula: "2.2.9", fases: ["Revisão e lançamentos", "Compatibilização", "Definições"] },
     pl: { nome: "Projeto Legal", curto: "Projeto Legal", tempo: ["pl"] },
@@ -23,11 +24,12 @@
     encerrado: { nome: "Encerrado", curto: "Encerrado" }
   };
   function doZero(sigla) { return !(sigla === "REF" || sigla === "INT"); }
-  function fluxo(sigla) { return doZero(sigla) ? ["abertura", "ep", "ap", "pe", "encerrado"] : ["abertura", "ep", "pe", "encerrado"]; }
+  // Reforma e interiores: Levantamento entre a Abertura e o Estudo Preliminar (contratos 03 e 04, decisão de 01/10/2026)
+  function fluxo(sigla) { return doZero(sigla) ? ["abertura", "ep", "ap", "pe", "encerrado"] : ["abertura", "lev", "ep", "pe", "encerrado"]; }
   function temLegal(g) { return g.legal && g.legal !== "nao_se_aplica"; }
   function marcAtiva(g) { return !!(g.marc && g.marc.ativo); }
   function marcAberta(g) { return marcAtiva(g) && g.marc.etapa !== "fim"; }
-  function etapasPlano(g) { var e = ["abertura", "ep"]; if (doZero(g.sigla)) e.push("ap"); if (temLegal(g)) e.push("pl"); e.push("pe"); if (marcAtiva(g)) e.push("mep", "mex"); return e; }
+  function etapasPlano(g) { var e = ["abertura"]; if (!doZero(g.sigla)) e.push("lev"); e.push("ep"); if (doZero(g.sigla)) e.push("ap"); if (temLegal(g)) e.push("pl"); e.push("pe"); if (marcAtiva(g)) e.push("mep", "mex"); return e; }
   var LEGAL = [["nao_iniciado", "Não iniciado"], ["em_preparo", "Em preparo"], ["protocolado", "Protocolado"], ["aprovado", "Aprovado"], ["nao_se_aplica", "Não se aplica"]];
   var SIT = [["a_fazer", "A fazer"], ["andamento", "Em andamento"], ["revisao", "Revisão interna"], ["rev_cliente", "Revisão Cliente"], ["pronto", "Pronto"], ["entregue", "Entregue"]];
   // Espera/pausa por trilha (arquitetura ou marcenaria). Condomínio e prefeitura ficam no quadro do Projeto Legal.
@@ -50,6 +52,7 @@
   function grupos(etapa, g) {
     function serie(n) { return { k: "s" + n, n: n + " · " + SERIES[n], cod: "serie", serie: n }; }
     if (etapa === "abertura") return [{ k: "abertura", n: "Abertura do projeto" }];
+    if (etapa === "lev") return [{ k: "lev", n: "Levantamento e modelagem do existente" }];
     if (etapa === "ep") return [{ k: "ep-estudos", n: "Estudos e concepção" }, { k: "ep-apres", n: "Material da apresentação", cod: "AP" }, { k: "ep-entrega", n: "Apresentação e aprovação" }];
     if (etapa === "ap") return [100, 200, 300, 400].map(serie).concat([{ k: "ap-comp", n: "Complementares" }, { k: "ap-def", n: "Definições com o cliente" }, { k: "ap-fecha", n: "Encerramento do Anteprojeto" }]);
     if (etapa === "pl") return (g && g.leg && g.leg.cond ? [{ k: "pl-cond", n: ORGAOS.cond.nome, cod: "PC" }] : []).concat([{ k: "pl-pref", n: ORGAOS.pref.nome, cod: "PL" }]);
@@ -162,7 +165,8 @@
   function ativo(g) { return !g.suspenso && !g.arquivado; }
   function etapaLista(g) { return g.etapa === "encerrado" && marcAberta(g) ? "marc" : g.etapa; }
   // Reforma e interiores (sigla REF/INT) têm prazos próprios de EP e Executivo (contratos 03 e 04).
-  function prazoPadrao(k, sigla) { var c = T.cfg().prazosPadrao || {}, d = T.DEFAULT_CONFIG.prazosPadrao || {}; if (sigla && !doZero(sigla) && (k === "ep" || k === "pe")) { var r = "ref" + k.charAt(0).toUpperCase() + k.slice(1); if (c[r] != null || d[r] != null) return c[r] != null ? c[r] : d[r]; } return c[k] != null ? c[k] : d[k] != null ? d[k] : (ETAPAS[k] || {}).prazo || null; }
+  function prazoPadrao(k, sigla) { var c = T.cfg().prazosPadrao || {}, d = T.DEFAULT_CONFIG.prazosPadrao || {}; if (k === "lev") return c.refLev != null ? c.refLev : d.refLev != null ? d.refLev : 5;
+    if (sigla && !doZero(sigla) && (k === "ep" || k === "pe")) { var r = "ref" + k.charAt(0).toUpperCase() + k.slice(1); if (c[r] != null || d[r] != null) return c[r] != null ? c[r] : d[r]; } return c[k] != null ? c[k] : d[k] != null ? d[k] : (ETAPAS[k] || {}).prazo || null; }
   // Prazo da etapa no projeto: o da Configurações do projeto; senão o da ativação da marcenaria (antigo); senão o padrão.
   function prazoEtapa(g, e) { var info = (g.etapas || {})[e] || {}; if (info.prazo) return info.prazo; if (ETAPAS[e].marc && ((g.marc || {}).prazos || {})[e]) return g.marc.prazos[e]; return prazoPadrao(e, g.sigla); }
   function trilhaDe(e) { return ETAPAS[e] && ETAPAS[e].marc ? "marc" : "arq"; }
@@ -316,6 +320,7 @@
     add("abertura", "abertura", "Receber documentos do cliente (pessoais, registro, IPTU)", { chave: "documentos" });
     ["Duplicar a pasta padrão", "Criar o arquivo ArchiCAD pelo template", "Preencher dados do cliente e do terreno", "Análise de legislação"].forEach(function (t) { add("abertura", "abertura", t); });
     add("abertura", "abertura", "Modelar o terreno", { desenhos: des(["Importar o topográfico", "Curvas e platôs", "Conferir níveis e divisas"]) });
+    if (!zero) { add("lev", "lev", "Agendar e fazer o levantamento no local", { desenhos: des(["Medidas", "Fotos", "Instalações aparentes", "Estrutura aparente"]) }); add("lev", "lev", "Modelar a edificação existente"); add("lev", "lev", "Conferir o modelo com o levantamento"); }
     add("ep", "ep-estudos", "Análise do terreno e condicionantes", { desenhos: des(["Insolação", "Ventilação", "Chuva", "Visuais", "Legislação aplicada"]) });
     ["Estudo de concepção (partido)", "Modelo 3D", "Estrutura preliminar"].forEach(function (t) { add("ep", "ep-estudos", t); });
     ["Estudo de concepção", "Implantação / cobertura"].concat(pavs.map(function (p) { return "Planta – " + p; }))
@@ -479,7 +484,7 @@
       "<div><small>Horas</small><b>" + (h ? T.fmtH(h) : "—") + "</b></div></div>" +
       (dois ? (g.etapa !== "encerrado" ? linhaPrazo(pa, "Arq.") : "") + (marcAberta(g) ? linhaPrazo(pzm, "Marc.") : "") : linhaPrazo(pz, "")) + "</div></button>";
   }
-  var GRUPOS_LISTA = [["abertura", "Abertura"], ["ep", "Estudo Preliminar"], ["ap", "Anteprojeto"], ["pe", "Executivo"], ["marc", "Marcenaria"]];
+  var GRUPOS_LISTA = [["abertura", "Abertura"], ["lev", "Levantamento"], ["ep", "Estudo Preliminar"], ["ap", "Anteprojeto"], ["pe", "Executivo"], ["marc", "Marcenaria"]];
   function renderLista() {
     var todos = projetosGestor(), q = S.busca.trim().toLowerCase();
     var n = { ativos: 0, aguardando: 0, suspensos: 0, arquivados: 0 };
@@ -571,7 +576,7 @@
     return '<div class="card gp-box gp-trilha"><div class="gp-trilha-h"><div><small class="gp-trilha-k">Arquitetura</small><h3 class="panel-title">' + esc(enc ? "Arquitetura entregue" : et.nome || "") + (g.fase && et.fases && !enc ? ' <span class="hint">· fase ' + g.fase + "</span>" : "") + '</h3></div><span class="gp-sit ' + sit.k + '">' + esc(sit.txt) + "</span></div>" +
       (enc ? '<p class="hint">Arquitetura encerrada.' + (marcAberta(g) ? " A marcenaria continua no quadro ao lado." : "") + "</p>" :
         numerosTrilha(g, p.id, "arq", pz, ie, g.etapa) + '<div class="gp-trilha-campos">' + fase + '<div class="field"><label for="gp-proximo">Próximo passo</label><input id="gp-proximo" value="' + esc(g.proximo || "") + '" placeholder="Ex.: apresentar o Estudo Preliminar"></div></div>' +
-        controleEspera(g, "arq") + blocoAvanco(g)) + "</div>";
+        controleEspera(g, "arq") + blocoRodada(g) + blocoAvanco(g)) + "</div>";
   }
   function quadroMarc(g, p) {
     var m = g.marc, et = m.etapa, emCurso = et === "mep" || et === "mex", pz = emCurso ? calcPrazo(g, et) : null, ie = emCurso ? itensDe(g, et) : [];
@@ -609,9 +614,31 @@
     var legais = orgaosLegal(g).length ? '<div class="gp-trilhas' + (orgaosLegal(g).length > 1 ? " dois" : "") + '">' + orgaosLegal(g).map(function (o) { return quadroLegal(g, o); }).join("") + "</div>" : "";
     return banner + passos(g, p.id) + trilhas + legais + '<div class="gp-cols"><div class="gp-main">' + marcoBox + reunioesBox(g) + "</div>" + '<div class="gp-side">' + ultimos(g) + "</div></div>";
   }
+  var RODADAS = { ep: [["ajustes", "Rodada de ajustes pontuais", 15], ["revisao", "Revisão total", 40]], ap: [["compat-est", "Rodada de compatibilização (estrutura)", 10], ["compat", "Rodada de compatibilização (complementares)", 10]], pe: [["compat", "Rodada de compatibilização (complementares)", 10]], lev: [] };
+  function blocoRodada(g) {
+    var ops = RODADAS[g.etapa]; if (!ops || !ETAPAS[g.etapa] || !ETAPAS[g.etapa].prazo) return "";
+    var feitas = (g.rodadas || []).filter(function (r) { return r.etapa === g.etapa; });
+    return '<details class="gp-rodada"><summary>Registrar rodada' + (feitas.length ? " · " + feitas.length + (feitas.length === 1 ? " registrada" : " registradas") : "") + '</summary><div class="form-actions"><select class="ctl" id="gp-rod-tipo" aria-label="Tipo de rodada">' +
+      ops.map(function (o) { return '<option value="' + o[0] + '" data-d="' + o[2] + '">' + esc(o[1]) + " (+" + o[2] + " d.u.)</option>"; }).join("") + '<option value="outra" data-d="">Outra (informe os dias)</option></select><input class="ctl" type="number" min="1" id="gp-rod-dias" placeholder="dias" aria-label="Dias úteis" style="width:80px">' +
+      '<button class="btn btn-small" data-act="rodada">Registrar</button></div><p class="hint">Soma os dias úteis ao prazo da etapa e fica no histórico. ' + (g.etapa === "ep" ? "A partir da 4ª rodada de ajustes e na 2ª revisão total, o contrato prevê adicional (Cláusula Nona)." : "Contados da entrega do projeto complementar.") + "</p></div></details>";
+  }
+  async function registrarRodada() {
+    var g = G(S.projId), e = g.etapa, sel = $("gp-rod-tipo"), op = sel.options[sel.selectedIndex], tipo = sel.value, dias = T.numOrNull($("gp-rod-dias").value) || T.numOrNull(op.dataset.d);
+    if (!dias || dias < 1) { T.toast("Informe os dias úteis da rodada."); return; }
+    var nome = tipo === "outra" ? "Rodada" : op.textContent.replace(/ \(\+\d+ d\.u\.\)$/, ""), mesmas = (g.rodadas || []).filter(function (r) { return r.etapa === e && r.tipo === tipo; }).length + 1;
+    var aviso = e === "ep" && ((tipo === "ajustes" && mesmas >= 4) || (tipo === "revisao" && mesmas >= 2)) ? " Pelo contrato, esta rodada é cobrada como adicional (Cláusula Nona)." : "";
+    if (!(await T.confirmar({ titulo: "Registrar " + nome.toLowerCase() + "?", texto: "Soma " + dias + " dias úteis ao prazo do " + ETAPAS[e].nome + " (" + prazoEtapa(g, e) + " → " + (prazoEtapa(g, e) + dias) + " d.u.)." + aviso, ok: "Registrar" }))) return;
+    await salvar(S.projId, function (x) {
+      x.etapas = x.etapas || {}; x.etapas[e] = Object.assign({}, x.etapas[e], { prazo: prazoEtapa(x, e) + dias });
+      x.rodadas = (x.rodadas || []).concat([{ etapa: e, tipo: tipo, nome: nome, dias: dias, n: mesmas, em: new Date().toISOString() }]);
+      evento(x, nome + " nº " + mesmas + " registrada: +" + dias + " d.u. no prazo do " + ETAPAS[e].nome + (aviso ? " (adicional pelo contrato)" : ""), hojeIso(), { tipo: "etapa" });
+    });
+    T.toast(nome + " registrada ✓");
+  }
   function blocoAvanco(g) {
     var f = fluxo(g.sigla), prox = f[f.indexOf(g.etapa) + 1], falta = [], bloqueio = false, rotulo, et = ETAPAS[g.etapa];
-    if (g.etapa === "abertura") { rotulo = "Base pronta: iniciar o Estudo Preliminar (marco zero)"; if (!marco(g, "contrato")) falta.push("contrato assinado"); if (!marco(g, "parcela")) falta.push("1ª parcela paga"); if (!marco(g, "topografico")) falta.push("topográfico"); var ab = itensDe(g, "abertura"); if (prontos(ab) < ab.length) falta.push((ab.length - prontos(ab)) + " item(ns) da Abertura"); }
+    if (g.etapa === "abertura") { rotulo = "Base pronta: iniciar " + (prox === "lev" ? "o Levantamento" : "o Estudo Preliminar") + " (marco zero)"; if (!marco(g, "contrato")) falta.push("contrato assinado"); if (!marco(g, "parcela")) falta.push("1ª parcela paga"); if (doZero(g.sigla) && !marco(g, "topografico")) falta.push("topográfico"); var ab = itensDe(g, "abertura"); if (prontos(ab) < ab.length) falta.push((ab.length - prontos(ab)) + " item(ns) da Abertura"); }
+    else if (g.etapa === "lev") { rotulo = "Levantamento e modelagem concluídos: abrir o Estudo Preliminar"; var lv = itensDe(g, "lev"); if (prontos(lv) < lv.length) falta.push((lv.length - prontos(lv)) + " item(ns) do Levantamento"); }
     else { rotulo = "Termo assinado: " + (prox === "encerrado" ? "encerrar a arquitetura" : "abrir " + ETAPAS[prox].nome); if (prox === "pe" && !legalAprovado(g)) { orgaosLegal(g).forEach(function (o) { if (legalDe(g, o).sit !== "aprovado") falta.push(ORGAOS[o].nome + " aprovado"); }); bloqueio = true; } }
     var txt = falta.length ? '<p class="hint warn">Falta: ' + esc(falta.join(", ")) + ".</p>" : "";
     var termo = et.termo ? '<button class="btn btn-small btn-termo" data-termo="' + g.etapa + '">' + (et.termo === "projeto" ? "Gerar Termo de Encerramento de Projeto (PDF)" : "Gerar Termo de Encerramento de Etapa (PDF)") + "</button>" : "";
@@ -1038,7 +1065,7 @@
       '<div class="col-12 form-actions"><button class="btn btn-primary" id="tm-pdf">Gerar PDF</button><button type="button" class="btn" data-close="1">Fechar</button><span class="save-state" id="tm-st"></span></div></form>';
   }
   function proxEtapa(g) { var f = fluxo(g.sigla), n = f[f.indexOf(g.etapa) + 1]; return n && ETAPAS[n] && n !== "encerrado" ? ETAPAS[n].nome : ""; }
-  function prereq(g) { if (g.etapa === "abertura") return "contrato assinado, 1ª parcela paga e levantamento topográfico entregue"; if (g.etapa === "ep") return "Termo de Encerramento de Etapa do Estudo Preliminar assinado"; if (g.etapa === "ap") return "Termo de Encerramento de Etapa do Anteprojeto assinado e aprovação dos projetos necessários"; return ""; }
+  function prereq(g) { if (g.etapa === "abertura") return doZero(g.sigla) ? "contrato assinado, 1ª parcela paga e levantamento topográfico entregue" : "contrato assinado e 1ª parcela paga"; if (g.etapa === "lev") return "levantamento e modelagem da edificação existente concluídos"; if (g.etapa === "ep") return "Termo de Encerramento de Etapa do Estudo Preliminar assinado"; if (g.etapa === "ap") return "Termo de Encerramento de Etapa do Anteprojeto assinado e aprovação dos projetos necessários"; return ""; }
   function loadScript(src) { return new Promise(function (ok, fail) { var s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = fail; document.head.appendChild(s); }); }
   async function logo() {
     if (S.logo) return S.logo;
@@ -1286,16 +1313,16 @@
   // ---------- ações ----------
   async function avancar() {
     var g = G(S.projId), f = fluxo(g.sigla), prox = f[f.indexOf(g.etapa) + 1], data = ($("gp-termo-data") || {}).value || hojeIso();
-    var falta = g.etapa === "abertura" && !(marco(g, "contrato") && marco(g, "parcela") && marco(g, "topografico"));
+    var falta = g.etapa === "abertura" && !(marco(g, "contrato") && marco(g, "parcela") && (!doZero(g.sigla) || marco(g, "topografico")));
     var antecipa = $("gp-antecipa") && $("gp-antecipa").checked;
     if (falta && !antecipa) { T.toast("Complete o que falta ou marque a antecipação autorizada."); return; }
     if (prox === "pe" && !legalAprovado(g)) return;
-    var ok = await T.confirmar({ titulo: prox === "encerrado" ? "Encerrar a arquitetura?" : "Abrir " + ETAPAS[prox].nome + "?", texto: g.etapa === "abertura" ? "Marca o marco zero em " + T.fmtYmd(data) + " e começa a contar o prazo do Estudo Preliminar." : "Registra o termo de " + esc(ETAPAS[g.etapa].nome) + " assinado em " + T.fmtYmd(data) + (prox === "encerrado" ? "." : " e abre a próxima etapa."), ok: prox === "encerrado" ? "Encerrar" : "Abrir etapa" });
+    var ok = await T.confirmar({ titulo: prox === "encerrado" ? "Encerrar a arquitetura?" : "Abrir " + ETAPAS[prox].nome + "?", texto: g.etapa === "abertura" ? "Marca o marco zero em " + T.fmtYmd(data) + " e começa a contar o prazo do " + ETAPAS[prox].nome + "." : g.etapa === "lev" ? "Conclui o Levantamento em " + T.fmtYmd(data) + " e começa a contar o prazo do Estudo Preliminar." : "Registra o termo de " + esc(ETAPAS[g.etapa].nome) + " assinado em " + T.fmtYmd(data) + (prox === "encerrado" ? "." : " e abre a próxima etapa."), ok: prox === "encerrado" ? "Encerrar" : "Abrir etapa" });
     if (!ok) return;
     var iso = isoDeData(data);
     await salvar(S.projId, function (x) {
       x.etapas = x.etapas || {}; x.etapas[x.etapa] = Object.assign({}, x.etapas[x.etapa], { fim: iso, termoEm: ETAPAS[x.etapa].termo ? data : null });
-      evento(x, x.etapa === "abertura" ? "Marco zero: Estudo Preliminar iniciado" + (antecipa && falta ? " (antecipação com Termo de Ciência)" : "") : "Termo de " + (ETAPAS[x.etapa].termo === "projeto" ? "Encerramento de Projeto" : "Encerramento de Etapa") + " assinado (" + ETAPAS[x.etapa].nome + ")", data, { tipo: "etapa" });
+      evento(x, x.etapa === "abertura" ? "Marco zero: " + ETAPAS[prox].nome + " iniciado" + (antecipa && falta ? " (antecipação com Termo de Ciência)" : "") : x.etapa === "lev" ? "Levantamento e modelagem concluídos" : "Termo de " + (ETAPAS[x.etapa].termo === "projeto" ? "Encerramento de Projeto" : "Encerramento de Etapa") + " assinado (" + ETAPAS[x.etapa].nome + ")", data, { tipo: "etapa" });
       x.etapa = prox; x.fase = ETAPAS[prox].fases ? 1 : null; x.etapas[prox] = Object.assign({}, x.etapas[prox], { inicio: iso });
       if (prox === "encerrado") {
         if (!marcAberta(x)) x.esperas = (x.esperas || []).map(function (e) { if (!e.fim) e.fim = iso; return e; });
@@ -1527,6 +1554,7 @@
       if ((b = t.closest("[data-act]"))) {
         var act = b.dataset.act;
         if (act === "avancar") avancar();
+        else if (act === "rodada") registrarRodada();
         else if (act === "marc-avancar") marcAvancar();
         else if (act === "marc-form") { S.modal = "marc-ativar"; render(); }
         else if (act === "marc-cancel") { S.modal = null; render(); }

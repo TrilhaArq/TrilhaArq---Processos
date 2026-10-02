@@ -70,7 +70,7 @@ Um módulo **não** mexe no HTML nem no estado de outro módulo. Para ler dados 
 ele expõe (ex.: `Trilha.tempo.lancAtivos()`, `Trilha.tempo.custoLanc(l)`, `Trilha.tempo.lancar(l)`,
 `Trilha.relatorios.fechamentos()`, `Trilha.relatorios.calcFechamento(pid, mes)`, `Trilha.gestor.*`,
 `Trilha.cadastros.contato(id)`, `Trilha.cadastros.editarProjeto(pid)`, `Trilha.tarefas.criar(pid, item)`,
-`Trilha.gestor.criar(dados)` (cria projeto + processo, usado pelo "Virar projeto" do Comercial), `Trilha.gestor.corpoItem(pid, item)` + `Trilha.gestor.ligarCorpo(elemento)` para mostrar e editar desenhos e
+`Trilha.gestor.criar(dados)` (cria projeto + processo, usado pelo "Virar projeto" do Comercial), `Trilha.comercial.*` (oportunidades, cálculo do simulador), `Trilha.comercialDocs.*` (proposta PDF, contrato .docx, IA), `Trilha.gestor.corpoItem(pid, item)` + `Trilha.gestor.ligarCorpo(elemento)` para mostrar e editar desenhos e
 checklists de um item fora do Gestor, como faz a área da pessoa).
 
 ## 3. O que o núcleo oferece (`window.Trilha`, abreviado `T`)

@@ -118,23 +118,28 @@
   var CONTRATOS = [
     { id: "01", nome: "Projeto do zero com aprovação", grupo: "zero", legal: true }, { id: "02", nome: "Projeto do zero sem aprovação", grupo: "zero", legal: false },
     { id: "03", nome: "Reforma com aprovação", grupo: "reforma", legal: true }, { id: "04", nome: "Reforma sem aprovação", grupo: "reforma", legal: false },
-    { id: "05", nome: "Marcenaria avulsa", grupo: "marc", vinculada: false }, { id: "06", nome: "Marcenaria vinculada", grupo: "marc", vinculada: true }
+    { id: "05", nome: "Marcenaria avulsa", grupo: "marc", vinculada: false }, { id: "06", nome: "Marcenaria vinculada", grupo: "marc", vinculada: true },
+    { id: "07", nome: "Serviço menor (modelo curto)", grupo: "serv" }
   ];
   // Sem modelos salvos no banco, usa o arquivo modelos-padrao.json publicado com o app (ids dos arquivos deste artefato).
   function MOD() { return S.mod || S.modPadrao || {}; }
-  function modeloProposta(o) { var l = MOD().propostas || []; return l.filter(function (m) { return !m.tipos || !m.tipos.length || m.tipos.indexOf(o.tipo) >= 0; })[0] || l[0] || null; }
-  function contratoInfo(id) { var c = (MOD().contratos || []).filter(function (x) { return x.id === id; })[0] || {}; return Object.assign({}, T.byId(CONTRATOS.map(function (x) { return Object.assign({ id: x.id }, x); }), id) || {}, c); }
+  // modelo do tipo: primeiro o do banco; se o banco não tem um para esse tipo, o do arquivo padrão (modelos novos de outras rodadas)
+  function modeloProposta(o) {
+    function doTipo(l) { return (l || []).filter(function (m) { return m.tipos && m.tipos.indexOf(o.tipo) >= 0; })[0]; }
+    var l = MOD().propostas || []; return doTipo(l) || doTipo((S.modPadrao || {}).propostas) || l.filter(function (m) { return !m.tipos || !m.tipos.length; })[0] || l[0] || null;
+  }
+  function contratoInfo(id) { var c = (MOD().contratos || []).filter(function (x) { return x.id === id && x.asset; })[0] || ((S.modPadrao || {}).contratos || []).filter(function (x) { return x.id === id; })[0] || {}; return Object.assign({}, T.byId(CONTRATOS.map(function (x) { return Object.assign({ id: x.id }, x); }), id) || {}, c); }
   // sugestão do modelo de contrato: tipo (RES/COM/HOT = do zero; REF/INT = reforma; MARC = marcenaria) e Projeto Legal
   function contratoSugerido(o) {
     if (o.tipo === "MARC") return (o.ctr && o.ctr.projArq) ? "06" : "05";
-    if (o.tipo === "SERV") return null;
+    if (o.tipo === "SERV") return "07";
     var leg = legalDe(o); return doZero(o.tipo) ? (leg ? "01" : "02") : (leg ? "03" : "04");
   }
   function ctxProposta(o) {
     var c = C(), op = Object.assign({ admPct: c.admObraPct }, o.prop || {});
-    return { o: o, r: calc(o), marca: MOD().marca || {}, setores: SETORES, opc: op, legal: legalDe(o) && o.tipo !== "MARC", validade: c.validadeDias, nf: c.nfPct, modelo: modeloProposta(o) };
+    return { o: o, r: calc(o), marca: MOD().marca || {}, setores: SETORES, opc: op, legal: legalDe(o) && o.tipo !== "MARC" && o.tipo !== "SERV", validade: c.validadeDias, nf: c.nfPct, modelo: modeloProposta(o) };
   }
-  function nomeArquivoProposta(o) { var p = o.proposta || {}, d = p.enviadaEm || hoje(); return (p.numero || proxNumero()) + "_" + T.comercialDocs.ddmmaa(d) + " - Proposta " + tipoNome(o.tipo) + " " + nome0(o) + ".pdf"; }
+  function nomeArquivoProposta(o) { var p = o.proposta || {}, d = p.enviadaEm || hoje(); return (p.numero || proxNumero()) + "_" + T.comercialDocs.ddmmaa(d) + (p.versao > 1 ? " v" + p.versao : "") + " - Proposta " + tipoNome(o.tipo) + " " + nome0(o) + ".pdf"; }
 
   // ---------- cálculo do simulador ----------
   function custoHora() {
@@ -145,7 +150,7 @@
   function impostoPct() { return S.fin && S.fin.impostoPct != null ? { v: S.fin.impostoPct, src: "Financeiro" } : { v: C().impostoPct, src: "provisório" }; }
   function padraoDe(id) { return T.byId(T.padroes(), id); }
   function areaProg(o) { return ((o.programa || {}).amb || []).reduce(function (s, a) { return s + (+a.area || 0) * (+a.qtd || 1); }, 0); }
-  function legalDe(o) { var s = o.sim || {}; return s.legal != null ? !!s.legal : doZero(o.tipo); }
+  function legalDe(o) { if (o.tipo === "SERV" || o.tipo === "MARC") return false; var s = o.sim || {}; return s.legal != null ? !!s.legal : doZero(o.tipo); }
   function pesosEtapas(o) {
     var p = Object.assign({}, T.DEFAULT_CONFIG.pesosEtapas, T.cfg().pesosEtapas || {}), ets = doZero(o.tipo) ? ["ep", "ap"].concat(legalDe(o) ? ["pl"] : []).concat(["pe"]) : ["ep", "pe"];
     var tot = ets.reduce(function (s, e) { return s + (+p[e] || 0); }, 0) || 1;
@@ -163,7 +168,9 @@
     r.hAmb = amb.reduce(function (s, a) { return s + (+c.horasAmb[a.tipo] || +c.horasAmb.outro || 0) * (+a.qtd || 1); }, 0);
     r.hGer = (c.horasGerais || []).filter(function (g) { return !g.legal || legal; }).reduce(function (s, g) { return s + (+g.h || 0); }, 0);
     r.hBase = amb.length ? r.hAmb + r.hGer : 0; // sem programa, sem preço
+    if (o.tipo === "SERV") { r.hAmb = 0; r.hGer = 0; r.hBase = +((o.serv || {}).horas) || 0; } // serviço: horas estimadas direto
     r.f = { padrao: c.fatores.padrao[cat.padrao] || 1, dimensao: c.fatores.dimensao[cat.dimensao] || 1, terreno: c.fatores.terreno[cat.dificuldade] || 1, cliente: c.fatores.cliente[cat.cliente] || 1 };
+    if (o.tipo === "SERV") r.f = { padrao: 1, dimensao: 1, terreno: 1, cliente: r.f.cliente };
     r.fTotal = r.f.padrao * r.f.dimensao * r.f.terreno * r.f.cliente;
     r.hAj = r.hBase * r.fTotal;
     r.ch = custoHora(); r.custo = r.hAj * r.ch.v;
@@ -176,14 +183,14 @@
     r.m2proj = r.final && r.area ? r.final / r.area : null;
     r.lucroRes = r.final ? (1 - (r.imp.v + r.res) / 100 - r.custo / r.final) * 100 : null;
     r.dif = r.valor && r.tabela ? r.valor - r.tabela : null;
-    r.etapas = pesosEtapas(o).map(function (x) { return Object.assign(x, { h: r.hAj * x.peso, v: r.final ? r.final * x.peso : null }); });
+    r.etapas = o.tipo === "SERV" ? [{ e: "serv", nome: "Serviço", peso: 1, h: r.hAj, v: r.final }] : pesosEtapas(o).map(function (x) { return Object.assign(x, { h: r.hAj * x.peso, v: r.final ? r.final * x.peso : null }); });
     r.disp = (o.dados || {}).valorDisponivel || null; r.razao = r.disp && r.obra ? r.obra / r.disp : null;
     r.alertaExp = r.razao != null && r.razao > 1.2;
-    var ent = sim.entrada != null ? +sim.entrada : (r.final ? Math.round(r.final * 0.1) : null), np = +sim.parcelas || 0;
+    var ent = sim.entrada != null ? +sim.entrada : (r.final ? Math.round(r.final * (o.tipo === "SERV" ? 0.5 : 0.1)) : null), np = +sim.parcelas || 0;
     r.entrada = ent; r.np = np; r.parcela = r.final && np ? (r.final - (ent || 0)) / np : null;
     return r;
   }
-  function valorOp(o) { if (o.valor) return o.valor; var s = o.sim || {}; return s.meuValor || (o.programa && o.programa.amb && o.programa.amb.length ? calc(o).tabela : null); }
+  function valorOp(o) { if (o.valor) return o.valor; var s = o.sim || {}; return s.meuValor || ((o.programa && o.programa.amb && o.programa.amb.length) || (o.serv && o.serv.horas) ? calc(o).tabela : null); }
 
   // ---------- leitura do briefing (planilha de respostas do Google Forms) ----------
   // Aceita a linha do cliente colada junto com a linha de títulos (copiada do Google Sheets: separada por tabulação)
@@ -377,7 +384,7 @@
   }
 
   // ---------- HTML base ----------
-  var html = '<div id="com-lista"></div><div id="com-op" hidden></div><div id="com-cfg" hidden></div>';
+  var html = '<div id="com-lista"></div><div id="com-op" hidden></div><div id="com-cfg" hidden></div><div id="com-rel" hidden></div>';
 
   // ---------- lista (tela principal) ----------
   function abertas() { return S.ops.filter(function (o) { return o.etapa !== "perdido" && !(o.etapa === "fechado" && o.projetoId); }); }
@@ -389,11 +396,12 @@
     var somaV = function (l) { return l.reduce(function (s, o) { return s + (valorOp(o) || 0); }, 0); };
     var conv = fechAno.length + perdAno.length ? fechAno.length / (fechAno.length + perdAno.length) * 100 : null;
     var h = '<div class="section-head com-head"><div class="form-actions"><button class="btn btn-primary" data-act="novo">+ Nova oportunidade</button></div>' +
-      '<div class="form-actions"><button class="btn btn-small" data-act="cfg">Configurações do comercial</button></div></div>';
+      '<div class="form-actions"><button class="btn btn-small" data-act="rel">Relatórios</button><button class="btn btn-small" data-act="cfg">Configurações do comercial</button></div></div>';
     if (S.novo) h += formNovo();
     var pend = pendencias();
     h += '<div class="section-head"><h2 class="section-title">Precisa de você hoje</h2></div>' +
       (pend.length ? '<div class="gp-avisos com-pend">' + pend.map(function (p) { return '<button class="gp-aviso ' + p[0] + '" data-open="' + esc(p[2]) + '">' + p[1] + ' <span class="com-pend-acao">' + esc(p[3]) + " →</span></button>"; }).join("") + "</div>" : '<div class="empty">Nada pendente. Bom trabalho!</div>');
+    h += chatHtml("geral");
     h += '<div class="card gp-strip com-strip"><div><small>Em negociação</small><b>' + BRL(somaV(negoc)) + "</b><span>" + negoc.length + (negoc.length === 1 ? " proposta" : " propostas") + " em aberto</span></div>" +
       "<div><small>Fechados no mês</small><b>" + BRL(somaV(fechMes)) + "</b><span>" + fechMes.length + (fechMes.length === 1 ? " contrato" : " contratos") + "</span></div>" +
       "<div><small>Conversão em " + ano + "</small><b>" + pct(conv, 0) + "</b><span>" + fechAno.length + " fechadas · " + perdAno.length + " perdidas</span></div>" +
@@ -497,7 +505,7 @@
 
   // ---------- oportunidade ----------
   var ABAS = [["resumo", "Resumo"], ["briefing", "Briefing"], ["programa", "Programa"], ["simulador", "Simulador"], ["proposta", "Proposta"], ["contrato", "Contrato"], ["historico", "Histórico"]];
-  function abrir(id, tab) { S.view = "op"; S.opId = id; S.tab = tab || "resumo"; S.acao = null; S.ed = null; S.dirty = false; S.imp = null; S.ctrEd = null; S.prev = null; S.ia = null; render(); window.scrollTo(0, 0); }
+  function abrir(id, tab) { S.view = "op"; S.opId = id; S.tab = tab || "resumo"; S.acao = null; S.ed = null; S.dirty = false; S.imp = null; S.ctrEd = null; S.prev = null; S.ia = null; S.servIA = null; S.chat = null; render(); window.scrollTo(0, 0); }
   function ed() { var o = op(S.opId); if (!o) return null; if (!S.ed || S.ed.id !== o.id) S.ed = T.clone(o); return S.ed; }
   function renderOp() {
     var o = op(S.opId); if (!o) { $("com-op").innerHTML = '<div class="empty">' + (S.loaded ? "Oportunidade não encontrada." : "Carregando…") + '</div><button class="btn" data-act="voltar">← Comercial</button>'; return; }
@@ -510,7 +518,7 @@
       "<div><small>Valor</small><b>" + BRL(r.final) + "</b><span>" + (r.valor ? "meu valor" : r.tabela ? "pela tabela de horas" : "monte o programa") + "</span></div>" +
       "<div><small>Área estimada</small><b>" + m2(r.area) + "</b><span>" + ((x.programa && x.programa.amb || []).length) + " ambientes</span></div>" +
       "<div><small>% da obra</small><b>" + pct(r.pctObra, 2) + "</b><span>" + (r.obra ? "obra " + BRL(r.obra) : "defina o padrão") + "</span></div></div>" +
-      (fim ? "" : trilha(o)) + proximoPasso(o, r) + "</div>";
+      (fim ? "" : trilha(o)) + proximoPasso(o, r) + chatHtml(o.id) + "</div>";
     h += '<div class="segmented com-abas">' + ABAS.map(function (a) { return '<button class="seg-pill' + (S.tab === a[0] ? " is-selected" : "") + '" data-tab="' + a[0] + '">' + a[1] + "</button>"; }).join("") + "</div>";
     h += '<div id="com-tab">' + aba(o, x, r) + "</div>";
     $("com-op").innerHTML = h;
@@ -519,12 +527,14 @@
   function proximoPasso(o, r) {
     if (o.etapa === "perdido") return '<div class="card gp-box com-next"><p><b>Oportunidade perdida</b>' + (o.perda ? " · " + esc(o.perda.motivo || "") + (o.perda.nota ? " — " + esc(o.perda.nota) : "") : "") + '</p><div class="form-actions"><button class="btn" data-act="reabrir">Reabrir</button></div></div>';
     if (o.etapa === "fechado" && o.projetoId) { var p = T.projeto(o.projetoId); return '<div class="card gp-box com-next"><p><b>Virou projeto</b>: ' + esc(p ? p.nome : "projeto") + '</p><div class="form-actions">' + (T.gestor && T.gestor.gp(o.projetoId) ? '<button class="btn btn-primary" data-act="ir-gestor">Abrir no Gestor de Projetos</button>' : "") + "</div></div>"; }
-    var e = ETAPAS[IDX[o.etapa]], acao = S.acao, h = '<div class="card gp-box com-next"><div class="com-next-h"><div><small class="hint">Próximo passo</small><div class="com-next-t">' + esc(e[2]) + "</div></div>" +
-      '<div class="form-actions"><button class="btn btn-primary" data-act="passo">' + esc(e[2]) + "</button>" +
+    var e = ETAPAS[IDX[o.etapa]], acao = S.acao, rot = rotuloPasso(o), h = '<div class="card gp-box com-next"><div class="com-next-h"><div><small class="hint">Próximo passo</small><div class="com-next-t">' + esc(rot) + "</div></div>" +
+      '<div class="form-actions"><button class="btn btn-primary" data-act="passo">' + esc(rot) + "</button>" + (o.etapa === "proposta_apresentada" ? '<button class="btn" data-act="nova-versao">Nova versão</button>' : "") +
       (o.etapa === "proposta_apresentada" ? '<button class="btn" data-act="perder">Perdido</button>' : '<button class="btn btn-small" data-act="perder">Perdido</button>') + "</div></div>";
     if (acao) h += '<div class="gp-avanco">' + formAcao(o, r, acao) + "</div>";
     return h + "</div>";
   }
+  // serviços menores não têm briefing: da reunião vão direto para a proposta
+  function rotuloPasso(o) { if (o.tipo === "SERV" && o.etapa === "reuniao") return "Montar proposta"; return (ETAPAS[IDX[o.etapa]] || ["", "", ""])[2]; }
   function msgBox(id, txt, tel) {
     var wa = waLink(tel, txt);
     return '<div class="field"><label for="' + id + '">Mensagem</label><textarea id="' + id + '" rows="4">' + esc(txt) + '</textarea></div><div class="form-actions"><button class="btn btn-small" type="button" data-copiar="' + id + '">Copiar mensagem</button>' + (wa ? '<a class="btn btn-small" data-wa="' + id + '" href="' + esc(wa) + '" target="_blank" rel="noopener">Abrir no WhatsApp</a>' : '<span class="hint">Cadastre o telefone para abrir o WhatsApp.</span>') + "</div>";
@@ -539,11 +549,11 @@
       '<div class="form-actions"><button class="btn btn-primary" data-act="ok-briefing">Briefing enviado</button><button class="btn" data-act="cancelar">Cancelar</button></div>';
     if (a === "cobrar") return msgBox("ca-msg", preencher(c.msgs.cobrarBriefing, o), tel) + '<div class="form-actions"><button class="btn btn-primary" data-act="ok-cobrar">Registrar cobrança</button><button class="btn" data-act="cancelar">Fechar</button></div>';
     if (a === "apresentar") {
-      var falta = []; if (!r.final) falta.push("valor da proposta (aba Simulador)"); if (!(o.demanda || "").trim()) falta.push("texto \"Sua demanda\" (aba Proposta)");
+      var falta = []; if (!r.final) falta.push("valor da proposta (aba Simulador)"); if (o.tipo === "SERV" ? !((o.serv || {}).descricao || "").trim() : !(o.demanda || "").trim()) falta.push(o.tipo === "SERV" ? "descrição do serviço (aba Proposta)" : "texto \"Sua demanda\" (aba Proposta)");
       var exp = r.alertaExp && !(o.expectativa && o.expectativa.alinhada);
       return (falta.length ? '<p class="hint warn">Antes de apresentar: ' + falta.join(" e ") + ".</p>" : "") +
         (exp ? '<div class="gp-aviso bad">O cliente informou ' + BRL(r.disp) + " para a obra; a estimativa é " + BRL(r.obra) + " (" + T.fmtNum(r.razao, 1) + "×). Alinhe a expectativa com o cliente antes de apresentar (aba Simulador).</div>" : "") +
-        '<div class="grid-form"><div class="field col-4"><label for="ca-num">Nº da proposta</label><input id="ca-num" type="number" min="1" value="' + proxNumero() + '"></div><div class="field col-4"><label for="ca-dt">Apresentada em</label><input type="date" id="ca-dt" value="' + hoje() + '"></div><div class="field col-4"><label for="ca-val">Válida até</label><input type="date" id="ca-val" value="' + addDiasYmd(c.validadeDias) + '"></div></div>' +
+        '<div class="grid-form"><div class="field col-4"><label for="ca-num">Nº da proposta</label><input id="ca-num" type="number" min="1" value="' + ((o.proposta && o.proposta.numero) || proxNumero()) + '"></div><div class="field col-4"><label for="ca-dt">Apresentada em</label><input type="date" id="ca-dt" value="' + hoje() + '"></div><div class="field col-4"><label for="ca-val">Válida até</label><input type="date" id="ca-val" value="' + addDiasYmd(c.validadeDias) + '"></div></div>' +
         '<div class="form-actions"><button class="btn btn-small" data-act="pdf">Baixar PDF da proposta</button><span class="hint" id="cpp-pdf-st"></span></div>' +
         msgBox("ca-msg", preencher(c.msgs.proposta, o, { validade: T.fmtYmd(addDiasYmd(c.validadeDias)) }), tel) +
         '<div class="form-actions"><button class="btn btn-primary" data-act="ok-apresentar"' + (falta.length ? " disabled" : "") + '>Proposta apresentada</button><button class="btn" data-act="cancelar">Cancelar</button></div>';
@@ -619,6 +629,7 @@
   }
 
   function abaPrograma(x, r) {
+    if (x.tipo === "SERV") return '<div class="card gp-box"><p>Serviços menores não usam programa de necessidades: descreva o serviço, os entregáveis e as horas na aba <b>Proposta</b>.</p></div>';
     var p = x.programa || (x.programa = { pavs: ["Térreo"], amb: [] }), c = C();
     var h = '<div class="card gp-box"><div class="section-head" style="margin:0"><h3 class="panel-title" style="margin:0">Programa de necessidades</h3><div class="form-actions">' +
       (x.briefing && x.briefing.resp ? '<button class="btn btn-small" data-act="prog-brief">Refazer pelo briefing</button>' : "") + '<button class="btn btn-small" data-act="prog-padrao">Residência padrão</button></div></div>' +
@@ -649,6 +660,14 @@
 
   function abaSimulador(x, r) {
     var s = x.sim || (x.sim = {}), cat = x.cat || (x.cat = {}), c = C(), d = x.dados || {}, pz = x.prazos || {};
+    if (x.tipo === "SERV") {
+      var num0 = function (id, k, v, ph, extra) { return '<input type="number" id="' + id + '" data-sim="' + k + '" value="' + (v != null ? v : "") + '"' + (ph != null ? ' placeholder="' + esc(ph) + '"' : "") + (extra || ' min="0" step="any"') + ">"; };
+      return '<div class="gp-cols"><div class="card gp-box" id="cs-in"><h3 class="panel-title">Entradas</h3><p class="hint">Serviço menor: o preço sai das horas estimadas (aba Proposta: ' + horas(r.hBase) + ") × fator do cliente × custo-hora.</p><div class=\"grid-form\">" +
+        '<div class="field col-6"><label for="cs-cli">Perfil do cliente</label><select id="cs-cli" data-cat="cliente">' + T.optHtml([["", "—"]].concat(PERFIS), cat.cliente || "") + '</select><span class="hint">Interno, nunca vai à proposta</span></div>' +
+        '<div class="field col-12 com-meu"><label for="cs-meu">Meu valor (R$)</label>' + num0("cs-meu", "meuValor", s.meuValor, r.tabela ? Math.round(r.tabela) : "") + '<span class="hint">Vazio = preço pelas horas</span></div>' +
+        '<div class="field col-6"><label for="cs-ent">Entrada (R$)</label>' + num0("cs-ent", "entrada", s.entrada, r.final ? Math.round(r.final * 0.5) : "") + '</div><div class="field col-6"><label for="cs-np">Parcelas (quantas)</label>' + num0("cs-np", "parcelas", s.parcelas, "1", ' min="0" step="1"') + "</div>" +
+        '<div class="col-12 form-actions"><button class="btn btn-primary" id="cs-salvar" data-act="sim-salvar">Salvar simulação</button>' + (S.dirty ? '<span class="save-state dirty">Alterações não salvas</span>' : "") + '</div></div></div><div id="cs-out">' + saidaSim(x, r) + "</div></div>";
+    }
     var pzPad = Object.assign({}, T.DEFAULT_CONFIG.prazosPadrao, T.cfg().prazosPadrao || {}), ref = !doZero(x.tipo);
     function num(id, k, v, ph, extra) { return '<input type="number" id="' + id + '" data-sim="' + k + '" value="' + (v != null ? v : "") + '"' + (ph != null ? ' placeholder="' + esc(ph) + '"' : "") + (extra || ' min="0" step="any"') + ">"; }
     function selC(id, k, opts, v) { return '<select id="' + id + '" data-cat="' + k + '">' + T.optHtml([["", "—"]].concat(opts), v || "") + "</select>"; }
@@ -712,6 +731,7 @@
   function abaProposta(o, x, r) {
     var p = o.proposta || {}, am = (x.programa || {}).amb || [], op = o.prop || {}, c = C(), mod = modeloProposta(o), ia = S.ia;
     var temIA = !!(window.claude && window.claude.use);
+    if (o.tipo === "SERV") return abaServico(o, x, r, temIA) + painelDocs(o, r, mod) + versoesHtml(o);
     var h = '<div class="gp-cols"><form class="card gp-box" id="cpp-form"><h3 class="panel-title">Sua demanda</h3><p class="hint">Texto da proposta sobre o cliente e a casa (3ª pessoa, no jeito Trilha). Vira também a descrição do projeto no Gestor.</p>' +
       '<div class="field"><label for="cpp-dem">Texto</label><textarea id="cpp-dem" rows="14" placeholder="Residência para moradia…">' + esc(ia && ia.texto != null ? ia.texto : o.demanda || "") + "</textarea></div>" +
       (temIA ? '<div class="com-ia"><button type="button" class="btn btn-small" data-act="ia-escrever"' + (ia && ia.rodando ? " disabled" : "") + '>✨ Escrever com o Claude</button>' +
@@ -730,8 +750,30 @@
       '<div class="card gp-box"><h3 class="panel-title">Resumo</h3>' + kv("Nº", p.numero ? p.numero + "_" + T.comercialDocs.ddmmaa(p.enviadaEm) : "definido ao apresentar") +
       kv("Área estimada", m2(r.area)) + kv("Ambientes", am.length) + kv("Padrão", r.pad ? T.padraoRotulo(r.pad) : "—") + kv("Custo da obra", r.obra ? BRL(r.obra) + (r.obraAlta ? " a " + BRL(r.obraAlta) : "") : "—") +
       kv("Investimento", BRL(r.final) + (r.valor && r.tabela && r.valor < r.tabela ? " (de " + BRL(r.tabela) + ")" : "")) + kv("% do custo da obra", pct(r.pctObra, 2)) + (r.parcela ? kv("Pagamento", "entrada de " + BRL(r.entrada) + " + " + r.np + " × " + BRL(r.parcela)) : "") + kv("Válida até", p.validadeAte ? T.fmtYmd(p.validadeAte) : "—") + "</div></div></div>";
+    h += versoesHtml(o);
     if (S.prev && S.prev.id === o.id) h += '<div class="card gp-box"><h3 class="panel-title">Prévia · ' + S.prev.pags.length + ' páginas</h3><div class="pp-prev">' + S.prev.pags.map(function (pg, i) { return '<div class="pp-mini-w" title="Página ' + (i + 1) + '">' + (pg.img ? '<img src="' + T.comercialDocs.blob(pg.img) + '" alt="Página ' + (i + 1) + '">' : pg.html) + "</div>"; }).join("") + "</div></div>";
     return h;
+  }
+  function versoesHtml(o) {
+    var v = o.versoes || []; if (!v.length) return "";
+    return '<div class="card gp-box"><h3 class="panel-title">Versões da proposta</h3><div class="table-wrap as-list"><table><thead><tr><th>Versão</th><th>Apresentada</th><th>Tabela</th><th>Valor</th><th>Área</th></tr></thead><tbody>' +
+      v.slice().sort(function (a, b) { return a.versao - b.versao; }).map(function (x) { return '<tr><td data-l="Versão">v' + x.versao + '</td><td data-l="Apresentada">' + (x.em ? T.fmtYmd(x.em) : "—") + '</td><td data-l="Tabela">' + BRL(x.valorTabela) + '</td><td data-l="Valor">' + BRL(x.valorFinal) + '</td><td data-l="Área">' + (x.area ? x.area + " m²" : "—") + "</td></tr>"; }).join("") + "</tbody></table></div></div>";
+  }
+  function painelDocs(o, r, mod) {
+    var h = '<div class="card gp-box"><h3 class="panel-title">PDF da proposta</h3><p class="hint">Modelo: <b>' + esc(mod ? mod.nome : "sem modelo (só as páginas variáveis)") + '</b>.</p><div class="form-actions"><button class="btn" data-act="prev">Pré-visualizar</button><button class="btn btn-primary" data-act="pdf">Baixar PDF</button><span class="hint" id="cpp-pdf-st"></span></div></div>';
+    if (S.prev && S.prev.id === o.id) h += '<div class="card gp-box"><h3 class="panel-title">Prévia · ' + S.prev.pags.length + ' páginas</h3><div class="pp-prev">' + S.prev.pags.map(function (pg, i) { return '<div class="pp-mini-w">' + (pg.img ? '<img src="' + T.comercialDocs.blob(pg.img) + '" alt="Página ' + (i + 1) + '">' : pg.html) + "</div>"; }).join("") + "</div></div>";
+    return h;
+  }
+  // Serviço menor: o sócio descreve; a IA (ou ele) organiza título, descrição, entregáveis, prazo e horas.
+  function abaServico(o, x, r, temIA) {
+    var sv = Object.assign({}, o.serv || {}, S.servIA && S.servIA.id === o.id ? S.servIA.d : {});
+    return '<form class="card gp-box" id="cps-form"><h3 class="panel-title">O serviço</h3>' +
+      (temIA ? '<div class="field"><label for="cps-ped">Descreva o pedido (a IA organiza)</label><textarea id="cps-ped" rows="3" placeholder="Ex.: consultoria de 2 encontros para reorganizar o layout da cozinha e da área de serviço de um apartamento de 90 m²">' + esc(sv.pedido || "") + '</textarea></div><div class="form-actions"><button type="button" class="btn btn-small" data-act="ia-serv"' + (S.servIA && S.servIA.rodando ? " disabled" : "") + '>✨ Montar com o Claude</button><span class="hint">' + (S.servIA && S.servIA.rodando ? "O Claude está organizando…" : "Rascunho: revise antes de salvar. Usa o nível rápido.") + "</span></div>" : "") +
+      '<div class="grid-form"><div class="field col-8"><label for="cps-tit">Título</label><input id="cps-tit" value="' + esc(sv.titulo || "") + '" placeholder="Consultoria de layout"></div>' +
+      '<div class="field col-2"><label for="cps-prz">Prazo (d.u.)</label><input id="cps-prz" type="number" min="1" value="' + (sv.prazo || "") + '"></div><div class="field col-2"><label for="cps-h">Horas</label><input id="cps-h" type="number" min="0" step="0.5" value="' + (sv.horas || "") + '"></div>' +
+      '<div class="field col-12"><label for="cps-desc">Descrição</label><textarea id="cps-desc" rows="6">' + esc(sv.descricao || "") + '</textarea></div>' +
+      '<div class="field col-12"><label for="cps-ent">Entregáveis (um por linha)</label><textarea id="cps-ent" rows="5">' + esc(sv.entregaveis || "") + "</textarea></div></div>" +
+      '<div class="form-actions"><button class="btn btn-primary" id="cps-salvar" type="submit">Salvar serviço</button><span class="hint">Preço: horas × custo-hora na aba Simulador (' + horas(r.hAj) + " · " + BRL(r.tabela) + ").</span></div></form>";
   }
   // ---------- aba Contrato ----------
   function dadosContrato(o) {
@@ -742,7 +784,7 @@
     var data = c.data || hoje(), numero = c.numero || ((o.proposta && o.proposta.numero) ? o.proposta.numero + T.comercialDocs.ddmmaa(data) : "");
     var parcelas = c.parcelas && c.parcelas.length ? c.parcelas : parcelasSim(o, r, data);
     return { modelo: c.modelo || contratoSugerido(o), tipoEdif: c.tipoEdif || ({ RES: "uma residência", COM: "um espaço comercial", HOT: "um empreendimento hoteleiro", REF: "uma residência", INT: "uma residência", MARC: "uma residência" }[o.tipo] || ""),
-      matricula: c.matricula || "", cli: cli, numero: numero, data: data, cidade: c.cidade || "Juiz de Fora/MG", projArq: c.projArq || "", escopo: c.escopo != null ? c.escopo : (o.demanda || ""), parcelas: parcelas };
+      matricula: c.matricula || "", cli: cli, clis: c.clis && c.clis.length ? [cli].concat(c.clis.slice(1)) : [cli], numero: numero, data: data, cidade: c.cidade || "Juiz de Fora/MG", projArq: c.projArq || "", escopo: c.escopo != null ? c.escopo : (o.tipo === "SERV" ? (o.serv && o.serv.descricao) || "" : o.demanda || ""), servTitulo: c.servTitulo || (o.serv && o.serv.titulo) || "", parcelas: parcelas };
   }
   function parcelasSim(o, r, data) {
     if (!r.final) return []; var out = [], ini = T.parseYmd(data);
@@ -753,7 +795,6 @@
     return out;
   }
   function abaContrato(o, x, r) {
-    if (o.tipo === "SERV") return '<div class="card gp-box"><p>Serviços menores terão proposta e contrato simplificados (3–4 páginas), montados pela IA a partir de um modelo curto — na próxima rodada.</p></div>';
     var d = S.ctrEd && S.ctrEd.id === o.id ? S.ctrEd.d : (S.ctrEd = { id: o.id, d: dadosContrato(o) }).d, cli = d.cli, info = contratoInfo(d.modelo), sug = contratoSugerido(o);
     function f(id, l, v, cls, extra) { return '<div class="field ' + (cls || "col-4") + '"><label for="' + id + '">' + l + '</label><input id="' + id + '" data-ctr="' + id + '" value="' + esc(v || "") + '"' + (extra || "") + "></div>"; }
     var soma = d.parcelas.reduce(function (s, p) { return s + (+p.valor || 0); }, 0);
@@ -762,11 +803,12 @@
       '<div class="field col-8"><label for="ctr-modelo">Modelo de contrato</label><select id="ctr-modelo" data-ctr="ctr-modelo">' + CONTRATOS.map(function (m) { var i2 = contratoInfo(m.id); return '<option value="' + m.id + '"' + (m.id === d.modelo ? " selected" : "") + ">" + m.id + " · " + esc(m.nome) + (i2.asset ? "" : " (arquivo não carregado)") + (m.id === sug ? " — sugerido" : "") + "</option>"; }).join("") + "</select>" +
         '<span class="hint">' + (info.asset ? "Versão " + esc(info.versao || "—") + ". As cláusulas não mudam; o app só preenche os campos." : "Carregue o .docx em Configurações do comercial › Modelos.") + (d.modelo !== sug && sug ? " O sugerido pelo tipo e pelo Projeto Legal é o " + sug + "." : "") + "</span></div>" +
       f("ctr-num", "Nº do contrato", d.numero, "col-4", ' placeholder="nº do projeto + DDMMAA"') +
-      f("ctr-edif", "Edificação (\"…para uma residência\")", d.tipoEdif, "col-4") + f("ctr-matr", "Matrícula do imóvel (opcional)", d.matricula, "col-4") + f("ctr-data", "Data do contrato", d.data, "col-4", ' type="date"') +
-      '<div class="col-12 cfg-pesos-t">Contratante</div>' +
-      f("ctr-cnome", "Nome", cli.nome, "col-6") + f("ctr-cnac", "Nacionalidade", cli.nacionalidade, "col-3") + f("ctr-cciv", "Estado civil", cli.estadoCivil, "col-3") +
-      f("ctr-cprof", "Profissão", cli.profissao, "col-4") + f("ctr-cdoc", "CPF/CNPJ", cli.doc, "col-4") + f("ctr-crg", "RG", cli.rg, "col-4") +
-      f("ctr-cend", "Endereço residencial", cli.endereco, "col-12") + f("ctr-cmail", "E-mail", cli.email, "col-6") + f("ctr-ctel", "Telefone", cli.telefone, "col-6") +
+      (o.tipo === "SERV" ? f("ctr-stit", "Serviço (título no contrato)", d.servTitulo, "col-8") : f("ctr-edif", "Edificação (\"…para uma residência\")", d.tipoEdif, "col-4")) + f("ctr-matr", "Matrícula do imóvel (opcional)", d.matricula, "col-4") + f("ctr-data", "Data do contrato", d.data, "col-4", ' type="date"') +
+      d.clis.map(function (cl, k) { var px = "ctr-c" + k + "-"; return '<div class="col-12 cfg-pesos-t com-ctr-h">Contratante' + (d.clis.length > 1 ? " " + (k + 1) : "") + (k ? ' <button type="button" class="link danger" data-rmcli="' + k + '">Remover</button>' : "") + "</div>" +
+        f(px + "nome", "Nome", cl.nome, "col-6") + f(px + "nac", "Nacionalidade", cl.nacionalidade, "col-3") + f(px + "civ", "Estado civil", cl.estadoCivil, "col-3") +
+        f(px + "prof", "Profissão", cl.profissao, "col-4") + f(px + "doc", "CPF/CNPJ", cl.doc, "col-4") + f(px + "rg", "RG", cl.rg, "col-4") +
+        f(px + "end", "Endereço residencial", cl.endereco, "col-12") + f(px + "mail", "E-mail", cl.email, "col-6") + f(px + "tel", "Telefone", cl.telefone, "col-6"); }).join("") +
+      '<div class="col-12"><button type="button" class="btn btn-small" data-act="cli-add">+ Contratante</button><span class="hint"> Com mais de um, o contrato repete a qualificação e a assinatura de cada um.</span></div>' +
       (o.tipo === "MARC" ? '<div class="field col-12"><label for="ctr-parq">Projeto de arquitetura da Trilha (marcenaria vinculada)</label><select id="ctr-parq" data-ctr="ctr-parq"><option value="">— Nenhum (marcenaria avulsa) —</option>' + projs.map(function (p) { return '<option value="' + esc(p.id) + '"' + (p.id === d.projArq ? " selected" : "") + ">" + esc(p.nome) + (p.contrato && p.contrato.numero ? " · contrato " + esc(p.contrato.numero) : "") + "</option>"; }).join("") + "</select></div>" : "") +
       '<div class="field col-12"><label for="ctr-esc">Escopo (conceito do projeto)</label><textarea id="ctr-esc" data-ctr="ctr-esc" rows="6">' + esc(d.escopo) + "</textarea></div>" +
       f("ctr-cid", "Cidade (assinatura)", d.cidade, "col-6") + "</div>" +
@@ -781,7 +823,9 @@
     if ($("ctr-modelo")) d.modelo = $("ctr-modelo").value;
     d.numero = v("ctr-num"); d.tipoEdif = v("ctr-edif"); d.matricula = v("ctr-matr"); d.data = v("ctr-data") || hoje(); d.cidade = v("ctr-cid"); d.escopo = $("ctr-esc").value;
     if ($("ctr-parq")) d.projArq = $("ctr-parq").value;
-    d.cli = { nome: v("ctr-cnome"), nacionalidade: v("ctr-cnac"), estadoCivil: v("ctr-cciv"), profissao: v("ctr-cprof"), doc: v("ctr-cdoc"), rg: v("ctr-crg"), endereco: v("ctr-cend"), email: v("ctr-cmail"), telefone: v("ctr-ctel") };
+    d.clis = d.clis.map(function (x, k) { var px = "ctr-c" + k + "-"; return { nome: v(px + "nome"), nacionalidade: v(px + "nac"), estadoCivil: v(px + "civ"), profissao: v(px + "prof"), doc: v(px + "doc"), rg: v(px + "rg"), endereco: v(px + "end"), email: v(px + "mail"), telefone: v(px + "tel") }; });
+    d.cli = d.clis[0];
+    if ($("ctr-stit")) { d.servTitulo = v("ctr-stit"); }
     return d;
   }
   async function gerarContratoOp(o, btn) {
@@ -796,6 +840,7 @@
     Object.keys(o.prazos || {}).forEach(function (k) { var v = (o.prazos || {})[k]; if (v && v !== pzPad[k] && v !== pzPad["ref" + k.charAt(0).toUpperCase() + k.slice(1)]) pz[k] = v; });
     var campos = { contrato_numero: d.numero, tipo_edificacao: d.tipoEdif, area_estimada: r.area ? T.fmtNum(Math.round(r.area), 0) : "", projeto_endereco: o.endereco || "", imovel_matricula: d.matricula,
       cliente_nome: d.cli.nome, cliente_nacionalidade: d.cli.nacionalidade, cliente_estado_civil: d.cli.estadoCivil, cliente_profissao: d.cli.profissao, cliente_cpf_cnpj: d.cli.doc, cliente_rg: d.cli.rg, cliente_endereco: d.cli.endereco, cliente_email: d.cli.email, cliente_telefone: d.cli.telefone,
+      servico_titulo: d.servTitulo || (o.serv && o.serv.titulo) || "", prazo_dias: (o.serv && o.serv.prazo) || "",
       proposta_numero: (o.proposta && o.proposta.numero) || "", valor_total: D.numBR(total), valor_total_extenso: D.reaisExtenso(total), cidade: d.cidade, contrato_data_extenso: D.dataExtenso(d.data),
       ambientes_marcenaria: moveis.map(function (m) { return m[0]; }).join(", "), contrato_arquitetura_numero: parq && parq.contrato ? parq.contrato.numero || "" : "" };
     var falta = ["cliente_nome", "cliente_cpf_cnpj", "contrato_numero", "projeto_endereco"].filter(function (k) { return !campos[k]; });
@@ -803,10 +848,11 @@
     btn.disabled = true; st.textContent = "Gerando…";
     try {
       var b64 = await D.lerAsset(info.asset);
-      var ab = await D.gerarContrato(b64, { campos: campos, parcelas: d.parcelas, escopoLinhas: String(d.escopo || "").split(/\n\s*\n|\n/).map(function (x) { return x.trim(); }).filter(Boolean), programaLinhas: prog,
+      var clientes = d.clis.map(function (c) { return Object.assign({}, campos, { cliente_nome: c.nome, cliente_nacionalidade: c.nacionalidade, cliente_estado_civil: c.estadoCivil, cliente_profissao: c.profissao, cliente_cpf_cnpj: c.doc, cliente_rg: c.rg, cliente_endereco: c.endereco, cliente_email: c.email, cliente_telefone: c.telefone }); });
+      var ab = await D.gerarContrato(b64, { campos: campos, clientes: clientes, entregaveis: String((o.serv || {}).entregaveis || "").split("\n").map(function (x) { return x.replace(/^[-•*]\s*/, "").trim(); }).filter(Boolean), parcelas: d.parcelas, escopoLinhas: String(d.escopo || "").split(/\n\s*\n|\n/).map(function (x) { return x.trim(); }).filter(Boolean), programaLinhas: prog,
         briefingLinhas: ((o.briefing || {}).resp || []).map(function (x) { return x.p + ": " + x.r; }), moveis: moveis, prazos: pz });
       st.textContent = "Salvando…";
-      await T.downloads.save({ filename: "Contrato " + (d.numero || "") + " - " + (d.cli.nome || nome0(o)) + ".docx", data: ab });
+      await T.downloads.save({ filename: "Contrato " + (d.numero || "") + " - " + d.clis.map(function (c) { return c.nome; }).filter(Boolean).join(" e ") + ".docx", data: ab });
       st.textContent = "Contrato gerado ✓";
       await salvarOp(o.id, function (x) { x.ctr = d; hist(x, "Contrato gerado (modelo " + d.modelo + (info.versao ? ", versão " + info.versao : "") + ")"); });
     } catch (e) { st.textContent = e && e.code === "declined" ? "Download cancelado" : "Não foi possível gerar: " + (e && e.message || e); }
@@ -815,6 +861,133 @@
   function abaHistorico(o) {
     return '<div class="card gp-box"><form class="form-actions" id="ch-form"><input class="ctl com-in-n" id="ch-txt" placeholder="Registrar uma conversa, ligação, decisão…" aria-label="Novo registro"><button class="btn btn-small btn-primary" id="ch-salvar" type="submit">Registrar</button></form>' +
       '<div class="gp-hist">' + (o.hist || []).slice().reverse().map(function (h) { return '<div class="com-hist"><small>' + T.fmtDataHora(h.em) + "</small><span>" + esc(h.txt) + "</span></div>"; }).join("") + "</div></div>";
+  }
+
+  // ---------- "Peça ao Claude": conversa com ferramentas do app; nada é gravado sem o "Aplicar" ----------
+  var NIVEIS = [["quick", "Rápido"], ["default", "Padrão"], ["complex", "Complexo"]];
+  function resumoOp(o) {
+    var r = calc(o);
+    return { cliente: o.cliente, tipo: tipoNome(o.tipo), etapa: etapaNome(o.etapa), endereco: o.endereco, origem: o.origem, notas: o.notas, impressoes: o.impressoes, demanda: o.demanda,
+      servico: o.serv || null, categorias: o.cat, dadosDoBriefing: o.dados || null, ambientes: ((o.programa || {}).amb || []).map(function (a) { return { nome: a.nome, tipo: a.tipo, setor: a.setor, qtd: a.qtd, area: a.area }; }),
+      numeros: { area: r.area, custoObra: r.obra, horas: Math.round(r.hAj), precoTabela: r.tabela && Math.round(r.tabela), meuValor: (o.sim || {}).meuValor || null, pctObra: r.pctObra && +r.pctObra.toFixed(2), lucroResultante: r.lucroRes && +r.lucroRes.toFixed(1), entrada: r.entrada, parcelas: r.np },
+      proposta: o.proposta || null, padroesDisponiveis: T.padroes().map(function (p) { return p.id + " = " + T.padraoRotulo(p); }), tiposDeAmbiente: catalogo().map(function (t) { return t.id; }) };
+  }
+  function ferramentas(escopo) {
+    var ch = S.chat;
+    function pend() { return ch.pend || (ch.pend = { patch: {}, add: [], rem: [], notas: [], novas: [] }); }
+    if (escopo !== "geral") return [
+      { name: "ler_oportunidade", description: "Lê os dados atuais da oportunidade aberta (cliente, etapa, programa, simulador, textos).", inputSchema: { type: "object", properties: {} }, execute: function () { return resumoOp(op(escopo)); } },
+      { name: "propor_alteracoes", description: "Propõe mudanças nos campos da oportunidade. NÃO grava: o usuário confirma depois. Use só os campos necessários.", inputSchema: { type: "object", properties: {
+        demanda: { type: "string", description: "texto Sua demanda da proposta" }, impressoes: { type: "string" }, notas: { type: "string" }, meuValor: { type: "number", description: "valor final da proposta em reais" },
+        entrada: { type: "number" }, parcelas: { type: "number" }, custoM2: { type: "number" }, padrao: { type: "string", description: "id do padrão de obra" }, dimensao: { type: "string", enum: ["compacta", "confortavel", "espacosa"] },
+        dificuldade: { type: "string", enum: ["baixa", "normal", "dificil", "muito_dificil"] }, perfilCliente: { type: "string", enum: ["tranquilo", "normal", "exigente", "indeciso"] },
+        servTitulo: { type: "string" }, servDescricao: { type: "string" }, servEntregaveis: { type: "array", items: { type: "string" } }, servPrazo: { type: "number" }, servHoras: { type: "number" } } },
+        execute: function (i) { Object.assign(pend().patch, i || {}); return { ok: true, aguardandoConfirmacao: true }; } },
+      { name: "propor_ambientes", description: "Propõe acrescentar ou remover ambientes do programa. NÃO grava: o usuário confirma depois.", inputSchema: { type: "object", properties: {
+        adicionar: { type: "array", items: { type: "object", properties: { nome: { type: "string" }, tipo: { type: "string" }, qtd: { type: "number" }, area: { type: "number" }, setor: { type: "string", enum: ["social", "intimo", "servico", "lazer", "externo"] } }, required: ["nome"] } },
+        remover: { type: "array", items: { type: "string" }, description: "nomes exatos dos ambientes a remover" } } },
+        execute: function (i) { var p = pend(); p.add = p.add.concat((i && i.adicionar) || []); p.rem = p.rem.concat((i && i.remover) || []); return { ok: true, aguardandoConfirmacao: true }; } },
+      { name: "registrar_nota", description: "Propõe registrar uma nota no histórico da oportunidade.", inputSchema: { type: "object", properties: { texto: { type: "string" } }, required: ["texto"] }, execute: function (i) { pend().notas.push(i.texto); return { ok: true, aguardandoConfirmacao: true }; } }
+    ];
+    return [
+      { name: "listar_oportunidades", description: "Lista as oportunidades (cliente, tipo, etapa, dias parada, valor).", inputSchema: { type: "object", properties: {} }, execute: function () { return S.ops.map(function (o) { return { cliente: nome0(o), tipo: tipoNome(o.tipo), etapa: etapaNome(o.etapa), diasNaEtapa: dias(o.etapaEm), valor: valorOp(o), origem: o.origem || null, criadaEm: (o.criadoEm || "").slice(0, 10) }; }); } },
+      { name: "propor_nova_oportunidade", description: "Propõe criar uma oportunidade. NÃO grava: o usuário confirma depois.", inputSchema: { type: "object", properties: { nome: { type: "string" }, telefone: { type: "string" }, email: { type: "string" }, tipo: { type: "string", enum: TIPOS.map(function (t) { return t[0]; }) }, origem: { type: "string" }, notas: { type: "string" }, endereco: { type: "string" } }, required: ["nome"] },
+        execute: function (i) { pend().novas.push(i); return { ok: true, aguardandoConfirmacao: true }; } }
+    ];
+  }
+  function chatHtml(escopo) {
+    var temIA = !!(window.claude && window.claude.use); if (!temIA) return "";
+    var ch = S.chat && S.chat.escopo === escopo ? S.chat : null, o = escopo !== "geral" ? op(escopo) : null, msgs = ch ? ch.msgs : (o && o.chat) || [];
+    var aberto = ch && ch.aberto;
+    var h = '<div class="card gp-box com-chat"><div class="com-chat-h"><b>✨ Peça ao Claude</b><span class="hint">' + (escopo === "geral" ? "Ex.: \"quais propostas estão paradas há mais de 10 dias?\" ou \"crie uma oportunidade para Ana, indicação do Pedro\"" : "Ex.: \"reduza a suíte master para 14 m²\", \"escreva uma versão mais curta do texto\", \"ajuste o valor para 8% de desconto\"") + '</span><button type="button" class="link" data-chat="' + esc(escopo) + '">' + (aberto ? "Fechar" : "Abrir") + "</button></div>";
+    if (!aberto) return h + "</div>";
+    h += '<div class="com-chat-msgs">' + (msgs.length ? msgs.slice(-12).map(function (m) { return '<div class="com-msg ' + (m.role === "user" ? "eu" : "ia") + '">' + esc(m.text) + "</div>"; }).join("") : '<div class="hint">Nada ainda. O Claude lê os dados desta tela; mudanças só são gravadas quando você clicar em Aplicar.</div>') + (ch.rodando ? '<div class="com-msg ia">' + esc(ch.parcial || "Pensando…") + "</div>" : "") + "</div>";
+    if (ch.pend && resumoPend(ch.pend).length) h += '<div class="gp-aviso warn com-pend-ia"><b>O Claude propõe:</b><ul>' + resumoPend(ch.pend).map(function (l) { return "<li>" + esc(l) + "</li>"; }).join("") + '</ul><div class="form-actions"><button type="button" class="btn btn-small btn-primary" data-act="chat-aplicar">Aplicar</button><button type="button" class="btn btn-small" data-act="chat-descartar">Descartar</button></div></div>';
+    h += '<div class="com-chat-in"><textarea class="ctl" id="chat-txt" rows="2" placeholder="Escreva ou dite pelo microfone do teclado…" aria-label="Pedido ao Claude"' + (ch.rodando ? " disabled" : "") + '></textarea><select class="ctl" id="chat-nivel" aria-label="Nível">' + T.optHtml(NIVEIS, ch.nivel || "default") + '</select><button type="button" class="btn btn-small btn-primary" data-act="chat-enviar"' + (ch.rodando ? " disabled" : "") + '>Enviar</button></div>' +
+      '<p class="hint">Cada pedido consome uso da conta Claude de quem envia. Use "Rápido" para perguntas simples.</p>';
+    return h + "</div>";
+  }
+  function resumoPend(p) {
+    var out = [], nomes = { demanda: "Texto Sua demanda", impressoes: "Impressões", notas: "Notas", meuValor: "Meu valor", entrada: "Entrada", parcelas: "Parcelas", custoM2: "Custo da obra (R$/m²)", padrao: "Padrão", dimensao: "Dimensão", dificuldade: "Terreno", perfilCliente: "Perfil do cliente", servTitulo: "Título do serviço", servDescricao: "Descrição do serviço", servEntregaveis: "Entregáveis", servPrazo: "Prazo do serviço", servHoras: "Horas do serviço" };
+    Object.keys(p.patch || {}).forEach(function (k) { var v = p.patch[k]; out.push((nomes[k] || k) + ": " + (typeof v === "number" ? (/valor|entrada|R\$/i.test(nomes[k] || "") ? BRL(v) : v) : Array.isArray(v) ? v.join("; ") : String(v).slice(0, 140) + (String(v).length > 140 ? "…" : ""))); });
+    (p.add || []).forEach(function (a) { out.push("+ ambiente: " + a.nome + (a.qtd > 1 ? " ×" + a.qtd : "") + (a.area ? " · " + a.area + " m²" : "")); });
+    (p.rem || []).forEach(function (n) { out.push("− ambiente: " + n); });
+    (p.notas || []).forEach(function (n) { out.push("Nota no histórico: " + n); });
+    (p.novas || []).forEach(function (n) { out.push("Nova oportunidade: " + n.nome + (n.tipo ? " (" + tipoNome(n.tipo) + ")" : "") + (n.origem ? " · " + n.origem : "")); });
+    return out;
+  }
+  async function chatEnviar() {
+    var ch = S.chat, txt = ($("chat-txt") || {}).value || ""; if (!txt.trim() || !ch) return;
+    ch.nivel = ($("chat-nivel") || {}).value || "default";
+    var sample = await window.claude.use("sample"); if (!sample) { T.toast("A IA não está disponível nesta visualização."); return; }
+    var escopo = ch.escopo, o = escopo !== "geral" ? op(escopo) : null;
+    ch.msgs = (ch.msgs || []).concat([{ role: "user", text: txt.trim(), em: new Date().toISOString() }]); ch.rodando = true; ch.parcial = ""; ch.pend = null; if (document.activeElement) document.activeElement.blur(); render();
+    var contexto = "Você é o assistente do Gestor Comercial da Trilha Arquitetura Brasileira (Juiz de Fora/MG), dentro do app do escritório. Responda em português do Brasil, curto e direto, como um colega arquiteto. " +
+      "Use as ferramentas para ler os dados e para PROPOR mudanças; o usuário confirma antes de gravar, então diga o que propôs. Não invente dados. Para valores, considere o simulador (horas × custo-hora, impostos, reserva e lucro).\n" +
+      (o ? "Oportunidade aberta: " + nome0(o) + " (" + tipoNome(o.tipo) + ", " + etapaNome(o.etapa) + ")." : "Tela principal do comercial (todas as oportunidades).") + "\nHoje: " + T.fmtYmd(hoje()) + ".";
+    var turns = [], hist = ch.msgs.slice(-10);
+    hist.forEach(function (m, k) { turns.push({ role: m.role === "user" ? "user" : "assistant", content: (k === 0 && m.role === "user" ? contexto + "\n\n" : "") + m.text }); });
+    if (turns[0].role !== "user") turns.unshift({ role: "user", content: contexto });
+    try {
+      var r = await sample(turns, { modelTier: ch.nivel, tools: ferramentas(escopo), cache: false, onText: function (e) { ch.parcial = e.text; var box = document.querySelector(".com-chat-msgs .com-msg.ia:last-child"); if (box) box.textContent = e.text; } });
+      ch.msgs.push({ role: "assistant", text: (r && r.text || "").trim() || "(sem resposta)", em: new Date().toISOString() });
+    } catch (e) { ch.msgs.push({ role: "assistant", text: e && e.code === "not_granted" ? "A IA não foi autorizada nesta visualização." : e && e.code === "rate_limited" ? "Limite de uso atingido; tente mais tarde." : "Não consegui responder agora.", em: new Date().toISOString() }); }
+    ch.rodando = false; ch.parcial = "";
+    if (o) { var guardar = ch.msgs.slice(-20); try { await salvarOp(o.id, function (x) { x.chat = guardar; }); } catch (e) { /* conversa segue só nesta tela */ } }
+    render();
+  }
+  async function chatAplicar(btn) {
+    var ch = S.chat, p = ch && ch.pend; if (!p) return;
+    var ok = await T.saveWith(btn, async function () {
+      if (ch.escopo === "geral") { for (var i = 0; i < (p.novas || []).length; i++) await criarOpDados(p.novas[i]); return; }
+      await salvarOp(ch.escopo, function (x) {
+        var q = p.patch || {}; x.sim = x.sim || {}; x.cat = x.cat || {};
+        ["demanda", "impressoes", "notas"].forEach(function (k) { if (q[k] != null) x[k] = q[k]; });
+        ["meuValor", "entrada", "parcelas", "custoM2"].forEach(function (k) { if (q[k] != null) x.sim[k] = q[k]; });
+        if (q.padrao) x.cat.padrao = q.padrao; if (q.dimensao) x.cat.dimensao = q.dimensao; if (q.dificuldade) x.cat.dificuldade = q.dificuldade; if (q.perfilCliente) x.cat.cliente = q.perfilCliente;
+        if (q.servTitulo != null || q.servDescricao != null || q.servEntregaveis || q.servPrazo != null || q.servHoras != null) { x.serv = x.serv || {}; if (q.servTitulo != null) x.serv.titulo = q.servTitulo; if (q.servDescricao != null) x.serv.descricao = q.servDescricao; if (q.servEntregaveis) x.serv.entregaveis = q.servEntregaveis.join("\n"); if (q.servPrazo != null) x.serv.prazo = q.servPrazo; if (q.servHoras != null) x.serv.horas = q.servHoras; }
+        if ((p.add || []).length || (p.rem || []).length) { x.programa = x.programa || { pavs: ["Térreo"], amb: [] }; x.programa.amb = x.programa.amb.filter(function (a) { return (p.rem || []).indexOf(a.nome) < 0; }); (p.add || []).forEach(function (a) { x.programa.amb.push(novoAmb(T.byId(catalogo(), a.tipo) ? a.tipo : "outro", { nome: a.nome, qtd: a.qtd || 1, area: a.area != null ? a.area : tipoAmb(a.tipo).a, setor: a.setor || tipoAmb(a.tipo).s })); }); }
+        (p.notas || []).forEach(function (n) { hist(x, n); });
+        hist(x, "Alterações sugeridas pelo Claude aplicadas");
+      });
+    });
+    if (ok) { ch.pend = null; S.ed = null; S.dirty = false; render(); }
+  }
+  async function criarOpDados(n) {
+    var cliId = null, agora = new Date().toISOString();
+    if (T.cadastros) cliId = await T.cadastros.criarContato({ tipos: ["cliente"], nome: n.nome, contato: n.telefone || "", email: n.email || "", categoria: "Comercial" });
+    await T.db.collection("com_oport").add({ tipo: n.tipo || "RES", etapa: "contato", etapaEm: agora, etapaMax: 0, criadoEm: agora, atualizadoEm: agora, clienteId: cliId, cliente: { nome: n.nome, telefone: n.telefone || "", email: n.email || "" },
+      endereco: n.endereco || "", origem: n.origem || "", indicadoPor: "", notas: n.notas || "", cat: { dimensao: "confortavel", cliente: "normal" }, hist: [{ em: agora, txt: "Oportunidade criada pelo Peça ao Claude", etapa: "contato" }] });
+  }
+
+  // ---------- relatórios do comercial ----------
+  var CHANCE = { proposta_revisao: 30, proposta_apresentada: 50, contrato: 90 };
+  function renderRel() {
+    var ano = String(S.ano), c = C(), l = S.ops.filter(function (o) { return (o.criadoEm || "").slice(0, 4) === ano; });
+    var fech = S.ops.filter(function (o) { return (o.fechadoEm || "").slice(0, 4) === ano; }), perd = S.ops.filter(function (o) { return o.etapa === "perdido" && ((o.perda || {}).em || "").slice(0, 4) === ano; });
+    function tabela(cab, linhas) { return '<div class="table-wrap as-list"><table><thead><tr>' + cab.map(function (x) { return "<th>" + x + "</th>"; }).join("") + "</tr></thead><tbody>" + (linhas.length ? linhas.map(function (ln) { return "<tr>" + ln.map(function (v, i) { return '<td data-l="' + cab[i] + '">' + v + "</td>"; }).join("") + "</tr>"; }).join("") : '<tr><td colspan="' + cab.length + '" class="hint">Sem dados.</td></tr>') + "</tbody></table></div>"; }
+    var h = '<div class="gp-p-head"><button class="link" data-act="voltar">← Comercial</button><div class="gp-p-nav"><h2 class="gp-p-name">Relatórios do comercial</h2><div class="segmented">' + [S.ano - 1, S.ano].concat(S.ano < new Date().getFullYear() ? [S.ano + 1] : []).map(function (a) { return '<button class="seg-pill' + (a === S.ano ? " is-selected" : "") + '" data-ano="' + a + '">' + a + "</button>"; }).join("") + "</div></div></div>";
+    // conversão por etapa
+    var marcos = ETAPAS.map(function (e, k) { var n = l.filter(function (o) { return (o.etapaMax != null ? o.etapaMax : IDX[o.etapa] || 0) >= k; }).length; return [e[1], n, l.length ? T.fmtNum(n / l.length * 100, 0) + "%" : "—"]; });
+    h += '<div class="com-rel-g"><div class="card gp-box"><h3 class="panel-title">Conversão por etapa (' + l.length + " oportunidades criadas em " + ano + ")</h3>" + tabela(["Etapa", "Chegaram", "Do total"], marcos) + "</div>";
+    // origem
+    var orig = {}; l.forEach(function (o) { var k = o.origem || "Não informado"; orig[k] = orig[k] || { n: 0, f: 0, v: 0 }; orig[k].n++; });
+    fech.forEach(function (o) { var k = o.origem || "Não informado"; orig[k] = orig[k] || { n: 0, f: 0, v: 0 }; orig[k].f++; orig[k].v += valorOp(o) || 0; });
+    h += '<div class="card gp-box"><h3 class="panel-title">Origem dos clientes</h3>' + tabela(["Origem", "Oportunidades", "Fecharam", "Valor fechado"], Object.keys(orig).sort(function (a, b) { return orig[b].f - orig[a].f || orig[b].n - orig[a].n; }).map(function (k) { return [esc(k), orig[k].n, orig[k].f, BRL(orig[k].v)]; })) + "</div>";
+    // motivos de perda
+    var mot = {}; perd.forEach(function (o) { var k = (o.perda || {}).motivo || "Sem motivo"; mot[k] = (mot[k] || 0) + 1; });
+    h += '<div class="card gp-box"><h3 class="panel-title">Motivos de perda</h3>' + (perd.length ? '<div class="meters">' + Object.keys(mot).sort(function (a, b) { return mot[b] - mot[a]; }).map(function (k) { var p = mot[k] / perd.length * 100; return '<div class="meter-row"><span class="m-label">' + esc(k) + '</span><div class="meter"><i style="width:' + p + '%"></i></div><span class="m-val">' + mot[k] + "</span></div>"; }).join("") + "</div>" : '<div class="empty">Nenhuma perda em ' + ano + ".</div>") + "</div>";
+    // tempo até o contrato e custo de captação
+    var tempos = fech.filter(function (o) { return o.criadoEm; }).map(function (o) { return (new Date(o.fechadoEm) - new Date(o.criadoEm)) / 86400000; }), tm = tempos.length ? tempos.reduce(function (a, b) { return a + b; }, 0) / tempos.length : null;
+    var lanc = T.tempo ? T.tempo.lancAtivos().filter(function (x) { return x.tipo === "area" && x.alvoId === "com" && T.ymd(new Date(x.inicio)).slice(0, 4) === ano; }) : [], min = lanc.reduce(function (s0, x) { return s0 + (x.min || 0); }, 0), cst = lanc.reduce(function (s0, x) { return s0 + (T.tempo.custoLanc(x) || 0); }, 0);
+    h += '<div class="card gp-box"><h3 class="panel-title">Tempo e custo de captação</h3>' + kv("Tempo médio do contato ao contrato", tm != null ? Math.round(tm) + " dias" : "—") + kv("Horas em \"Comercial e captação\" (Tempo)", T.fmtH(min)) + kv("Custo dessas horas", BRL(cst)) + kv("Custo de captação por contrato fechado", fech.length ? BRL(cst / fech.length) : "—") + '<p class="hint">As horas vêm dos lançamentos no Tempo na área "Comercial e captação".</p></div>';
+    // previsão de receita
+    var abertas2 = S.ops.filter(function (o) { return CHANCE[o.etapa]; }), prev = abertas2.reduce(function (s0, o) { return s0 + (valorOp(o) || 0) * CHANCE[o.etapa] / 100; }, 0);
+    h += '<div class="card gp-box"><h3 class="panel-title">Previsão de receita</h3><p class="hint">Propostas em aberto × chance de fechar (revisão 30%, apresentada 50%, contrato 90%).</p>' + tabela(["Cliente", "Etapa", "Valor", "Chance", "Previsto"], abertas2.map(function (o) { var v = valorOp(o) || 0; return [esc(nome0(o)), esc(etapaNome(o.etapa)), BRL(v), CHANCE[o.etapa] + "%", BRL(v * CHANCE[o.etapa] / 100)]; })) + kv("Total previsto", BRL(prev)) + "</div>";
+    // calculado × praticado
+    var cp = fech.map(function (o) { var p = o.proposta || {}, tab = p.valorTabela, fin = o.valor || p.valorFinal; return [esc(nome0(o)), BRL(tab), BRL(fin), tab && fin ? T.fmtNum((fin / tab - 1) * 100, 1) + "%" : "—"]; });
+    h += '<div class="card gp-box"><h3 class="panel-title">Valor calculado × praticado</h3>' + tabela(["Cliente", "Tabela de horas", "Fechado", "Diferença"], cp) + '<p class="hint">Mostra o quanto o valor fechado se afasta do preço pelas horas — base para calibrar horas e fatores.</p></div></div>';
+    $("com-rel").innerHTML = h;
   }
 
   // ---------- configurações do comercial ----------
@@ -932,6 +1105,7 @@
     var o = op(S.opId); if (!o) return;
     var mapa = { contato: "agendar", reuniao: "briefing", proposta_revisao: "apresentar", proposta_apresentada: null, contrato: "assinado", fechado: "virar" };
     if (o.etapa === "briefing_enviado") { S.tab = "briefing"; S.acao = null; render(); return; }
+    if (o.tipo === "SERV" && o.etapa === "reuniao") { try { await salvarOp(o.id, function (x) { mudarEtapa(x, "proposta_revisao", "Montagem da proposta do serviço"); }); } catch (err) { T.showError(err); return; } S.tab = "proposta"; S.acao = null; S.ed = null; renderOp(); return; }
     if (o.etapa === "briefing_recebido") { try { await salvarOp(o.id, function (x) { mudarEtapa(x, "proposta_revisao", "Montagem da proposta iniciada"); }); } catch (err) { T.showError(err); return; } S.tab = (o.programa && o.programa.amb && o.programa.amb.length) ? "simulador" : "programa"; S.acao = null; S.ed = null; S.dirty = false; renderOp(); return; }
     if (o.etapa === "proposta_apresentada") { if (await T.confirmar({ titulo: "O cliente vai fechar?", texto: "A oportunidade passa para Contrato.", ok: "Seguir para o contrato" })) { try { await salvarOp(o.id, function (x) { mudarEtapa(x, "contrato", "Cliente aceitou a proposta"); }); } catch (err) { T.showError(err); } renderOp(); } return; }
     S.acao = mapa[o.etapa]; renderOp();
@@ -957,7 +1131,8 @@
     if (a === "ok-apresentar") {
       var r = calc(o), num = +$("ca-num").value, dta = $("ca-dt").value || hoje(), val = $("ca-val").value;
       if (r.alertaExp && !(o.expectativa && o.expectativa.alinhada) && !(await T.confirmar({ titulo: "Expectativa ainda não alinhada", texto: "O cliente informou " + BRL(r.disp) + " e a obra está estimada em " + BRL(r.obra) + ". Apresentar mesmo assim?", ok: "Apresentar" }))) return;
-      if (await T.saveWith(btn, function () { return salvarOp(o.id, function (x) { x.proposta = Object.assign({}, x.proposta || {}, { numero: num, enviadaEm: dta, validadeAte: val, valorTabela: r.tabela ? Math.round(r.tabela) : null, valorFinal: r.final ? Math.round(r.final) : null }); x.valor = r.final ? Math.round(r.final) : null; mudarEtapa(x, "proposta_apresentada", "Proposta nº " + num + " apresentada: " + BRL(r.final)); }); })) S.acao = null;
+      if (await T.saveWith(btn, function () { return salvarOp(o.id, function (x) { x.proposta = Object.assign({}, x.proposta || {}, { numero: num, enviadaEm: dta, validadeAte: val, valorTabela: r.tabela ? Math.round(r.tabela) : null, valorFinal: r.final ? Math.round(r.final) : null, versao: (x.proposta && x.proposta.versao) || 1 });
+          x.versoes = (x.versoes || []).filter(function (v) { return v.versao !== x.proposta.versao; }).concat([{ versao: x.proposta.versao, em: dta, valorTabela: x.proposta.valorTabela, valorFinal: x.proposta.valorFinal, area: r.area ? Math.round(r.area) : null, ambientes: ((x.programa || {}).amb || []).length }]); x.valor = r.final ? Math.round(r.final) : null; mudarEtapa(x, "proposta_apresentada", "Proposta nº " + num + " apresentada: " + BRL(r.final)); }); })) S.acao = null;
       return;
     }
     if (a === "ok-assinado") {
@@ -972,7 +1147,7 @@
   async function contratoFinanceiro(o, pid) {
     var d = dadosContrato(o), ps = (d.parcelas || []).filter(function (p) { return +p.valor > 0; }); if (!ps.length || !pid) return null;
     var total = Math.round(ps.reduce(function (s, p) { return s + (+p.valor || 0); }, 0) * 100) / 100, id = "c-" + T.novoId();
-    await T.db.doc("fin_contratos/" + id).set({ projetoId: pid, cliente: d.cli.nome || nome0(o), clienteDoc: d.cli.doc || "", servico: o.tipo === "MARC" ? "Projeto de marcenaria" : o.tipo === "SERV" ? "Serviço" : "Projeto " + tipoNome(o.tipo).toLowerCase(), valorTotal: total, status: "ativo",
+    await T.db.doc("fin_contratos/" + id).set({ projetoId: pid, cliente: d.clis.map(function (c) { return c.nome; }).filter(Boolean).join(" e ") || nome0(o), clienteDoc: d.cli.doc || "", servico: o.tipo === "MARC" ? "Projeto de marcenaria" : o.tipo === "SERV" ? "Serviço" : "Projeto " + tipoNome(o.tipo).toLowerCase(), valorTotal: total, status: "ativo",
       parcelas: ps.map(function (p, k) { return { id: T.novoId(), descricao: k === 0 && ps.length > 1 ? "Entrada" : "Parcela " + (k + 1), vencimento: p.vencimento || hoje(), valor: +p.valor, recibo: null }; }), criadoEm: new Date().toISOString(), origem: { comercial: o.id } });
     var pj = T.projeto(pid); if (!pj || pj.honorario == null) await T.db.doc("projetos/" + pid).update({ honorario: total }).catch(function () {});
     return id;
@@ -1050,7 +1225,8 @@
       var t = e.target.closest("button, a"); if (!t) return;
       if (t.dataset.open) { abrir(t.dataset.open); return; }
       if (t.dataset.tab) { if (S.dirty && !(await T.confirmar({ titulo: "Sair sem salvar?", texto: "As alterações desta aba ainda não foram salvas.", ok: "Sair sem salvar", perigo: true }))) return; S.tab = t.dataset.tab; S.dirty = false; S.ed = null; S.ctrEd = null; renderOp(); return; }
-      if (t.dataset.ano) { S.ano = +t.dataset.ano; renderLista(); return; }
+      if (t.dataset.ano) { S.ano = +t.dataset.ano; if (S.view === "rel") renderRel(); else renderLista(); return; }
+      if (t.dataset.chat) { var esc0 = t.dataset.chat, oc = esc0 !== "geral" ? op(esc0) : null; if (!S.chat || S.chat.escopo !== esc0) S.chat = { escopo: esc0, msgs: oc && oc.chat ? T.clone(oc.chat) : [], aberto: false, nivel: "default" }; S.chat.aberto = !S.chat.aberto; render(); var ta0 = $("chat-txt"); if (ta0 && S.chat.aberto) ta0.focus(); return; }
       if (t.dataset.ntipo) { S.novo.tipo = t.dataset.ntipo; T.each("[data-ntipo]", function (b) { b.classList.toggle("is-selected", b === t); }); return; }
       if (t.dataset.copiar) { var ta = $(t.dataset.copiar); try { await navigator.clipboard.writeText(ta.value); T.toast("Mensagem copiada ✓"); } catch (x) { ta.select(); T.toast("Selecione e copie a mensagem."); } return; }
       if (t.dataset.wa) { var ta2 = $(t.dataset.wa), o0 = op(S.opId); t.href = waLink(o0 && o0.cliente && o0.cliente.telefone, ta2.value); return; }
@@ -1065,6 +1241,7 @@
       if (t.dataset.pgmv) { lerCfgModelos(); var mv = t.dataset.pgmv.split("|"), pm0 = S.modEd.propostas[Math.min(S.modSel || 0, S.modEd.propostas.length - 1)], i0 = +mv[0], j0 = i0 + +mv[1]; if (j0 >= 0 && j0 < pm0.paginas.length) { var tmp = pm0.paginas[i0]; pm0.paginas[i0] = pm0.paginas[j0]; pm0.paginas[j0] = tmp; } renderCfg(); return; }
       if (t.dataset.pgrm != null) { lerCfgModelos(); var pm1 = S.modEd.propostas[Math.min(S.modSel || 0, S.modEd.propostas.length - 1)]; if (await T.confirmar({ titulo: "Remover a página?", texto: "Sai do modelo ao salvar (a imagem continua guardada).", ok: "Remover", perigo: true })) { pm1.paginas.splice(+t.dataset.pgrm, 1); renderCfg(); } return; }
       if (t.dataset.exrm != null) { lerCfgModelos(); S.modEd.exemplos.splice(+t.dataset.exrm, 1); renderCfg(); return; }
+      if (t.dataset.rmcli != null) { lerFormContrato(); S.ctrEd.d.clis.splice(+t.dataset.rmcli, 1); renderOp(); return; }
       if (t.dataset.rmparc != null) { lerFormContrato(); S.ctrEd.d.parcelas.splice(+t.dataset.rmparc, 1); renderOp(); return; }
       if (t.dataset.rmamb != null) { var x = ed(); x.programa.amb.splice(+t.dataset.rmamb, 1); S.dirty = true; renderOp(); return; }
       var a = t.dataset.act; if (!a) return;
@@ -1079,13 +1256,33 @@
       if (a === "reabrir") { var o2 = op(S.opId); if (await T.confirmar({ titulo: "Reabrir a oportunidade?", texto: "Volta para " + etapaNome((o2.perda && o2.perda.etapa) || "contato") + ".", ok: "Reabrir" })) { try { await salvarOp(o2.id, function (x) { mudarEtapa(x, (x.perda && x.perda.etapa) || "contato", "Oportunidade reaberta"); delete x.perda; }); } catch (err) { T.showError(err); } renderOp(); } return; }
       if (a === "ir-gestor") { var o3 = op(S.opId); T.gestor.abrir(o3.projetoId); return; }
       if (a.indexOf("ok-") === 0 || a === "marc-feito") { await confirmarAcao(a); if (!S.acao) renderOp(); return; }
+      if (a === "rel") { S.view = "rel"; render(); window.scrollTo(0, 0); return; }
+      if (a === "chat-enviar") { await chatEnviar(); return; }
+      if (a === "chat-aplicar") { await chatAplicar(t); return; }
+      if (a === "chat-descartar") { if (S.chat) S.chat.pend = null; render(); return; }
+      if (a === "cli-add") { lerFormContrato(); S.ctrEd.d.clis.push({ nacionalidade: "brasileiro(a)" }); renderOp(); return; }
+      if (a === "nova-versao") {
+        var o8 = op(S.opId), v8 = ((o8.proposta && o8.proposta.versao) || 1) + 1;
+        if (await T.confirmar({ titulo: "Fazer a versão " + v8 + " da proposta?", texto: "A oportunidade volta para Proposta em revisão para você ajustar programa, valor ou condições; a versão " + (v8 - 1) + " fica registrada.", ok: "Nova versão" })) {
+          try { await salvarOp(o8.id, function (x) { x.proposta = Object.assign({}, x.proposta || {}, { versao: v8 }); mudarEtapa(x, "proposta_revisao", "Nova versão da proposta (v" + v8 + ")"); }); S.tab = "simulador"; S.ed = null; S.dirty = false; renderOp(); } catch (err) { T.showError(err); }
+        }
+        return;
+      }
+      if (a === "ia-serv") {
+        var o9 = op(S.opId), ped = ($("cps-ped") || {}).value || ""; if (!ped.trim()) { T.toast("Descreva o pedido primeiro."); return; }
+        S.servIA = { id: o9.id, rodando: true, d: { pedido: ped } }; renderOp();
+        try { var rs = await T.comercialDocs.montarServico(o9, ped, MOD().exemplos || []); S.servIA = { id: o9.id, rodando: false, d: { pedido: ped, titulo: rs.titulo || "", descricao: rs.descricao || "", entregaveis: (Array.isArray(rs.entregaveis) ? rs.entregaveis : String(rs.entregaveis || "").split("\n")).join("\n"), prazo: +rs.prazo || null, horas: +rs.horas || null } }; T.toast("Rascunho pronto — revise e clique em Salvar serviço."); }
+        catch (err) { S.servIA = null; T.toast(err && err.code === "not_granted" ? "A IA não foi autorizada." : (err && err.message) || "A IA não respondeu."); }
+        renderOp(); return;
+      }
       if (a === "parc-add") { lerFormContrato(); var ps0 = S.ctrEd.d.parcelas, ult = ps0[ps0.length - 1]; ps0.push({ valor: ult ? ult.valor : 0, vencimento: ult && ult.vencimento ? T.ymd(new Date(T.parseYmd(ult.vencimento).getFullYear(), T.parseYmd(ult.vencimento).getMonth() + 1, T.parseYmd(ult.vencimento).getDate())) : hoje() }); renderOp(); return; }
       if (a === "parc-sim") { lerFormContrato(); var oo = op(S.opId); S.ctrEd.d.parcelas = parcelasSim(oo, calc(oo), S.ctrEd.d.data || hoje()); renderOp(); return; }
       if (a === "ctr-gerar") { await gerarContratoOp(op(S.opId), t); return; }
       if (a === "prev") { var o5 = op(S.opId); try { S.prev = { id: o5.id, pags: T.comercialDocs.paginasProposta(ctxProposta(o5)) }; } catch (err) { T.toast("Não foi possível montar a prévia."); } renderOp(); return; }
       if (a === "pdf") {
         var o6 = op(S.opId), st6 = $("cpp-pdf-st"); if (!T.downloads) { T.toast("Esta visualização não permite baixar arquivos."); return; }
-        if (!(o6.demanda || "").trim() && !(await T.confirmar({ titulo: "Sem o texto \"Sua demanda\"", texto: "A página Sua demanda sairá vazia. Baixar mesmo assim?", ok: "Baixar" }))) return;
+        var semTexto = o6.tipo === "SERV" ? !((o6.serv || {}).descricao || "").trim() : !(o6.demanda || "").trim();
+        if (semTexto && !(await T.confirmar({ titulo: o6.tipo === "SERV" ? "Sem a descrição do serviço" : "Sem o texto \"Sua demanda\"", texto: "A página sairá sem o texto. Baixar mesmo assim?", ok: "Baixar" }))) return;
         t.disabled = true;
         try { await T.comercialDocs.baixarProposta(ctxProposta(o6), nomeArquivoProposta(o6), function (m) { if (st6) st6.textContent = m; }); if (st6) st6.textContent = "PDF pronto ✓"; await salvarOp(o6.id, function (x) { hist(x, "PDF da proposta gerado"); }); }
         catch (err) { if (st6) st6.textContent = err && err.code === "declined" ? "Download cancelado" : "Não foi possível gerar o PDF: " + (err && err.message || err); }
@@ -1146,6 +1343,7 @@
         return;
       }
       if (f.id === "cpp-form") { if (await T.saveWith($("cpp-salvar"), function () { return salvarOp(o.id, function (x) { x.demanda = $("cpp-dem").value.trim(); if ($("cpp-mov")) x.moveis = $("cpp-mov").value.trim(); }); })) S.ia = null; return; }
+      if (f.id === "cps-form") { var sv = { pedido: ($("cps-ped") || {}).value || "", titulo: $("cps-tit").value.trim(), prazo: T.numOrNull($("cps-prz").value), horas: T.numOrNull($("cps-h").value), descricao: $("cps-desc").value.trim(), entregaveis: $("cps-ent").value.trim() }; if (await T.saveWith($("cps-salvar"), function () { return salvarOp(o.id, function (x) { x.serv = sv; }); })) S.servIA = null; return; }
       if (f.id === "cpo-form") { await T.saveWith($("cpo-salvar"), function () { return salvarOp(o.id, function (x) { x.prop = $("cpo-apos") ? { aposArq: $("cpo-apos").checked } : { marc: $("cpo-marc").checked, marcValor: T.numOrNull($("cpo-marcv").value), adm: $("cpo-adm").checked, admPct: T.numOrNull($("cpo-admp").value) }; }); }); S.prev = null; return; }
       if (f.id === "ctr-form") { var dd = lerFormContrato(); if (await T.saveWith($("ctr-salvar"), function () { return salvarOp(o.id, function (x) { x.ctr = T.clone(dd); }); })) S.ctrEd = null; return; }
       if (f.id === "ch-form") { var tx = $("ch-txt").value.trim(); if (!tx) return; if (await T.saveWith($("ch-salvar"), function () { return salvarOp(o.id, function (x) { hist(x, tx); }); })) $("ch-txt").value = ""; return; }
@@ -1159,8 +1357,9 @@
 
   // ---------- render ----------
   function render() {
-    var lista = S.view === "lista", isOp = S.view === "op", cfg = S.view === "cfg";
-    $("com-lista").hidden = !lista; $("com-op").hidden = !isOp; $("com-cfg").hidden = !cfg;
+    var lista = S.view === "lista", isOp = S.view === "op", cfg = S.view === "cfg", rel = S.view === "rel";
+    $("com-lista").hidden = !lista; $("com-op").hidden = !isOp; $("com-cfg").hidden = !cfg; $("com-rel").hidden = !rel;
+    if (rel) { renderRel(); return; }
     // não redesenhar enquanto alguém digita num formulário desta tela
     var foco = document.activeElement, dentro = foco && foco !== document.body && $("view-comercial").contains(foco) && /INPUT|TEXTAREA|SELECT/.test(foco.tagName);
     if (lista) { if (!(dentro && S.novo)) renderLista(); }

@@ -1,82 +1,93 @@
-# Pendências para a conta de origem (quem usa o app)
+# Pendências e roteiro para a conta de origem (quem usa o app)
 
-O desenvolvimento do Gestor Comercial é feito por uma **conta de desenvolvimento, convidada de outra organização**.
-O app de verdade é usado pela **conta de origem** (Luan e Elisa, dona do app oficial). A conta convidada tem limites:
+O Gestor Comercial foi desenvolvido por uma **conta de desenvolvimento, convidada de outra organização**. O app de
+verdade é usado pela **conta de origem** (Luan e Elisa, dona do app oficial). A conta convidada tem limites:
 
 - não lê nem grava o banco do app pelo Claude Code (ArtifactData recusado para convidados);
 - só envia ao armazenamento de arquivos do app **imagens, vídeos, fontes, CSS e scripts** (não aceita texto, CSV, JSON);
-- o Google Agenda, a IA (`sample`) e os downloads funcionam com a conta de **quem está usando** o app.
+- Agenda Google, IA (`sample`) e downloads funcionam com a conta de **quem está usando** o app.
 
-Por isso, algumas coisas só podem (ou devem) ser feitas na conta de origem. **Regra:** ao atualizar o app pela
-conta de origem, o Claude lê este arquivo, executa as pendências abertas (pedindo autorização ao Luan quando o item
-pede) e marca cada uma como feita, com a data. Itens novos entram no fim, com data e origem.
+**Regra (vale para todo chat que mexer no app):**
+1. Ao trabalhar pela **conta de origem**: ler este arquivo antes de tudo, executar os itens abertos na ordem, **pedir
+   autorização ao Luan** antes de cada item marcado com 🔐, e marcar cada item feito com a data e quem fez.
+2. Ao trabalhar pela **conta convidada**: acrescentar aqui (no fim da seção certa, com data) tudo o que precisar ser
+   feito ou configurado na conta de origem.
 
-## Como marcar
-`[ ]` aberta · `[x] dd/mm/aaaa` feita (quem fez) · `[~]` não se aplica mais (motivo)
+Marcação: `[ ]` aberto · `[x] dd/mm/aaaa (quem)` feito · `[~]` não se aplica mais (motivo).
 
 ---
 
-## A. Gestor Comercial no app oficial (fases 1 e 2 publicadas em 02/10/2026, versão 1790904962-39e8)
+## Roteiro para terminar o Gestor Comercial no app oficial (comando do Luan: "terminar o serviço no app oficial")
 
-- [x] 02/10/2026 (conta de desenvolvimento) **A1. Capacidades do oficial.** Publicar com `db`, `downloads`, `mcp` (Google Calendar `create_event`,
-  `update_event`) **e** as novas `assets` (arquivos dos modelos) e `sample` (IA). Ao declarar, repetir todas.
-  *Pode ser feito pela conta de desenvolvimento (é editora do oficial).*
-- [x] 02/10/2026 (conta de desenvolvimento) **A2. Arquivos dos modelos no oficial.** Imagens e os 6 contratos
-  enviados (contratos como script); `modelos-padrao.json` publicado com os ids do oficial. Se o escritório quiser,
-  a conta de origem pode reenviar cada .docx pelo botão "Enviar .docx" (fica como texto). Enviar ao armazenamento do oficial as imagens de
-  `referencias-comercial/paginas/` (capa, páginas fixas, logo e assinatura) e os 6 contratos.
-  - Contratos: pela conta de origem, em **Configurações do comercial › Modelos de contrato › Enviar .docx**
-    (o app guarda o .docx como texto base64). Pela conta convidada só dá como script (`"<base64>";`), que o app
-    também lê. Os .docx oficiais **não** ficam no repositório (CPF e dados bancários).
-  - Os ids dos arquivos são próprios de cada artefato: os da cópia de teste **não** servem no oficial.
-- [ ] **A3. Modelos no banco.** Depois de A2, abrir Gestor Comercial › Configurações do comercial › Modelos e
-  clicar **Salvar modelos** (grava `com_config/modelos`). Enquanto não salvar, o app usa o arquivo
-  `modelos-padrao.json` publicado junto (só leitura). Alternativa pela conta de origem: gravar
-  `com_config/modelos` direto com ArtifactData a partir de `referencias-comercial/modelos-template.json`
-  (trocando os `ID_…` pelos ids do oficial).
-- [ ] **A4. Prazos padrão (decisão de 01/10/2026: prazos seguem os contratos, maior número da faixa).**
-  O banco guarda os prazos salvos em Configurações e eles valem por cima do código: em **Configurações › Prazos
-  padrão**, mudar **Anteprojeto de 70 para 80** e conferir Reforma (Levantamento 5, EP 30, Executivo 40).
-  Pela conta de origem também dá por ArtifactData em `config/escritorio.prazosPadrao` (com `if_version`).
-  Projetos que já existem mantêm os prazos que têm.
-- [ ] **A5. Padrões de obra.** Em **Configurações › Padrões de obra**, conferir as faixas de R$/m² (vêm com as da
-  proposta do Gustavo: Médio 3.000–3.500 · Médio Alto 3.500–4.500 · Alto 4.500–5.500 · Alto 5.500–7.000 ·
-  Luxo acima de 7.000) e salvar.
-- [ ] **A6. Valores provisórios do Comercial (Luan decide).** Em **Gestor Comercial › Configurações do comercial**:
-  fatores (padrão, dimensão, terreno, cliente), horas gerais e horas por ambiente, custo-hora reserva (R$ 35,
-  só enquanto a equipe não tem custo-hora), impostos 6% · reserva 10% · lucro 20%, nota fiscal 17%, CAU 8%,
-  mercado R$ 70–120/m², meta anual R$ 300 mil, validade 30 dias, adm. de obra 12%, cobrança do briefing 5 dias,
-  follow-up 7 dias, nº da próxima proposta 81. Ao salvar, o aviso "provisório" some.
-- [ ] **A7. Custo-hora da equipe.** Em **Configurações › Pessoas** (custo-hora) e **Escritório** (custos fixos e
-  horas produtivas): sem isso o Simulador usa o custo-hora reserva.
-- [ ] **A8. Imposto no Financeiro.** Em Financeiro › Ajustes, a reserva de imposto (%) — o Simulador usa esse valor.
-- [ ] **A9. Link do formulário de briefing.** Em Configurações do comercial, colar o link do Google Forms de
-  residência (entra na mensagem de WhatsApp "Enviar briefing").
-- [ ] **A10. Planilha de respostas.** No Google Forms, ligar o formulário a uma planilha (Respostas › Planilha):
-  o app importa colando a linha de títulos + a linha do cliente.
-- [ ] **A11. Agenda Google** (integração do Comercial usa os mesmos campos das Tarefas, mas ainda não foi
-  verificada com uma chamada real). Na primeira reunião agendada pelo Comercial no oficial, confirmar que o evento entrou
-  na agenda `trilha@trilhaarq.com.br` (a cópia de teste não tem a Agenda). O conector Google Calendar precisa estar
-  ligado na conta de quem usa.
-- [ ] **A12. IA (`sample`).** Na primeira vez que alguém clicar em "✨ Escrever com o Claude", o Claude pede
-  autorização; cada pedido consome o uso da conta de quem clica. Conferir a qualidade do texto e, se preciso,
-  ajustar os textos exemplares (Configurações do comercial › Jeito Trilha de escrever).
-- [ ] **A13. Primeiro uso real.** Fazer uma oportunidade do início ao fim (briefing real → proposta PDF → contrato
-  → virar projeto) e conferir: contrato .docx aberto no Word, parcelas em Financeiro › Contratos, projeto no Gestor.
-- [ ] **A14. Páginas do Canva.** Quando houver a revisão de design das propostas, exportar as páginas fixas **sem
-  número de página** (o app numera as variáveis; páginas fixas com número impresso ficam desalinhadas quando o
-  programa ou o plano ocupam mais de uma página) e trocar em Configurações do comercial › Modelos.
+Situação em 02/10/2026:
+- **Oficial** (https://claude.ai/artifact/N5fGJZBumZy7dyN57w7e8o) tem as **fases 1 e 2** (versão 1790904962-39e8) com
+  `db`, `downloads`, `mcp` Google Calendar (`create_event`, `update_event`), `assets` e `sample`, e o
+  `modelos-padrao.json` da fase 2.
+- **Cópia de teste** (https://claude.ai/artifact/V9bUhPfLyowX83XUz5Zeaw) tem a **fase 3** (versão 1790906297-dd33).
+- **Código:** repositório `TrilhaArq/TrilhaArq---Processos`, ramo `claude/tender-bell-5u0djo`, pasta `gestao-trilha/`.
+- Os arquivos dos modelos (páginas, logos e os 7 contratos, inclusive o 07) **já estão no armazenamento do oficial**;
+  os ids estão em `referencias-comercial/modelos-padrao-oficial.json`.
 
-## B. Cópia de teste
+### Passo 1 — Publicar a fase 3 no oficial
+- [ ] **1.1** Conferir que nenhum outro chat está publicando no oficial (perguntar ao Luan). 🔐
+- [ ] **1.2** Ler a versão publicada do oficial (Artifact `read` e `list scope files`). Se não for a 1790904962-39e8
+  (alguém publicou depois), comparar com o ramo e juntar as mudanças antes de publicar.
+- [ ] **1.3** Publicar no oficial: `file_path` = `gestao-trilha/index.html`, `root` = `gestao-trilha`, `files` = `estilo.css`,
+  `nucleo.js`, `logo.png`, todos os `modulos/*.js` (inclusive `comercial-docs.js` e `comercial.js`) e
+  `"modelos-padrao.json": referencias-comercial/modelos-padrao-oficial.json`. **Sem** passar `capabilities` (mantém as
+  cinco). 🔐
+- [ ] **1.4** Abrir o oficial e conferir: capa com "Gestor Comercial", oportunidade abre, Configurações do comercial abre.
 
-- [ ] **B1.** Na cópia de teste, clicar uma vez em **Salvar modelos** (Configurações do comercial) para gravar os
-  modelos no banco dela. (Ids dos arquivos da cópia de teste: ver `modelos-padrao.json` publicado nela.)
-- [ ] **B2.** A cópia de teste fica com `db`, `downloads`, `assets` e `sample`, **sem** Agenda Google de propósito
-  (dados fictícios não devem virar eventos reais).
+### Passo 2 — Configurações que só a conta de origem faz (no próprio app)
+- [ ] **2.1 Modelos:** Gestor Comercial › Configurações do comercial › Modelos › **Salvar modelos** (grava
+  `com_config/modelos` com os modelos "Residência" e "Serviço menor", os 7 contratos e os textos exemplares).
+  Se já tinha salvo antes do Passo 1, os modelos novos (Serviço menor e contrato 07) aparecem mesmo assim (o app
+  completa com o arquivo padrão); salvar de novo para gravá-los.
+- [ ] **2.2 Contratos como .docx (opcional):** pela conta de origem dá para reenviar cada .docx oficial pelo botão
+  "Enviar .docx" (fica como texto). Os enviados pela conta convidada estão como script e funcionam igual.
+- [ ] **2.3 Prazos padrão** 🔐: Configurações › Prazos padrão → **Anteprojeto 70 → 80**; conferir Reforma
+  (Levantamento 5, EP 30, Executivo 40). O valor salvo no banco vale por cima do código. Alternativa pelo chat da conta
+  de origem: ArtifactData `update` em `config/escritorio` (`prazosPadrao.ap = 80`, `refLev 5`, `refEp 30`, `refPe 40`),
+  com `if_version`. Projetos existentes mantêm os prazos que têm.
+- [ ] **2.4 Padrões de obra:** Configurações › Padrões de obra → conferir as faixas de R$/m² e salvar.
+- [ ] **2.5 Valores do Comercial** 🔐 (Luan decide): Configurações do comercial → fatores, horas gerais, horas por
+  ambiente, custo-hora reserva (R$ 35), impostos 6% · reserva 10% · lucro 20%, nota fiscal 17%, CAU 8%, mercado
+  R$ 70–120/m², meta anual R$ 300 mil, validade 30 dias, adm. de obra 12%, cobrar briefing 5 dias, follow-up 7 dias,
+  nº da próxima proposta 81. Ao salvar, o aviso "provisório" some.
+- [ ] **2.6 Custo-hora da equipe:** Configurações › Pessoas (custo-hora) e Escritório (custos fixos, horas produtivas).
+- [ ] **2.7 Imposto no Financeiro:** Financeiro › Ajustes › reserva de imposto (%), usada pelo Simulador.
+- [ ] **2.8 Link do formulário de briefing:** Configurações do comercial → link do Google Forms de residência.
+- [ ] **2.9 Planilha de respostas:** no Google Forms, Respostas › Planilha (o app importa colando títulos + linha do cliente).
+- [ ] **2.10 Contrato 07 (serviço menor)** 🔐: **revisão jurídica** do modelo curto antes do primeiro uso; se mudar,
+  enviar o .docx novo em Configurações do comercial › Modelos de contrato.
 
-## C. Próximas rodadas (fase 3) — itens que vão exigir a conta de origem
+### Passo 3 — Conferências no primeiro uso real
+- [ ] **3.1 Agenda Google:** na primeira reunião agendada pelo Comercial, conferir o evento na agenda
+  `trilha@trilhaarq.com.br` (mesmos campos das Tarefas, mas ainda não verificado com chamada real).
+- [ ] **3.2 IA:** primeiro "✨ Escrever com o Claude", "✨ Montar com o Claude" e "Peça ao Claude" pedem autorização;
+  conferir a qualidade e o consumo de uso na conta de origem. Ajustar os textos exemplares se preciso.
+- [ ] **3.3 Ciclo completo:** uma oportunidade de residência (briefing real → PDF → contrato → virar projeto) e um
+  serviço menor (proposta curta → contrato 07 → virar projeto); conferir Word, Financeiro › Contratos e Gestor.
+- [ ] **3.4 Gestor:** num projeto de reforma novo, conferir a etapa Levantamento; numa etapa com prazo, testar
+  "Registrar rodada" (soma ao prazo e aparece no histórico).
+- [ ] **3.5 Páginas do Canva:** na revisão de design, exportar as páginas fixas **sem número de página** e trocar em
+  Configurações do comercial › Modelos (páginas com número impresso desalinham quando programa ou plano têm 2 páginas).
 
-- [ ] **C1.** Levantamento e "Registrar rodada" no Gestor de Projetos: combinar com o chat do Gestor antes de
-  publicar no oficial (mexe em `gestor.js`).
-- [ ] **C2.** "Peça ao Claude" (barra de conversa): usa `sample` com ferramentas do app; conferir custo de uso na
-  conta de origem.
+### Passo 4 — Registro
+- [ ] **4.1** Marcar aqui o que foi feito, atualizar `REGRAS.md` (seções "Fase 3" → "no oficial desde …") e
+  `CONTRATO.md` se algo mudou, sincronizar `.claude/skills/gestao-trilha/referencias/` e o `gestao-trilha-skill.zip`,
+  commit e push.
+
+---
+
+## Histórico (já feito)
+
+- [x] 02/10/2026 (conta de desenvolvimento) Fases 1 e 2 publicadas no oficial com as capacidades `db`, `downloads`,
+  `mcp` (Google Calendar), `assets` e `sample`.
+- [x] 02/10/2026 (conta de desenvolvimento) Imagens das páginas, logos e os contratos 01–07 enviados ao armazenamento
+  do oficial (contratos como script); `modelos-padrao.json` da fase 2 publicado no oficial.
+- [x] 02/10/2026 (conta de desenvolvimento) Fase 3 publicada na cópia de teste, com `modelos-padrao-teste.json`.
+
+## Cópia de teste
+- [ ] Clicar uma vez em **Salvar modelos** na cópia de teste (grava os modelos no banco dela).
+- A cópia de teste fica **sem** Agenda Google de propósito (dados fictícios não devem virar eventos reais).

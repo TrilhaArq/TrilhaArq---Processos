@@ -14,9 +14,10 @@ Um único Artifact, organizado em **módulos**, com um único banco de dados com
 - **Regras de negócio dos módulos atuais:** `referencias/REGRAS.md`
 - **Processo de projeto da Trilha (base do Gestor):** `manual-trilha/` no repositório (MAPEAMENTO.md,
   processo-trilha.json, AJUSTES-TESTE.md com as decisões do Luan, TERMOS.md com os textos dos termos)
-- **Gestor Comercial:** v1 e fase 2 no app oficial (02/10/2026, `modulos/comercial.js` e `comercial-docs.js`); plano em
-  `gestao-trilha/COMERCIAL-PLANO.md`, regras em `REGRAS.md` (seção Gestor Comercial), referências em
-  `gestao-trilha/referencias-comercial/`.
+- **Gestor Comercial:** fases 1 e 2 no app oficial; fase 3 (serviços menores, "Peça ao Claude", versões, relatórios,
+  vários contratantes, Levantamento e "Registrar rodada" no Gestor) na cópia de teste em 02/10/2026, para levar ao oficial
+  pelo roteiro de `PENDENCIAS-CONTA-ORIGEM.md`. Código em `modulos/comercial.js` e `comercial-docs.js`; plano em
+  `gestao-trilha/COMERCIAL-PLANO.md`; regras em `REGRAS.md`; referências e modelos em `gestao-trilha/referencias-comercial/`.
 - **Pendências para a conta de origem:** `gestao-trilha/PENDENCIAS-CONTA-ORIGEM.md` — **ler sempre antes de mexer no
   app**. O desenvolvimento pode ser feito por uma conta convidada (sem acesso ao banco pelo chat e que só envia imagens e
   scripts); o que só a conta de origem (Luan e Elisa) pode configurar fica listado ali. Ao trabalhar pela conta de

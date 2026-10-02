@@ -11,3 +11,6 @@ gerados a partir dos .docx oficiais (que não ficam no repositório por terem CP
 Contas convidadas de outra organização só conseguem enviar imagens e scripts; por isso o contrato vai como script.
 O primeiro "Salvar modelos" em Configurações do comercial grava os modelos no banco (`com_config/modelos`).
 Ids da cópia de teste (02/10/2026): ver o `modelos-padrao.json` publicado nela.
+
+Arquivos prontos com os ids de cada artefato: `../modelos-padrao-oficial.json` e `../modelos-padrao-teste.json`
+(inclui o modelo de proposta "Serviço menor" e o contrato 07).

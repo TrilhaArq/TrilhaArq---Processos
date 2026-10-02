@@ -118,6 +118,39 @@
      "n": "Contatos"
     }
    ]
+  },
+  {
+   "id": "serv",
+   "nome": "Serviço menor (curta)",
+   "tipos": [
+    "SERV"
+   ],
+   "paginas": [
+    {
+     "t": "capa"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-02",
+     "n": "Trilha · Arquitetura · Brasileira"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-03",
+     "n": "Quem somos"
+    },
+    {
+     "t": "servico"
+    },
+    {
+     "t": "investimento"
+    },
+    {
+     "t": "fixa",
+     "img": "ID_fixa-25",
+     "n": "Contatos"
+    }
+   ]
   }
  ],
  "marca": {
@@ -163,6 +196,12 @@
    "asset": "ID_contrato-06",
    "arquivo": "Contrato_06_Marcenaria_Vinculada.docx",
    "versao": "30/09/2026"
+  },
+  {
+   "id": "07",
+   "asset": "ID_contrato-07",
+   "arquivo": "Contrato_07_Servico_Menor.docx",
+   "versao": "02/10/2026 (modelo curto — revisar com advogado)"
   }
  ],
  "exemplos": [

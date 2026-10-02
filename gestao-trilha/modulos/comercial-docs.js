@@ -67,7 +67,8 @@
 
   // ---------- proposta: páginas ----------
   // Tipos de página variável (desenhados pelo app). Páginas fixas: { t: "fixa", img: <id do arquivo>, n: nome, opc?: "marcenaria"|"adm" }.
-  var VARIAVEIS = [["capa", "Capa (nome do cliente e tipo)"], ["demanda", "Sua demanda"], ["programa", "Programa de necessidades"], ["plano", "Plano de projeto"], ["horas", "Entregáveis, horas e custo da obra"], ["investimento", "Investimento"]];
+  var VARIAVEIS = [["capa", "Capa (nome do cliente e tipo)"], ["demanda", "Sua demanda"], ["programa", "Programa de necessidades"], ["plano", "Plano de projeto"], ["horas", "Entregáveis, horas e custo da obra"], ["servico", "O serviço (serviços menores)"], ["investimento", "Investimento"]];
+  function linhas(t) { return String(t || "").split("\n").map(function (x) { return x.replace(/^[-•*]\s*/, "").trim(); }).filter(Boolean); }
   function tituloTipo(t) { return { RES: "Projeto Residência", COM: "Projeto Comercial", HOT: "Projeto Hotelaria", REF: "Projeto de Reforma", INT: "Projeto de Interiores", MARC: "Projeto de Marcenaria", SERV: "Serviço" }[t] || "Projeto"; }
   function pp(cls, corpo, n, escuro, marca) {
     var m = marca || {};
@@ -124,12 +125,19 @@
       return [pp("pp-horas", '<div class="pp-card pp-tabs"><table class="pp-tab2"><tr class="pp-cab"><td>Entregáveis por Etapa</td><td>quant.</td></tr>' + ent + '<tr class="pp-sum"><td>TOTAL</td><td>' + tot + '</td></tr></table><p class="pp-mini">Os números são estimativas, sendo que no Projeto Executivo muitos desenhos e documentos não conseguem ser mensurados previamente.</p>' +
         '<table class="pp-tab2"><tr class="pp-cab"><td>Tempo Estimado por Etapa</td><td>horas</td></tr>' + hs + '<tr class="pp-sum"><td>TOTAL</td><td>' + th + '</td></tr></table><p class="pp-mini">Nossas estimativas de horas de desenvolvimento são baseadas em nossas experiências e geradas através do Programa de Necessidades. Reflete o altíssimo nível de dedicação e qualidade dos nossos projetos.</p></div>' + obra, n, false, ctx.marca)];
     },
+    servico: function (ctx, pg, n) {
+      var o = ctx.o, sv = o.serv || {}, ent = linhas(sv.entregaveis);
+      return [pp("pp-dem pp-serv-pg", '<div class="pp-head"><h2>O SERVIÇO</h2><p>' + esc(sv.titulo || "Serviço") + "</p>" + (o.endereco ? "<p>" + esc(o.endereco) + "</p>" : "") + '</div><div class="pp-card pp-texto">' + paragrafos(sv.descricao) +
+        (ent.length ? '<h3 class="pp-sub">ENTREGÁVEIS</h3><ul class="pp-ent">' + ent.map(function (e) { return "<li>" + esc(e) + "</li>"; }).join("") + "</ul>" : "") +
+        (sv.prazo ? '<h3 class="pp-sub">PRAZO</h3><p>Até ' + esc(sv.prazo) + " dias úteis, contados da assinatura do contrato, do pagamento da 1ª parcela e do recebimento das informações necessárias.</p>" : "") + "</div>", n, false, ctx.marca)];
+    },
     investimento: function (ctx, pg, n) {
       var o = ctx.o, r = ctx.r, op = ctx.opc || {}, zero = ["RES", "COM", "HOT"].indexOf(o.tipo) >= 0, marc = o.tipo === "MARC";
-      var ets = marc ? ["Briefing", "Estudo Preliminar", "Projeto Executivo", "Pré-Obra e Orçamento"] : ["Briefing"].concat(zero ? [] : ["Levantamento"]).concat(["Estudo Preliminar"]).concat(ctx.legal ? ["Projeto Legal"] : []).concat(zero ? ["Ante Projeto"] : []).concat(["Projeto Executivo"]);
+      var serv = o.tipo === "SERV", entS = linhas((o.serv || {}).entregaveis).slice(0, 6);
+      var ets = serv ? (entS.length ? entS : ["Serviço"]) : marc ? ["Briefing", "Estudo Preliminar", "Projeto Executivo", "Pré-Obra e Orçamento"] : ["Briefing"].concat(zero ? [] : ["Levantamento"]).concat(["Estudo Preliminar"]).concat(ctx.legal ? ["Projeto Legal"] : []).concat(zero ? ["Ante Projeto"] : []).concat(["Projeto Executivo"]);
       var de = r.valor && r.tabela && r.valor < r.tabela - 1;
-      var bloco = '<div class="pp-serv"><h3>' + (marc ? "PROJETO DE INTERIORES/MARCENARIA" : "PROJETO ARQUITETÔNICO") + '</h3><div class="pp-serv-c"><ul>' + ets.map(function (e) { return "<li>✓ " + e + "</li>"; }).join("") + '</ul><div class="pp-preco">' +
-        (de ? '<span class="pp-de">' + BRL(r.tabela) + "</span>" : "") + '<b class="pp-valor">' + BRL(r.final) + "</b>" + (r.pctObra && !marc ? "<small>" + T.fmtNum(r.pctObra, 2) + "% DO CUSTO DA OBRA (aprox.)</small>" : "") + "</div></div>" +
+      var bloco = '<div class="pp-serv"><h3>' + (serv ? esc(((o.serv || {}).titulo || "SERVIÇO").toUpperCase()) : marc ? "PROJETO DE INTERIORES/MARCENARIA" : "PROJETO ARQUITETÔNICO") + '</h3><div class="pp-serv-c"><ul>' + ets.map(function (e) { return "<li>✓ " + e + "</li>"; }).join("") + '</ul><div class="pp-preco">' +
+        (de ? '<span class="pp-de">' + BRL(r.tabela) + "</span>" : "") + '<b class="pp-valor">' + BRL(r.final) + "</b>" + (r.pctObra && !marc && !serv ? "<small>" + T.fmtNum(r.pctObra, 2) + "% DO CUSTO DA OBRA (aprox.)</small>" : "") + "</div></div>" +
         '<p class="pp-lbl">Formas de pagamento:</p><div class="pp-pill">' + (r.parcela ? "ENTRADA DE " + BRL(r.entrada) + " + " + r.np + " PARCELAS DE " + BRL(r.parcela) : "A COMBINAR") + "</div>" +
         (op.aposArq ? '<p class="pp-c">Pagamento iniciando após a finalização do pagamento do Projeto Arquitetônico</p>' : "") +
         '<p class="pp-c">Outras formas de pagamento poderão ser combinadas<br>Para emissão de nota fiscal considerar acréscimo de ' + T.fmtNum(ctx.nf, 0) + "%</p>" +
@@ -196,7 +204,7 @@
     var m, ant = null, corte = -1;
     while ((m = RP.exec(corpo))) { if (/INSTRUÇÕES DE PREENCHIMENTO/.test(textoP(m[0]))) { corte = ant && /w:type="page"/.test(ant.s) && !textoP(ant.s).trim() ? ant.i : m.index; break; } ant = { s: m[0], i: m.index }; }
     if (corte >= 0) corpo = corpo.slice(0, corte);
-    var parcelas = d.parcelas || [], etapaPrazo = null;
+    var parcelas = d.parcelas || [], etapaPrazo = null, ultLinha = "", clientes = d.clientes && d.clientes.length ? d.clientes : [d.campos];
     corpo = corpo.replace(RP, function (p) {
       var t = textoP(p), tt = t.trim();
       if (/^3\.3\.\d/.test(tt)) etapaPrazo = /Estudo Preliminar/.test(t) ? "ep" : /Projeto Executivo/.test(t) ? "pe" : /Projeto Legal/.test(t) ? "plDev" : /Levantamento/.test(t) ? "lev" : null;
@@ -204,6 +212,11 @@
       if (/\{parcela_n_valor\}/.test(t)) return parcelas.map(function (pc, k) { return trocar(p, { parcela_n: k + 1, parcela_n_valor: numBR(pc.valor), parcela_n_extenso: reaisExtenso(pc.valor), parcela_n_vencimento: pc.vencimento ? T.fmtYmd(pc.vencimento) : "a combinar" }); }).join("");
       if (tt === "{escopo_descricao}") return repetir(p, "escopo_descricao", d.escopoLinhas || []);
       if (tt === "{programa_necessidades}") return repetir(p, "programa_necessidades", d.programaLinhas || []);
+      if (tt === "{entregaveis}") return repetir(p, "entregaveis", d.entregaveis || []);
+      // mais de um contratante: o parágrafo de qualificação e a linha de assinatura se repetem para cada um
+      if (/^CONTRATANTE:/.test(tt) && /\{cliente_nome\}/.test(t)) return clientes.map(function (c) { return trocar(p, c); }).join("");
+      if (/^_{10,}$/.test(tt)) ultLinha = p;
+      if (/^\{cliente_nome\}/.test(tt) && /CPF/.test(t)) return clientes.map(function (c, k) { return (k ? ultLinha : "") + trocar(p, c); }).join("");
       if (tt === "{anexar_respostas_do_briefing}") return repetir(p, "anexar_respostas_do_briefing", d.briefingLinhas || []);
       if (/\{ambiente_1\}/.test(t)) return (d.moveis && d.moveis.length ? d.moveis : [["", ""]]).map(function (x) { return trocar(p, { ambiente_1: x[0], moveis_1: x[1] }); }).join("");
       if (/\{ambiente_2\}|\{ambiente_n\}/.test(t)) return "";
@@ -238,6 +251,18 @@
     return (r && r.text || "").trim();
   }
 
-  T.comercialDocs = { VARIAVEIS: VARIAVEIS, paginasProposta: paginasProposta, baixarProposta: baixarProposta, planoProposta: planoProposta, gerarContrato: gerarContrato, arquivoBase64: arquivoBase64, lerAsset: lerAsset,
+  // ---------- IA: serviço menor (o sócio descreve; a IA organiza título, descrição, entregáveis, prazo e horas) ----------
+  async function montarServico(o, pedido, exemplos) {
+    var sample = window.claude && window.claude.use ? await window.claude.use("sample") : null;
+    if (!sample) throw new Error("A IA não está disponível nesta visualização.");
+    var p = "Você organiza propostas de serviços menores da Trilha Arquitetura Brasileira (Juiz de Fora/MG): consultorias, layouts, visitas técnicas, laudos, pequenos projetos.\n" +
+      "A partir do pedido do arquiteto, devolva SÓ um JSON: {\"titulo\": string curta (ex.: \"Consultoria de layout da cozinha\"), \"descricao\": 2 a 3 parágrafos em 3ª pessoa no tom da Trilha, sem inventar fatos, " +
+      "\"entregaveis\": lista de 2 a 6 itens objetivos, \"prazo\": dias úteis (número), \"horas\": horas de trabalho estimadas (número, conservador)}.\n" +
+      (exemplos && exemplos.length ? "Estilo de escrita da Trilha (referência):\n" + exemplos[0].slice(0, 900) + "\n\n" : "") +
+      "Cliente: " + ((o.cliente && o.cliente.nome) || "—") + "\nLocal: " + (o.endereco || "—") + "\nNotas: " + (o.notas || "—") + "\nPedido do arquiteto: " + pedido;
+    var r = await sample.json(p, { modelTier: "quick" });
+    return r || {};
+  }
+  T.comercialDocs = { montarServico: montarServico, VARIAVEIS: VARIAVEIS, paginasProposta: paginasProposta, baixarProposta: baixarProposta, planoProposta: planoProposta, gerarContrato: gerarContrato, arquivoBase64: arquivoBase64, lerAsset: lerAsset,
     reaisExtenso: reaisExtenso, numBR: numBR, dataExtenso: dataExtenso, ddmmaa: ddmmaa, escreverDemanda: escreverDemanda, carregar: carregar, blob: blob };
 })();

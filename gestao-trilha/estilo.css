@@ -1176,3 +1176,25 @@
   .pp-c { text-align: center; font-size: 12.5px; line-height: 1.5; color: #fff; margin: 10px 0; }
   .pp-validade { position: absolute; left: 60px; bottom: 0; width: 490px; height: 120px; background: var(--pp-verde); border-radius: 24px 24px 0 0; display: flex; align-items: center; justify-content: center; }
   .pp-validade span { border: 2px solid var(--pp-grafite); color: var(--pp-grafite); padding: 6px 40px; font-size: 14px; }
+  /* Comercial · fase 3: Peça ao Claude, relatórios, serviço, contratantes */
+  .com-chat { margin-bottom: 14px; gap: 10px; }
+  .com-chat-h { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .com-chat-h b { font-family: 'Comfortaa', sans-serif; font-size: 14px; color: var(--ink); }
+  .com-chat-h .hint { flex: 1; min-width: 180px; }
+  .com-chat-msgs { display: flex; flex-direction: column; gap: 8px; max-height: 360px; overflow-y: auto; }
+  .com-msg { max-width: 85%; padding: 9px 12px; border-radius: 12px; font-size: 13.5px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .com-msg.eu { align-self: flex-end; background: var(--accent-tint); color: var(--ink); border-bottom-right-radius: 4px; }
+  .com-msg.ia { align-self: flex-start; background: var(--surface-muted); color: var(--body-ink); border-bottom-left-radius: 4px; }
+  .com-chat-in { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; align-items: end; }
+  .com-chat-in textarea.ctl { height: auto; min-height: 44px; padding: 8px; resize: vertical; width: 100%; }
+  @media (max-width: 560px) { .com-chat-in { grid-template-columns: minmax(0, 1fr) auto; } .com-chat-in textarea.ctl { grid-column: 1 / -1; } }
+  .com-pend-ia ul { margin: 6px 0 8px; padding-left: 18px; font-size: 13px; }
+  .com-rel-g { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; }
+  .com-rel-g > .gp-box { margin-bottom: 0; }
+  @media (max-width: 900px) { .com-rel-g { grid-template-columns: minmax(0, 1fr); } }
+  .com-ctr-h { display: flex; align-items: center; gap: 10px; }
+  .pp-sub { font-size: 15px; font-weight: 700; margin: 22px 0 10px; color: var(--pp-verde); }
+  .pp-ent { margin: 0; padding-left: 20px; font-size: 15px; line-height: 1.6; }
+  .gp-rodada { font-size: 13px; color: var(--body-ink); }
+  .gp-rodada summary { cursor: pointer; font-family: 'Comfortaa', sans-serif; font-size: 12.5px; font-weight: 600; color: var(--accent-deep); padding: 4px 0; }
+  .gp-rodada .form-actions { margin: 6px 0; }
