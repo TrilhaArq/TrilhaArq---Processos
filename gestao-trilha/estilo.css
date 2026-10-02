@@ -1210,3 +1210,9 @@
 .apr-txt { white-space: pre-wrap; overflow-wrap: anywhere; }
 .apr-resp { font-size: 13px; color: var(--muted); white-space: pre-wrap; overflow-wrap: anywhere; }
 .apr-st.apr-feito, .apr-st.apr-aprovado { background: var(--accent-tint); color: var(--accent-deep); }
+#home-extra .ctl { font: inherit; font-size: 14px; color: var(--ink); background: var(--bg); border: 1px solid var(--border); border-radius: 10px; max-width: 100%; }
+#home-extra select.ctl { height: 36px; padding: 0 10px; }
+#home-extra textarea.ctl { width: 100%; min-height: 72px; padding: 10px 12px; resize: vertical; }
+#home-extra .ctl:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.apr-box .com-chat-in { grid-template-columns: minmax(0, 1fr) auto; }
+.apr-box .com-chat-in textarea.ctl { grid-column: 1 / -1; }
