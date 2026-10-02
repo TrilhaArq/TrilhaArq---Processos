@@ -61,7 +61,7 @@
       if (S.docs[mes]) await ref.update({ itens: T.clone(S.docs[mes]).concat([item]) });
       else await ref.set({ mes: mes, itens: [item] });
     });
-    if (ok) { $("apr-txt").value = ""; S.docs[mes] = (S.docs[mes] || []).concat([item]); renderLista(); T.toast("Registrado ✓ — fica guardado para análise."); }
+    if (ok) { $("apr-txt").value = ""; T.toast("Registrado ✓ — fica guardado para análise."); }
   }
   async function excluir(chave) {
     var k = chave.split("|"), mes = k[0], id = k[1];

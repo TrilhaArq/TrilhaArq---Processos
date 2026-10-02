@@ -660,3 +660,12 @@ teclado), parte do app e "Registrar". "Ver registros" mostra a lista com a situa
 Aprovado, Feito, Não será feito) e a resposta. Só registros ainda não analisados podem ser excluídos. O app não responde
 nem processa: a análise e as alterações acontecem no chat do Claude, quando o Luan pedir e autorizar (regra na skill).
 Dados: `aprimoramentos/<AAAA-MM>` com `itens[]`.
+
+## Tarefas · "Fale com o Claude" (desde 02/10/2026)
+
+No topo de Tarefas (área da pessoa), caixa para ditar ou escrever solto. "Organizar" chama o Claude no nível rápido
+(`sample.json`), que devolve fichas: grupo (compromisso, prioridade, demanda, tarefa), título curto, descrição resumida,
+checklist, data, hora, duração, lembrete, repetição e projeto citado. Compromisso sem data vira tarefa. Nada é gravado
+antes de "Criar selecionadas"; compromissos criados vão para a Agenda Google como os demais. Sem a IA disponível, a
+caixa não aparece. Microfone: o app não pode usar o microfone diretamente (o Claude bloqueia em todas as páginas
+publicadas); usa-se o ditado do teclado (Win + H no Windows, microfone do teclado no celular).

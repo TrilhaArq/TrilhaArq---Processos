@@ -1221,3 +1221,19 @@
 .apr-box .apr-dica { grid-column: 1 / -1; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
 .apr-box kbd { display: inline-flex; align-items: center; gap: 4px; font: 600 12px 'Work Sans', sans-serif; color: var(--ink); background: var(--surface); border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 6px; padding: 1px 6px; }
 .apr-box .apr-win { width: 11px; height: 11px; fill: currentColor; }
+
+/* Tarefas · Fale com o Claude */
+.tia-box { margin-bottom: 18px; }
+.tia-box .com-chat-in { grid-template-columns: minmax(0, 1fr) auto; }
+.tia-box .com-chat-in textarea.ctl, .tia-box .apr-dica { grid-column: 1 / -1; }
+#view-tarefas .tia-box textarea.ctl { font: inherit; font-size: 14px; color: var(--ink); background: var(--bg); border: 1px solid var(--border); border-radius: 10px; width: 100%; min-height: 80px; padding: 10px 12px; resize: vertical; }
+#view-tarefas .tia-box textarea.ctl:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.tia-box .apr-dica { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.tia-box kbd { display: inline-flex; align-items: center; gap: 4px; font: 600 12px 'Work Sans', sans-serif; color: var(--ink); background: var(--surface); border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 6px; padding: 1px 6px; }
+.tia-box .apr-win { width: 11px; height: 11px; fill: currentColor; }
+.tia-lista { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.tia-item { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; cursor: pointer; }
+.tia-item input { margin-top: 3px; accent-color: var(--accent); }
+.tia-c { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.tia-l1 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tia-d { font-size: 13px; color: var(--body-ink); white-space: pre-wrap; overflow-wrap: anywhere; }
