@@ -141,6 +141,14 @@ refletem o modelo de remuneração e os aceites decididos.
   não é obrigatória e fica fora da base do honorário.
 - **Rescisão (decidido)**: 3% (fase de planejamento) + parte de execução do honorário × avanço físico medido + próxima
   parcela como compensação; prever também rescisão pelo contratado (falta de aportes ou inadimplência).
+- **Regularização (decidido em parte)**: **CNO e INSS** ficam fora do escopo — serviço à parte, com contador; a Trilha
+  alerta e indica. **Alvará**: em definição (recomendação: serviço de legalização cobrado à parte, executado pela
+  Trilha; taxas pelo contratante). Licenças do negócio ficam com o contratante.
+- **Segurança (decidido)**: responsabilidade de cada prestador contratado; a Trilha estabelece **padrão próprio com uso
+  obrigatório de EPI**, que entra no memorial descritivo e nos contratos de empreitada. Sugestão: prever que a Trilha
+  pode suspender a atividade de quem estiver sem EPI até a regularização.
+- **Compras (decidido)**: a Trilha cota e solicita; o contratante aprova e paga; a Trilha alinha a entrega com o
+  fornecedor e confere o recebimento. Ajusta a redação da 2.4 ("responsável por todas as aquisições").
 - **RRT (em discussão — tema central do chat de contratos)**: hoje é emitido **RRT de execução de obra**. Com contratados
   pessoas físicas, a responsabilidade técnica recai pessoalmente sobre os arquitetos. A discutir:
   - verificar no CAU se uma atividade de **gestão** (gerenciamento, fiscalização ou acompanhamento de obra) atende ao

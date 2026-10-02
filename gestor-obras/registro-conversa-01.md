@@ -455,7 +455,25 @@ administração etc.) são **padrões editáveis por obra**, conforme a negocia�
   fiscalização ou acompanhamento de obra) atende; avaliar seguro de responsabilidade civil profissional; delimitar no
   contrato o que a Trilha responde (gestão e fiscalização) e o que é dos prestadores contratados pelo cliente.
 
-**Próximo passo**: D9–D10 (regularização/segurança e escopo da administração).
+**Decisões da pauta — D8 a D10 (02/10/2026)**
+- **D8 (RESOLVIDO AQUI, segue para o chat de contratos)** — RRT de execução emitido hoje; como preservar a
+  caracterização de administração será tratado no chat de contratos (pontos já anotados na análise do contrato).
+- **D9 (QUASE DECIDIDO)**:
+  - **CNO e INSS da obra**: **fora do escopo** da Trilha — serviço à parte, ligado à contabilidade (um profissional
+    com experiência pode ajudar o cliente a economizar). Futuro possível: com a Trilha estruturada e engenheiros de
+    obra, incluir esse serviço. Hoje: a Trilha **alerta e indica** (item do checklist de início).
+  - **Segurança do trabalho**: responsabilidade de **cada profissional contratado**. A Trilha implanta **padrões de
+    segurança próprios**: **uso de EPI obrigatório** na obra por todos os contratados — vai nas **regras da obra do
+    memorial descritivo** e no **contrato de empreitada**.
+  - **Alvará**: em aberto. Na prática é a Trilha quem acaba solicitando. Recomendação do Claude: tratar como serviço
+    de **legalização/aprovação**, cobrado à parte (valor fixo, na proposta de projeto ou de administração), executado
+    pela Trilha porque depende do projeto e do responsável técnico; taxas pagas pelo cliente; licenças do negócio
+    (funcionamento, bombeiros etc.) ficam com o cliente.
+- **D10 (DECIDIDO)** — escopo da administração como recomendado. **Compras**: a Trilha **cota** → passa ao cliente →
+  o cliente **aprova e paga** → a Trilha **alinha a entrega com o vendedor e confere** o material na obra.
+  Quem aprova e paga é sempre o cliente. (Responde boa parte do tema T3.)
+
+**Próximo passo**: decidir o alvará (D9) e seguir para D11–D13.
 
 ---
 
