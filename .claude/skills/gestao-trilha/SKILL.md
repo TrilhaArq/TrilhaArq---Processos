@@ -14,7 +14,14 @@ Um único Artifact, organizado em **módulos**, com um único banco de dados com
 - **Regras de negócio dos módulos atuais:** `referencias/REGRAS.md`
 - **Processo de projeto da Trilha (base do Gestor):** `manual-trilha/` no repositório (MAPEAMENTO.md,
   processo-trilha.json, AJUSTES-TESTE.md com as decisões do Luan, TERMOS.md com os textos dos termos)
-- **Planejamento do Gestor Comercial (ainda não construído):** `gestao-trilha/COMERCIAL-PLANO.md` no repositório — ler antes de começar esse módulo.
+- **Gestor Comercial:** v1 e fase 2 construídas (02/10/2026, `modulos/comercial.js` e `comercial-docs.js`); plano em
+  `gestao-trilha/COMERCIAL-PLANO.md`, regras em `REGRAS.md` (seção Gestor Comercial), referências em
+  `gestao-trilha/referencias-comercial/`.
+- **Pendências para a conta de origem:** `gestao-trilha/PENDENCIAS-CONTA-ORIGEM.md` — **ler sempre antes de mexer no
+  app**. O desenvolvimento pode ser feito por uma conta convidada (sem acesso ao banco pelo chat e que só envia imagens e
+  scripts); o que só a conta de origem (Luan e Elisa) pode configurar fica listado ali. Ao trabalhar pela conta de
+  origem: executar os itens abertos, pedindo autorização ao Luan quando o item pedir, e marcar cada um como feito.
+  Ao trabalhar pela conta convidada: acrescentar ali tudo o que precisar ser feito/configurado na conta de origem.
 
 ## Princípios que não se reabrem sem pedido explícito
 
@@ -22,7 +29,7 @@ Um único Artifact, organizado em **módulos**, com um único banco de dados com
    custos). Um módulo novo nasce como `modulos/<id>.js` deste app, não como outro Artifact.
 2. **Capa** = hub: notificações no topo (só as do Gestor de Projetos, via `notes()`), botões das pessoas (área
    "pessoa": Tempo, Tarefas, Projetos) e botões do Escritório nesta ordem: Gestor de Projetos, Gestor de obras
-   (em breve), Gestor Comercial (em breve), Financeiro, Relatórios (com a aba Horas e custos), Configurações,
+   (em breve), Gestor Comercial, Financeiro, Relatórios (com a aba Horas e custos), Configurações,
    Cadastros. Cada app do escritório abre sozinho, só com "← Início".
 3. **Banco:** limite de 5.000 documentos por Artifact → registros numerosos agrupados em um documento por
    pessoa/mês ou por mês/obra, com `itens[]`. Gravações pelo chat usam `if_version`.
@@ -53,7 +60,8 @@ Um único Artifact, organizado em **módulos**, com um único banco de dados com
    `file://`, que bloqueia o PDF do logo), em 390 px e 1280 px, sem erros no console.
 4. **Publicar** no mesmo link: `url` = link acima, `file_path` = `index.html`, `root` = pasta do app, `files`
    com todos os arquivos. Não alterar `capabilities` sem necessidade (hoje: `db`, `downloads` e `mcp` com
-   Google Calendar `create_event`/`update_event`); ao declarar uma nova, repetir as existentes.
+   Google Calendar `create_event`/`update_event`; com o Gestor Comercial entram `assets` e `sample`); ao declarar
+   uma nova, repetir as existentes.
 5. **Atualizar a documentação:** `REGRAS.md` (regras de negócio) e, se mudou a arquitetura, `CONTRATO.md`.
    Se houver acesso ao repositório, commit e push.
 6. **Um chat por vez** publicando no app, para um não sobrescrever o trabalho do outro.

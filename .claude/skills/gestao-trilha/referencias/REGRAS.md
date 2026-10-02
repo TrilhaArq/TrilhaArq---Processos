@@ -270,6 +270,13 @@ Quem vê: sócios veem tudo; colaborador vê os projetos em que tem item ou tare
   própria trilha (cliente, engenheiro, pausa interna com motivo) e encerramento; quadros do Projeto Legal por órgão.
 - **Prazos:** padrão em Configurações › Prazos padrão; cada projeto guarda os seus em `etapas.<e>.prazo` (congelados
   na criação/ativação da marcenaria); `marc.prazos` antigo só como reserva. Aviso 10 d.u. (Legal 5 d.u.).
+- **Prazos seguem os contratos (decisão de 01/10/2026; prazos por tipo e AP 80 implementados em 02/10/2026, Levantamento e "Registrar rodada" na próxima rodada):** o app adota os
+  prazos dos modelos de contrato e, quando o contrato dá uma faixa, o **maior número**. Prazos padrão por tipo
+  (d.u.): **projeto do zero** EP 40 · AP **80** (30 + 15 + 15 + 20) · Legal 20 · PE 60; **reforma** Levantamento 5 ·
+  EP 30 · Legal 20 · PE 40; **marcenaria** Levantamento 5 (só avulsa) · EP 30 · PE 40. Exigência do Legal: 10 d.u.,
+  controle interno (o contrato não fixa). Rodadas acrescentam prazo quando acontecem ("Registrar rodada"): ajustes
+  do EP +15, revisão total +40, compatibilização com engenheiro/complementares +10. Projetos existentes mantêm os
+  prazos já congelados. Detalhes em `referencias-comercial/CONTRATOS.md`.
 - **Plano:** cabeçalho de etapa (situação, contagem Em andamento/Revisão interna/Revisão Cliente/Pronto, "Atribuir a
   etapa"); ✓ nas abas de etapas concluídas; situação "Revisão Cliente"; desenhos e itens de checklist renomeáveis e
   reordenáveis; "Desfazer" ao remover item, desenho ou item de checklist; móveis da marcenaria vinculados EP ↔
@@ -529,6 +536,84 @@ deixar a Ficha restrita)
 **E. Proteção contra apagar sem querer** (Elisa 7)
 - "Desfazer" em toda remoção pequena (item, desenho, item de checklist); confirmação antes de apagar coisas grandes
   (projeto, etapa, ambiente, pessoa, contato).
+
+## Gestor Comercial (v1 — em teste desde 02/10/2026, só na cópia de teste)
+
+Planejamento completo: `COMERCIAL-PLANO.md`; referências (propostas, contratos, briefing): `referencias-comercial/`.
+
+- **Tela principal:** "+ Nova oportunidade" (cria o contato em Cadastros como cliente, categoria "Comercial", ou usa um
+  cliente já cadastrado); "Precisa de você hoje" (reunião hoje/amanhã, briefing sem resposta após N dias, briefing
+  recebido, expectativa fora da realidade, proposta vencendo/vencida ou sem resposta, contrato assinado sem projeto);
+  quadro único com em negociação, fechados no mês, conversão e ticket médio do ano; funil em 8 colunas (2 linhas de
+  4 no computador, lista no celular; dias parado: âmbar a partir de 7, vermelho a partir de 14); "O ano no
+  comercial" com seletor de ano (apresentadas × fechadas por mês, valor fechado × meta, funil do ano, origem de quem
+  fechou); "Encerradas" (perdidas e as que viraram projeto).
+- **Oportunidade:** cabeçalho com cliente, telefone e botão do WhatsApp, quadro (etapa, valor, área, % da obra),
+  trilha das 8 etapas e um único **próximo passo**: Agendar reunião (Agenda Google quando disponível) → Enviar
+  briefing (impressões do arquiteto + mensagem pronta) → Importar respostas → Montar proposta → Aprovar e
+  apresentar (nº, data, validade, mensagem) → Cliente vai fechar → Contrato assinado (nº, data, cidade, valor) →
+  Virar projeto. "Perdido" pede o motivo com um clique e pode ser reaberto. Abas: Resumo · Briefing · Programa ·
+  Simulador · Proposta · Histórico.
+- **Briefing:** colar a linha de títulos + a linha do cliente da planilha de respostas (ou enviar o CSV). O app lê em
+  código, sem IA: dados do cliente, dimensão, padrão (pela faixa de R$/m² que o cliente marcou, convertida para as
+  faixas do app), terreno, valor disponível, diretrizes (uso, expectativas, estética, relação, sistemas, execução),
+  programa (ambientes e quantidades) e a configuração de cada ambiente. Sem tabela, guarda o texto como está.
+- **Programa:** ambientes por setor (nome, quantidade, área, horas de referência), soma + 10% circulação + 10% paredes
+  e estrutura = total. "Residência padrão" e "Refazer pelo briefing". Ambientes fora do catálogo do Gestor
+  (varanda, despensa, sauna…) entram no Gestor como "Outro ambiente" com nome e setor.
+- **Simulador:** horas = Σ horas dos ambientes + horas gerais (Legal só quando há); × fatores (padrão, dimensão,
+  terreno, perfil do cliente — interno); custo = horas × custo-hora (média da equipe com rateio; sem custo-hora, o
+  valor reserva das Configurações do comercial); preço da tabela = custo ÷ (1 − impostos − reserva − lucro); imposto
+  do Financeiro quando existir. Mostra custo da obra (base e "banda pra cima"), CAU, mercado, **Meu valor**, % da
+  obra (destaque), R$/m², lucro resultante, diferença para a tabela, entrada + parcelas, valor com nota fiscal, horas
+  e valor por etapa (pesos das etapas) e a régua comparativa. Prazos da oportunidade (padrão por tipo).
+- **Expectativa do cliente:** se a obra estimada passa de 1,2× o valor que o cliente informou, aparece o alerta e a
+  marcação "Expectativa alinhada com o cliente"; apresentar sem alinhar pede confirmação (decisão do Luan: ajustar a
+  expectativa com o cliente antes de iniciar).
+- **Virar projeto:** usa `Trilha.gestor.criar` (mesma montagem do "+ Novo projeto"): projeto em Cadastros com
+  categorias, endereço e contrato; processo no Gestor na Abertura, com programa, Legal (e condomínio), prazos
+  contratados, descrição (texto "Sua demanda" ou impressões) e diretrizes do briefing. Serviço vira projeto simples;
+  marcenaria é ativada no projeto existente pelo Gestor.
+- **Valores provisórios** (preenchidos pelo Claude; o aviso some quando o Luan salvar as Configurações do comercial):
+  fatores do plano; horas por ambiente (cozinha 24, banho 10, suíte master 12…) e horas gerais (188 h + Legal 24 h);
+  custo-hora reserva R$ 35; impostos 6% (enquanto o Financeiro não tiver), reserva 10%, lucro 20%, nota fiscal 17%;
+  CAU 8%; mercado R$ 70–120/m²; meta anual R$ 300 mil; validade 30 dias; adm. de obra 12%; cobrar briefing após 5
+  dias; follow-up após 7; nº inicial da proposta 81. Faixas de R$/m² dos padrões: Configurações › Padrões de obra
+  (valores de mercado de 2026, editáveis).
+- **Fase 2 (em teste desde 02/10/2026):**
+  - **Proposta em PDF (modelo híbrido):** o modelo é uma sequência de páginas em `com_config/modelos.propostas[]`
+    (`{t: "fixa", img: <id do arquivo>, n, opc?}` ou `{t: capa|demanda|programa|plano|horas|investimento}`, `off`
+    para desligar, `opc` = só com marcenaria / adm. de obra / Projeto Legal). Páginas fixas = imagens (hoje recortadas
+    da proposta do Gustavo, 120 dpi); variáveis = HTML 810 × 1440 com a identidade das propostas (grafite #383135,
+    bege #E9DED6, verde #88AC67, Comfortaa), convertidas em imagem (html2canvas) e montadas em PDF (jsPDF) no formato
+    das propostas atuais. Programa e plano quebram em várias páginas; numeração contínua. Prévia em miniaturas na aba
+    Proposta; "Baixar PDF" também no passo "Aprovar e apresentar". Nome do arquivo: `<nº>_<DDMMAA> - Proposta <tipo> <cliente>.pdf`.
+  - **Opções da proposta:** incluir Projeto de Marcenaria (valor ou "a combinar") e Administração de Obra (%);
+    na marcenaria, "pagamento após a arquitetura" e lista de móveis por ambiente.
+  - **Plano de projeto da proposta:** gerado do programa e dos pavimentos (EP AP01…, séries 100–400 por pavimento,
+    500 = uma ampliação por cozinha, banheiros, lavanderia, gourmet, piscina, escada, sauna…, 600–800, xxx), com a
+    contagem de entregáveis por etapa e as horas por etapa (pesos das etapas, arredondadas a 10 h).
+  - **Contrato .docx:** os 6 modelos oficiais ficam no armazenamento de arquivos como texto base64 (o armazenamento não
+    aceita .docx) em `com_config/modelos.contratos[] {id, asset, arquivo, versao}`. Aba Contrato: modelo sugerido
+    (tipo + Projeto Legal; marcenaria vinculada quando há projeto de arquitetura escolhido), dados do contratante
+    (puxa Cadastros e briefing), nº (nº da proposta + DDMMAA), escopo (texto "Sua demanda"), parcelas (do Simulador,
+    editáveis). "Gerar contrato" preenche os {campos}, repete as linhas de parcela, monta programa, anexo do briefing
+    e móveis, apaga a página de instruções, tira o amarelo e troca só os prazos negociados (EP, Executivo, Legal).
+    Valores e datas por extenso em código.
+  - **Financeiro:** ao virar projeto, cria `fin_contratos/c-…` (mesmo formato do "+ Contrato" do Financeiro) com as
+    parcelas da aba Contrato ("Entrada", "Parcela 2"…) e grava o honorário no projeto. Marcenaria vinculada: o contrato
+    vai para o projeto de arquitetura escolhido.
+  - **IA (capacidade `sample`):** "✨ Escrever com o Claude" e "Reescrever" com orientação no texto "Sua demanda";
+    usa briefing, impressões, programa e os textos exemplares (`com_config/modelos.exemplos`, editáveis; "Guardar
+    como exemplo"). Só roda no clique; nível "padrão"; o texto é rascunho até "Salvar texto".
+  - **Configurações do comercial › Modelos:** páginas (ordem, ligar/desligar, opcional, trocar imagem, + página fixa,
+    + página variável, duplicar modelo, tipos de projeto), marca (logo e assinatura para páginas claras/escuras, fundo
+    da capa), contratos (enviar .docx novo, versão) e textos exemplares. Enviar arquivos exige a capacidade `assets`
+    (só quem edita o app). Sem modelos no banco, o app usa `modelos-padrao.json` publicado junto (ids dos arquivos
+    daquele artefato); o primeiro "Salvar modelos" grava em `com_config/modelos`. Ver `referencias-comercial/paginas/LEIA.md`.
+- **Ainda não faz:** "Peça ao Claude" (barra de conversa), proposta e contrato simplificados de serviços menores,
+  Levantamento e "Registrar rodada" no Gestor, relatórios do comercial, versões da proposta, mais de um contratante
+  no contrato.
 
 ## Próximos passos previstos
 
