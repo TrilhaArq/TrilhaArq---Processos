@@ -386,6 +386,35 @@ profunda será feita no chat específico de contratos. Principais pontos levanta
   aceites (por escrito, inclusive meio eletrônico/app); regularização (alvará, CNO, INSS) e segurança do trabalho;
   liberação de pagamentos por medição e retenção; termo de entrega/encerramento; declaração sobre comissões (RT).
 
+**Pagamento inicial, sinal e remuneração da fase de planejamento (02/10/2026)**
+- Problema identificado: o trabalho de orçamentação e planejamento acontece **antes** de existir orçamento; sem
+  pagamento, risco de o cliente levar o estudo e não fechar. **O contrato vem antes do orçamento preliminar.**
+- Fluxo decidido: Proposta (percentual + estimativa da obra) → **Contrato + sinal** → Orçamento preliminar →
+  Pacote executivo (honorário recalculado sobre o executivo = piso; sinal abatido; saldo no plano de pagamento) →
+  obra → ajuste final por aditivos.
+- **Regra do sinal (DECIDIDA)**: **1% do custo estimado da obra, com valor mínimo** (ponto de partida: R$ 2.000),
+  **não reembolsável e abatido do honorário**.
+  - Residencial: estimativa = área × custo/m² do padrão (ex.: 100 m² × R$ 4.500 = R$ 450 mil → sinal R$ 4.500).
+  - Comercial: estimativa = **verba que o cliente pretende investir**; senão, experiência do Luan; sem base → mínimo.
+  - Mínimo deve cobrir o custo das horas da fase de planejamento de uma obra pequena; calibrar com as horas reais
+    registradas no módulo Tempo nas próximas obras.
+- **Escala de remuneração do planejamento (DECIDIDA pelo Luan)** — percentuais do **custo da obra**:
+  - assinatura: **1%** · orçamento preliminar entregue: **2%** · pacote executivo aceito: **3%**.
+  - Se o cliente desistir após o preliminar, deve 2%; após o executivo, 3%. Ao pagar, recebe os documentos
+    (planilha do que foi feito) e pode usá-los.
+  - Fundamento: planejar/orçar exige expertise e organização diferentes da execução — pode dar tanto ou mais trabalho
+    que administrar a obra planejada.
+- **Sugestão do Claude (A CONFIRMAR)**: transformar a escala em **cronograma de pagamento por marco** (1% na
+  assinatura; complemento até 2% na entrega do preliminar; até 3% no aceite do executivo; restante durante a obra),
+  em vez de cobrar só na desistência — Trilha nunca trabalha a descoberto, não precisa cobrar "multa" de quem sai,
+  é mais fácil de vender e cada pagamento corresponde a um documento entregue.
+- A definir: **base do 2%** ("valor de referência" impresso no Orçamento Preliminar, ex.: soma das opções
+  recomendadas); ciência de que os percentuais do planejamento independem do percentual de administração negociado
+  (desconto recai sobre a fase de execução).
+- **Rescisão com obra em andamento (EM DISCUSSÃO)** — proposta inicial: 3% (planejamento) + parcela de execução do
+  honorário × **avanço físico medido** + compensação (hoje 9.2: próxima parcela integral). Prever também rescisão
+  pela Trilha (falta de aportes ou de pagamento).
+
 **Próximo passo**: seguir na gestão da execução da obra.
 
 ---

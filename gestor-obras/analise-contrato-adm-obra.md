@@ -62,8 +62,8 @@ refletem o modelo de remuneração e os aceites decididos.
 - **Modelo de remuneração desatualizado**: hoje o honorário é sobre o custo final (**4.1**), sem piso. Incluir:
   piso no **Orçamento Executivo**; incidência adicional só sobre **aditivos aprovados** e imprevistos combinados;
   variação de preço de itens previstos não altera o honorário.
-- **Pagamento inicial**: o trabalho de orçamentação/planejamento acontece antes de existir orçamento — prever
-  **sinal/remuneração inicial** na assinatura (tema em discussão no chat do Gestor de Obras).
+- **Pagamento inicial e fase de planejamento** (definido no chat do Gestor de Obras — ver seção 8):
+  o contrato vem **antes** do orçamento preliminar e precisa prever o **sinal** e a remuneração da fase de planejamento.
 - **Plano de pagamento**: hoje fixo em 3 parcelas. Sugestão: plano em **anexo**, permitindo mensal, por etapa ou em
   N vezes, e renegociação do saldo final por escrito.
 - **Nomes dos documentos inconsistentes**: "Orçamento Preliminar" (4.3) × "Orçamento Executivo" (9.1). Padronizar:
@@ -109,10 +109,35 @@ refletem o modelo de remuneração e os aceites decididos.
 - Faltam: **liberação de pagamentos aos prestadores por medição** e **retenção** (ex.: 5–10% até a entrega);
   **termo de entrega/encerramento** da obra; **declaração sobre comissões de fornecedores (RT)**.
 
+## 8. Sinal, fase de planejamento e rescisão (definido em 02/10/2026)
+**Decidido pelo Luan**
+- **Sinal na assinatura**: **1% do custo estimado da obra**, com **valor mínimo** (ponto de partida: R$ 2.000),
+  **não reembolsável e abatido do honorário total**. O trabalho só começa após o sinal.
+  - Residencial: estimativa = área × custo/m² do padrão. Comercial: verba informada pelo cliente; senão,
+    estimativa por experiência; sem base → valor mínimo.
+- **Remuneração da fase de planejamento**, em % do custo da obra: **1%** (assinatura) → **2%** (Orçamento Preliminar
+  entregue) → **3%** (pacote executivo aceito). Desistência após o preliminar: devidos 2%; após o executivo: 3%.
+  Pago o marco, o cliente recebe e pode usar os documentos daquela fase.
+- Fundamento: planejar e orçar exige expertise e organização distintas da execução; pode demandar tanto ou mais
+  trabalho que a administração da obra já planejada.
+
+**Sugerido, a confirmar**
+- Redigir como **cronograma de pagamento por marco** (complementos até 2% e 3% na entrega de cada fase; restante do
+  honorário durante a execução), e não como multa por desistência.
+- Definir a **base do 2%**: "valor de referência" impresso no Orçamento Preliminar.
+- Deixar claro que os percentuais da fase de planejamento **independem** do percentual de administração negociado.
+- Substituir a lógica atual da 4.3 (30% + 30% sobre o "valor preliminar total da obra") por essa escala.
+
+**Em discussão — rescisão com obra em andamento**
+- Proposta inicial: valor devido = 3% (planejamento) + parcela de execução do honorário × **avanço físico medido** +
+  compensação (hoje a 9.2 prevê a próxima parcela integral).
+- Prever também a **rescisão pela Trilha** (falta de aportes ou inadimplência do contratante).
+- Prever cláusula de **desistência antes da obra** (hoje a 9.2 só trata de paralisação).
+
 ## Prioridades
 1. **Urgentes (texto)**: retirar "Execução" do título · corrigir o erro dos 30% na 4.3 · trocar ART por RRT.
 2. **Posicionamento**: reescrever cláusula 2 e 2.4 (assessorar/solicitar, não contratar/comprar) · rever partes contratadas.
-3. **Remuneração**: sinal inicial · piso no executivo · origem do aumento · base de cálculo · plano de pagamento em anexo.
+3. **Remuneração**: sinal e escala 1%/2%/3% da fase de planejamento · piso no executivo · origem do aumento · base de cálculo · plano de pagamento em anexo.
 4. **Proteções**: atraso causado pelo contratante · forma dos aceites · regularização e segurança · medição e retenção.
 5. **Acabamento**: numeração, linguagem, termo de entrega, comissões.
 
