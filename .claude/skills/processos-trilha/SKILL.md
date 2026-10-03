@@ -6,7 +6,7 @@ description: Processo de trabalho e serviços da Trilha Arquitetura Brasileira �
 # Processos da Trilha Arquitetura Brasileira
 
 Escritório de arquitetura de Juiz de Fora (MG). Sócios: **Luan** (fundador) e **Elisa**. Contato: trilha@trilhaarq.com.br.
-Este conjunto reúne todo o levantamento do processo de projeto feito de 25/09 a 03/10/2026, sem nada de
+Este conjunto reúne todo o levantamento do processo de projeto e do comercial (25/09 a 03/10/2026), sem
 configuração de app. O app de gestão (Gestão Trilha) tem chat e skill próprios (`gestao-trilha`).
 
 ## Onde está cada coisa
@@ -15,6 +15,8 @@ configuração de app. O app de gestão (Gestão Trilha) tem chat e skill própr
 |---|---|
 | `referencias/MAPEAMENTO.md` | **Base do processo** (v3, 28/09/2026): papéis, entrada do projeto, fluxo e etapas, prazos, espera e suspensão, alterações e aditivos, entregáveis, padrões, complementares e aprovações, variações por tipo, dores, encerramento e passagem para obra, e §11 pauta de revisão do contrato |
 | `referencias/DECISOES-PROCESSO.md` | Decisões **mais novas** (29/09 a 03/10): Abertura, Plano de Projeto por etapa, marcenaria, suspensão/arquivamento, termos com anotações, reuniões, histórico e registros de acontecimentos, especificação, notificações. **Prevalece sobre o Mapeamento** quando diferente |
+| `referencias/COMERCIAL-CONTRATOS-PROPOSTAS.md` | Captação (8 etapas), briefing, estrutura e texto da proposta, lógica de preço, os **7 modelos de contrato**, prazos por tipo e pesos (01–03/10/2026) |
+| `referencias/APP-VISAO-GERAL.md` | O app Gestão Trilha em uma página: o que cada parte faz no processo (sem configuração) |
 | `referencias/TERMOS.md` | Textos dos termos (Encerramento de Etapa, Encerramento de Projeto, Ciência de Antecipação) |
 | `referencias/processo-trilha.json` | O processo em dados estruturados (etapas, modelos, marco zero, termos, espera, aditivos, pranchas, complementares, papéis, programa de necessidades, categorias, pendências) |
 | `referencias/LEVANTAMENTO.md` | Registro histórico das rodadas de perguntas e respostas |
@@ -27,7 +29,8 @@ configuração de app. O app de gestão (Gestão Trilha) tem chat e skill própr
   **[B]** formulário de briefing · **[X]** print de exportação de executivo.
 - **Em conflito entre o que o Luan disse e o contrato, vale o contrato.** Só voltar ao Luan o conflito grande. O que
   exige mudar o contrato entra na pauta de revisão (MAPEAMENTO §11).
-- Decisão mais nova vale sobre a mais antiga (DECISOES-PROCESSO.md > MAPEAMENTO.md > LEVANTAMENTO.md).
+- Decisão mais nova vale sobre a mais antiga (COMERCIAL-CONTRATOS-PROPOSTAS.md > DECISOES-PROCESSO.md >
+  MAPEAMENTO.md > LEVANTAMENTO.md).
 - Tudo é **padrão editável**, nada é rígido. Critério para qualquer ferramenta ou rotina: **poucos cliques**
   (a ferramenta Volbi falhou por ser complexa demais).
 - **Confidencialidade:** o contrato tem cláusula de sigilo. Não publicar dados pessoais de clientes (CPF, endereço)
@@ -54,10 +57,11 @@ FORMATO-DOCUMENTOS.md) e conferir as páginas como imagem antes de entregar.
 
 ## Pendências conhecidas
 
-- Revisão do contrato com os ajustes da MAPEAMENTO §11 (inclui antecipação, nomes dos termos, alteração no Legal,
-  marcenaria como contrato próprio).
+- Contratos revisados em 30/09 (modelos 01–06) e 07 em 02/10 (falta revisão jurídica): conferir quais itens da
+  MAPEAMENTO §11 entraram (antecipação, nomes dos termos, alteração no Legal).
 - Materiais a receber/produzir: pasta padrão, template ArchiCAD, exemplos de EP e Executivo, guias em PDF por
   desenho, "Como fazer marcenaria na Trilha", revisão final dos textos dos termos.
 - Detalhar os processos de Reforma e de Interiores/Marcenaria (hoje só as diferenças macro, MAPEAMENTO §7).
-- Processo comercial (captação/oportunidades e briefing) a mapear.
+- Revisão do formulário de briefing (faixas de padrão, ambientes que faltam, gourmet com várias opções).
+- Calibrar horas de referência e fatores de preço com horas reais.
 - Especificação: biblioteca de itens padrão e listas por projeto (DECISOES §7).

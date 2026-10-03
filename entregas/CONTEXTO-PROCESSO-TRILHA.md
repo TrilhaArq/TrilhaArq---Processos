@@ -1,15 +1,15 @@
 # Contexto — Processos da Trilha Arquitetura Brasileira
 
-Arquivo único para iniciar um chat dedicado ao processo do escritório (gerado em 03/10/2026).
-Ordem: 1 regras do chat · 2 decisões mais novas · 3 mapeamento completo · 4 textos dos termos · 5 formato dos documentos.
-Os nomes de arquivo citados abaixo (MAPEAMENTO.md, DECISOES-PROCESSO.md…) correspondem às partes deste mesmo arquivo; os PDFs e o HTML de origem ficam no pacote processos-trilha (zip) e no GitHub (TrilhaArq/TrilhaArq---Processos).
+Arquivo único com todo o contexto de processo (atualizado em 03/10/2026, conferido com o app publicado).
+Ordem: 1 regras · 2 comercial, contratos e propostas · 3 decisões de processo · 4 o app em uma página · 5 mapeamento completo · 6 termos · 7 formato dos documentos.
+Os nomes de arquivo citados correspondem às partes deste mesmo arquivo; PDFs e HTML de origem ficam no pacote processos-trilha e no GitHub (TrilhaArq/TrilhaArq---Processos).
 
 ---
 
 # 1. Regras deste chat
 
 Escritório de arquitetura de Juiz de Fora (MG). Sócios: **Luan** (fundador) e **Elisa**. Contato: trilha@trilhaarq.com.br.
-Este arquivo reúne todo o levantamento do processo de projeto feito de 25/09 a 03/10/2026, sem nada de
+Este conjunto reúne todo o levantamento do processo de projeto e do comercial (25/09 a 03/10/2026), sem
 configuração de app. O app de gestão (Gestão Trilha) tem chat e skill próprios (`gestao-trilha`).
 
 ## Onde está cada coisa
@@ -18,6 +18,8 @@ configuração de app. O app de gestão (Gestão Trilha) tem chat e skill própr
 |---|---|
 | `referencias/MAPEAMENTO.md` | **Base do processo** (v3, 28/09/2026): papéis, entrada do projeto, fluxo e etapas, prazos, espera e suspensão, alterações e aditivos, entregáveis, padrões, complementares e aprovações, variações por tipo, dores, encerramento e passagem para obra, e §11 pauta de revisão do contrato |
 | `referencias/DECISOES-PROCESSO.md` | Decisões **mais novas** (29/09 a 03/10): Abertura, Plano de Projeto por etapa, marcenaria, suspensão/arquivamento, termos com anotações, reuniões, histórico e registros de acontecimentos, especificação, notificações. **Prevalece sobre o Mapeamento** quando diferente |
+| `referencias/COMERCIAL-CONTRATOS-PROPOSTAS.md` | Captação (8 etapas), briefing, estrutura e texto da proposta, lógica de preço, os **7 modelos de contrato**, prazos por tipo e pesos (01–03/10/2026) |
+| `referencias/APP-VISAO-GERAL.md` | O app Gestão Trilha em uma página: o que cada parte faz no processo (sem configuração) |
 | `referencias/TERMOS.md` | Textos dos termos (Encerramento de Etapa, Encerramento de Projeto, Ciência de Antecipação) |
 | `referencias/processo-trilha.json` | O processo em dados estruturados (etapas, modelos, marco zero, termos, espera, aditivos, pranchas, complementares, papéis, programa de necessidades, categorias, pendências) |
 | `referencias/LEVANTAMENTO.md` | Registro histórico das rodadas de perguntas e respostas |
@@ -30,7 +32,8 @@ configuração de app. O app de gestão (Gestão Trilha) tem chat e skill própr
   **[B]** formulário de briefing · **[X]** print de exportação de executivo.
 - **Em conflito entre o que o Luan disse e o contrato, vale o contrato.** Só voltar ao Luan o conflito grande. O que
   exige mudar o contrato entra na pauta de revisão (MAPEAMENTO §11).
-- Decisão mais nova vale sobre a mais antiga (DECISOES-PROCESSO.md > MAPEAMENTO.md > LEVANTAMENTO.md).
+- Decisão mais nova vale sobre a mais antiga (COMERCIAL-CONTRATOS-PROPOSTAS.md > DECISOES-PROCESSO.md >
+  MAPEAMENTO.md > LEVANTAMENTO.md).
 - Tudo é **padrão editável**, nada é rígido. Critério para qualquer ferramenta ou rotina: **poucos cliques**
   (a ferramenta Volbi falhou por ser complexa demais).
 - **Confidencialidade:** o contrato tem cláusula de sigilo. Não publicar dados pessoais de clientes (CPF, endereço)
@@ -57,17 +60,136 @@ FORMATO-DOCUMENTOS.md) e conferir as páginas como imagem antes de entregar.
 
 ## Pendências conhecidas
 
-- Revisão do contrato com os ajustes da MAPEAMENTO §11 (inclui antecipação, nomes dos termos, alteração no Legal,
-  marcenaria como contrato próprio).
+- Contratos revisados em 30/09 (modelos 01–06) e 07 em 02/10 (falta revisão jurídica): conferir quais itens da
+  MAPEAMENTO §11 entraram (antecipação, nomes dos termos, alteração no Legal).
 - Materiais a receber/produzir: pasta padrão, template ArchiCAD, exemplos de EP e Executivo, guias em PDF por
   desenho, "Como fazer marcenaria na Trilha", revisão final dos textos dos termos.
 - Detalhar os processos de Reforma e de Interiores/Marcenaria (hoje só as diferenças macro, MAPEAMENTO §7).
-- Processo comercial (captação/oportunidades e briefing) a mapear.
+- Revisão do formulário de briefing (faixas de padrão, ambientes que faltam, gourmet com várias opções).
+- Calibrar horas de referência e fatores de preço com horas reais.
 - Especificação: biblioteca de itens padrão e listas por projeto (DECISOES §7).
 
 ---
 
+# Processo comercial, contratos e propostas (situação em 03/10/2026)
+
+Resumo de processo tirado dos documentos do app (`gestao-trilha/COMERCIAL-PLANO.md` e
+`gestao-trilha/referencias-comercial/`: CONTRATOS.md, PROPOSTAS.md, BRIEFING.md). Os arquivos originais de
+contratos, propostas e respostas de briefing **não ficam no GitHub** (têm CPF, dados bancários e dados de clientes).
+
+**Regra de prevalência (Luan, 01/10/2026):** o que já está decidido e configurado no processo/app vale (prazos,
+pesos, faixas, etapas). Propostas antigas seguem o processo atual. Só os **contratos** podem divergir; nesse caso,
+perguntar ao Luan.
+
+## 1. Captação (oportunidade) — antes do projeto existir
+
+Oito etapas, sempre com **um próximo passo** por vez:
+
+| Etapa | Próximo passo |
+|---|---|
+| Contato | agendar reunião ou visita (o cliente entra no cadastro) |
+| Reunião | enviar o briefing (mensagem de WhatsApp com o link do formulário) |
+| Briefing enviado | importar as respostas; cobrar após 5 dias sem resposta |
+| Briefing recebido | montar a proposta (texto, programa, plano de projeto, preço, prazos) |
+| Proposta em revisão | aprovar e gerar o PDF |
+| Proposta apresentada | cliente vai fechar / perdido (com o motivo); follow-up após 7 dias |
+| Contrato | gerar o contrato pelo modelo; registrar assinado (nº, data, cidade, valor) |
+| Fechado | virar projeto: nasce na **Abertura**, com programa, prazos contratados e diretrizes do briefing |
+
+- **Expectativa do cliente:** se a obra estimada passa de 1,2× o valor que o cliente informou, alinhar a
+  expectativa com o cliente **antes** de apresentar a proposta (decisão do Luan).
+- O padrão que o cliente marca não é o padrão da proposta: o arquiteto define e mostra a distância.
+- Captação é dos sócios; as horas de captação são do comercial, não do projeto.
+
+## 2. Briefing (formulário "Briefing Inicial - Residêncial", ~110 perguntas)
+
+Identificação · a casa (uso, metragem, **dimensão** Compacta/Confortável/Espaçosa, terreno e topografia, pavimentos,
+moradores, acessibilidade) · expectativas (texto livre) · programa por setor · configuração de cada ambiente
+(cozinha, jantar, estar, dormitórios, banheiros, lavanderia, gourmet, piscina, itens soltos) · edificação (prazo,
+sistema construtivo, expressão estética, materiais, relação com exterior e rua, paisagismo) · técnico (solar, reúso,
+ar, aquecimento, automação) · obra e investimento (quem executa, **valor disponível**, financiamento, padrão R$/m²).
+- Os textos livres decidem o projeto (ex.: cozinha protagonista); do briefing à proposta há interpretação do arquiteto.
+- Importar pela planilha de respostas (o PDF "Imprimir" do Forms perde as marcações).
+- A revisar no formulário: faixas de padrão (alinhar às do escritório), "Espaço gourmet – equipamentos" deve
+  aceitar várias opções, incluir ambientes que faltam (despensa, rouparia, quarto e banho de serviço, varanda,
+  biblioteca, sauna, academia, sala de jogos, brinquedoteca, área de fogueira, quadras, lareira, rede).
+
+## 3. Proposta (padrão atual, 24–25 páginas)
+
+Fundo grafite (#383135), bege (#E9DED6), verde-sálvia (#88AC67), Comfortaa. Código do arquivo: `<nº>_<DDMMAA>`.
+Páginas: capa · Trilha (missão, visão, valores) · quem somos · atuação e índice · projetos em destaque (4) · nosso
+serviço · projeto arquitetônico · **Sua demanda** · **Programa de necessidades** · processo de projeto · etapas
+(EP, AP, Legal e Executivo) · **Plano de projeto** · **entregáveis e horas por etapa + custo da obra** · marcenaria
+(opcional) · administração de obra (opcional, 12%) · **Investimento** · serviços extras · contatos.
+- **Programa:** tabelas por setor, soma + 10% circulação + 10% paredes e estrutura = total; itens sem área com "x";
+  setor de fase futura pode ficar fora do total.
+- **Plano de projeto:** mesma numeração do processo (EP AP01…; séries 100–1000 por pavimento e por ambiente; PL 01…).
+- **Custo da obra:** padrão e faixa, área, valor base (R$/m² escolhido × área) e "banda pra cima".
+- **Investimento:** valor de tabela riscado → valor final, com % do custo da obra; entrada + parcelas; nota fiscal
+  +17%; incluso RRT; não incluso plotagens e impressões; validade 30 dias.
+- **Proposta de marcenaria** (19 páginas): lista de móveis por pavimento (MOB01…), mapeamento de marcenaria (planta
+  com os móveis), fases, bônus opcional de iluminação, EP até 30 d.u. e Executivo 40 d.u., pagamento iniciando
+  depois do fim do pagamento da arquitetura.
+- **Serviço menor** (consultoria, layout, visita técnica, laudo, pequeno projeto): proposta curta (3–4 páginas) e
+  contrato 07.
+
+### Jeito Trilha de escrever ("Sua demanda", 250–400 palavras)
+3ª pessoa, sobre a casa e o desejo ("Residência para moradia…", "O desejo é…", "Deve explorar…"). Ordem: uso e
+lugar → desejo estético → terreno, topografia e vista → materiais e sistema construtivo → **ambiente protagonista**
+e relação com o exterior → sensação esperada → síntese ("A demanda consiste em…"). Palavras recorrentes: conexão com
+a paisagem, aconchego, amplitude, natureza, insolação e ventilação, contemporânea, brasileira/mineira, viver bem.
+Fecho com imagem própria quando cabe. Restrições práticas entram no texto (liquidez, financiamento, obra em fases).
+
+## 4. Preço (lógica do Luan, 01/10/2026)
+
+O **programa de necessidades** manda no preço: gera o Plano de Projeto e, portanto, as horas.
+Horas = Σ horas de referência dos ambientes + horas gerais (implantação, volumetria, fachadas, legal, reuniões);
+× fatores (padrão, dimensão, terreno e perfil do cliente — este interno, nunca na proposta); custo = horas ×
+custo-hora; preço sugerido = custo ÷ (1 − impostos − reserva − lucro); **o valor final é do arquiteto**. Referências
+de comparação: tabela do CAU e mercado (R$/m²). Valores iniciais são provisórios até haver horas reais.
+
+## 5. Contratos (modelos revisados em 30/09/2026)
+
+| Nº | Modelo | Etapas | Pesos na rescisão |
+|---|---|---|---|
+| 01 | Projeto do zero **com** aprovação | EP, AP, Legal, PE | EP 50 · AP 25 · PE 25 |
+| 02 | Projeto do zero **sem** aprovação | EP, AP, PE | EP 50 · AP 25 · PE 25 |
+| 03 | Reforma **com** aprovação | Levantamento, EP, Legal, PE | EP+levantamento 50 · PE 50 |
+| 04 | Reforma **sem** aprovação | Levantamento, EP, PE | EP+levantamento 50 · PE 50 |
+| 05 | Marcenaria **avulsa** (cliente sem projeto da Trilha) | Levantamento, EP, PE da marcenaria | 50 · 50 |
+| 06 | Marcenaria **vinculada** (dentro de projeto da Trilha) | EP e PE da marcenaria | 50 · 50 |
+| 07 | Serviço menor (02/10/2026, **precisa de revisão jurídica**) | objeto, entregáveis, prazo, 1 rodada de ajustes | proporcional |
+
+- Escolha: marcenaria → 06 se há projeto de arquitetura da Trilha, senão 05; do zero (RES/COM/HOT) ou reforma
+  (REF/INT); com ou sem Projeto Legal.
+- Nº do contrato = nº do projeto + data DDMMAA (projeto 68 em 28/08/2025 → 68280825).
+- Campos variáveis entre chaves (contratante(s), endereço, matrícula, escopo = texto "Sua demanda", programa, valores
+  e parcelas por extenso, anexo com as respostas do briefing; na marcenaria, ambientes e móveis). Cláusulas não se
+  alteram por projeto; a última página (instruções) é apagada antes de enviar; assinatura pelo gov.br.
+
+## 6. Prazos e pesos (decisões de 01 e 02/10/2026)
+
+- **Prazos seguem os contratos, pelo maior número da faixa** (dias úteis):
+  projeto do zero: EP 40 · AP **80** (30 + 15 + 15 + 20) · Legal 20 · PE 60;
+  reforma: Levantamento 5 · EP 30 · Legal 20 · PE 40;
+  marcenaria: Levantamento 5 (só avulsa) · EP 30 · PE 40.
+- **Rodadas somam prazo quando acontecem:** ajustes do EP +15 · revisão total +40 · compatibilização com engenheiro
+  ou complementares +10.
+- Exigência do Legal: 10 d.u. por exigência, como controle interno (o contrato não fixa). Aviso de prazo: 10 d.u.
+  antes do fim (Legal: 5 d.u.).
+- Os prazos variam por negociação: o que for contratado vale para aquele projeto.
+- **Levantamento** é etapa própria na reforma (REF/INT) e na marcenaria avulsa, antes do EP.
+- **Dois tipos de peso, funções diferentes:** % concluído do projeto (EP 30 · AP 30 · Legal 10 · PE 30; marcenaria
+  EP 50 · PE 50; Abertura não conta) e valor devido na rescisão (tabela do §5).
+- Situações de um entregável: A fazer · Em andamento · Revisão interna · **Revisão cliente** (enviado e com o cliente)
+  · Pronto · Entregue.
+
+---
+
 # Decisões de processo tomadas depois do Mapeamento v3 (29/09 a 03/10/2026)
+
+> Prazos, pesos, Levantamento, rodadas e contratos foram atualizados em 01–02/10/2026: ver
+> `COMERCIAL-CONTRATOS-PROPOSTAS.md` §5–6, que prevalece sobre os números abaixo.
 
 Decisões do Luan que mudam ou completam o MAPEAMENTO.md. Em caso de diferença, **vale este arquivo** (é mais novo).
 Continua valendo: em conflito entre o que o Luan disse e o contrato, vale o contrato, e o que precisa mudar no
@@ -76,7 +198,8 @@ contrato vai para a pauta de revisão (MAPEAMENTO §11).
 ## 1. Etapas do projeto
 
 - Fluxo: **Abertura → Estudo Preliminar → Anteprojeto → Projeto Executivo → Encerramento**.
-  Projeto Legal corre em paralelo ao Anteprojeto. Reforma e Interiores pulam Anteprojeto e Legal.
+  Projeto Legal corre em paralelo ao Anteprojeto. Reforma e Interiores pulam o Anteprojeto (o Legal depende do contrato: modelos 03/04) e começam com o
+  **Levantamento** (5 d.u.), como a marcenaria avulsa.
 - **Abertura** (nome escolhido pelo Luan) é a etapa entre o contrato e o marco zero. Itens:
   receber o levantamento topográfico · receber documentos do cliente (pessoais, registro, IPTU) · duplicar a pasta
   padrão · criar o arquivo ArchiCAD pelo template · preencher dados do cliente e do terreno · análise de legislação
@@ -143,7 +266,8 @@ contrato vai para a pauta de revisão (MAPEAMENTO §11).
 
 ## 4. Prazos, espera, suspensão e arquivamento
 
-- Prazos em dias úteis (EP 40, AP 70, Executivo 60 — padrão do contrato, ajustável por projeto). O prazo pausa
+- Prazos em dias úteis pelos modelos de contrato (do zero: EP 40 · AP 80 · Legal 20 · PE 60; reforma e marcenaria
+  em COMERCIAL-CONTRATOS-PROPOSTAS §6), ajustáveis por projeto; rodadas somam prazo. O prazo pausa
   enquanto o projeto aguarda alguém de fora da Trilha (cliente, engenheiro, condomínio, prefeitura).
 - Cliente sem retorno: **aviso aos 15 dias úteis** (momento de cobrar o cliente); aos **20 dias úteis** o projeto
   vai **automaticamente para Suspensos** (cláusula 3.4). Suspenso não fica no fluxo de trabalho principal.
@@ -209,6 +333,30 @@ Quem recebe: sócios veem tudo; colaborador vê os projetos em que trabalha.
   e as datas reais são ajustadas depois. Exemplo: Casa Motta (RES-CASAMOTTA, contrato 68280825 de 28/08/2025) —
   Anteprojeto fase 2 (compatibilização), Abertura, EP e Legal concluídos; marcenaria contratada no Anteprojeto, com
   o EP da marcenaria quase no fim (proposta e contrato da marcenaria a receber).
+
+---
+
+# O app Gestão Trilha em uma página (para quem trata de processo)
+
+Ferramenta interna (link: https://claude.ai/artifact/N5fGJZBumZy7dyN57w7e8o). Desenvolvimento e configuração ficam
+no chat e na skill `gestao-trilha`; aqui só o que ajuda a entender como o processo é usado no dia a dia.
+
+| Parte | Para quê |
+|---|---|
+| Capa | entrada: pessoas, apps do escritório, **notificações** e a caixa "Dúvidas e aprimoramentos" (só registra; a análise é feita com o Claude quando o Luan pedir) |
+| Área da pessoa | **Tempo** (cronômetro e lançamentos por projeto/etapa/item), **Tarefas** (agenda: tarefa, demanda, prioridade, compromisso → Agenda Google; "Fale com o Claude" organiza texto ditado), **Projetos** (itens do Plano atribuídos à pessoa) |
+| Gestor Comercial | captação: oportunidades em 8 etapas, briefing importado, programa, simulador de preço, proposta em PDF, contrato .docx pelos modelos 01–07, "virar projeto" |
+| Gestor de Projetos | processo de cada projeto: etapas e portões, Plano de Projeto (pranchas, desenhos, checklists), marcenaria como 2ª trilha, prazos com pausa, reuniões, histórico, termos em PDF, relatório de andamento, suspensão/arquivamento automáticos |
+| Cadastros | clientes, fornecedores, mão de obra, parceiros, projetos (nome, clientes, endereço, contratos), obras, colaboradores; único lugar para excluir |
+| Financeiro | recebimentos, despesas, contratos e parcelas, recibos em PDF |
+| Horas e custos · Relatórios | horas e custo por projeto; fechamentos mensais; análises e gráficos |
+| Configurações | pessoas e custo-hora, custos fixos, **prazos padrão**, **pesos das etapas**, **padrões de obra (R$/m²)**, listas |
+| Gestor de Obras | em desenvolvimento em outro chat (orçamento e administração de obra) |
+
+Regras de processo que o app aplica: as deste conjunto (MAPEAMENTO, DECISOES-PROCESSO, este arquivo de comercial).
+Uma mudança de processo decidida aqui deve ser levada ao chat do app para virar ajuste.
+Limite técnico a lembrar: cada projeto é uma "ficha" de até 256 KB; a Casa Motta estava com ~150 KB em 01/10/2026.
+Listas grandes (ex.: especificações) devem ficar fora da ficha do projeto.
 
 ---
 

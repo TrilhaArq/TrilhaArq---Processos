@@ -1,5 +1,8 @@
 # Decisões de processo tomadas depois do Mapeamento v3 (29/09 a 03/10/2026)
 
+> Prazos, pesos, Levantamento, rodadas e contratos foram atualizados em 01–02/10/2026: ver
+> `COMERCIAL-CONTRATOS-PROPOSTAS.md` §5–6, que prevalece sobre os números abaixo.
+
 Decisões do Luan que mudam ou completam o MAPEAMENTO.md. Em caso de diferença, **vale este arquivo** (é mais novo).
 Continua valendo: em conflito entre o que o Luan disse e o contrato, vale o contrato, e o que precisa mudar no
 contrato vai para a pauta de revisão (MAPEAMENTO §11).
@@ -7,7 +10,8 @@ contrato vai para a pauta de revisão (MAPEAMENTO §11).
 ## 1. Etapas do projeto
 
 - Fluxo: **Abertura → Estudo Preliminar → Anteprojeto → Projeto Executivo → Encerramento**.
-  Projeto Legal corre em paralelo ao Anteprojeto. Reforma e Interiores pulam Anteprojeto e Legal.
+  Projeto Legal corre em paralelo ao Anteprojeto. Reforma e Interiores pulam o Anteprojeto (o Legal depende do contrato: modelos 03/04) e começam com o
+  **Levantamento** (5 d.u.), como a marcenaria avulsa.
 - **Abertura** (nome escolhido pelo Luan) é a etapa entre o contrato e o marco zero. Itens:
   receber o levantamento topográfico · receber documentos do cliente (pessoais, registro, IPTU) · duplicar a pasta
   padrão · criar o arquivo ArchiCAD pelo template · preencher dados do cliente e do terreno · análise de legislação
@@ -74,7 +78,8 @@ contrato vai para a pauta de revisão (MAPEAMENTO §11).
 
 ## 4. Prazos, espera, suspensão e arquivamento
 
-- Prazos em dias úteis (EP 40, AP 70, Executivo 60 — padrão do contrato, ajustável por projeto). O prazo pausa
+- Prazos em dias úteis pelos modelos de contrato (do zero: EP 40 · AP 80 · Legal 20 · PE 60; reforma e marcenaria
+  em COMERCIAL-CONTRATOS-PROPOSTAS §6), ajustáveis por projeto; rodadas somam prazo. O prazo pausa
   enquanto o projeto aguarda alguém de fora da Trilha (cliente, engenheiro, condomínio, prefeitura).
 - Cliente sem retorno: **aviso aos 15 dias úteis** (momento de cobrar o cliente); aos **20 dias úteis** o projeto
   vai **automaticamente para Suspensos** (cláusula 3.4). Suspenso não fica no fluxo de trabalho principal.
