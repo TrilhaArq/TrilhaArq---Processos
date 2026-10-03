@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>O Caminho do Seu Projeto — Trilha</title>
+<link rel="stylesheet" href="fonts/local.css">
+<link rel="stylesheet" href="trilha-doc.css">
+<style>
+  body{ font-size:10.2pt; }
+  .hero{ height:257mm; display:flex; flex-direction:column; justify-content:space-between; }
+  .hero h1{ font-size:36pt; line-height:1.1; margin:0 0 5mm; }
+  .hero .sub{ font-size:13pt; max-width:130mm; color:var(--body); }
+  .hero .trail{ width:100%; height:70mm; }
+  .page{ break-before:page; }
+  .kicker{ font-family:"Comfortaa"; font-weight:700; color:var(--accent-deep); font-size:9pt; letter-spacing:.6px; text-transform:uppercase; margin-bottom:1mm; }
+  h2.big{ font-size:22pt; margin:0 0 3mm; }
+  .intro{ font-size:11pt; color:var(--ink); max-width:150mm; margin-bottom:5mm; }
+  .map{ width:100%; height:205mm; }
+  .step{ border:1px solid var(--border); border-radius:12px; padding:4mm 5mm; margin:0 0 5mm; break-inside:avoid; }
+  .step-head{ display:flex; align-items:center; gap:4mm; margin-bottom:3mm; }
+  .step-num{ width:11mm; height:11mm; border-radius:50%; background:var(--accent); color:#fff; font-family:"Comfortaa"; font-weight:700; font-size:12pt; display:flex; align-items:center; justify-content:center; flex:none; }
+  .step-num.alt{ background:#fff; color:var(--accent-deep); border:2px dashed var(--accent); }
+  .step-head h3{ margin:0; font-size:15pt; }
+  .step-head .tag-line{ font-size:9.5pt; color:var(--muted); }
+  .step .cols{ display:grid; grid-template-columns:1fr 1fr; gap:3mm 6mm; }
+  .step h5{ font-family:"Comfortaa"; font-size:8.4pt; color:var(--accent-deep); margin:0 0 .8mm; text-transform:uppercase; letter-spacing:.4px; }
+  .step p, .step li{ font-size:9.4pt; }
+  .step ul{ padding-left:4mm; margin:0; }
+  .step .end{ margin-top:3mm; padding-top:2.5mm; border-top:1px dashed var(--border); font-size:9.2pt; }
+  .step .end b{ color:var(--accent-deep); font-family:"Comfortaa"; }
+  .timeline{ margin:4mm 0 2mm; }
+  .tl-row{ display:flex; height:13mm; border-radius:8px; overflow:hidden; }
+  .tl-row div{ display:flex; align-items:center; justify-content:center; color:#fff; font-family:"Comfortaa"; font-weight:700; font-size:8.6pt; text-align:center; line-height:1.15; }
+  .tl-legal{ display:flex; margin-top:2mm; }
+  .tl-legal div{ min-height:9mm; padding:1.2mm 2mm; text-align:center; border:1.5px dashed var(--accent); border-radius:8px; display:flex; align-items:center; justify-content:center; font-family:"Comfortaa"; font-size:8pt; color:var(--accent-deep); }
+  .pause{ display:grid; grid-template-columns:repeat(4,1fr); gap:3mm; margin:3mm 0 5mm; }
+  .pause .card{ text-align:center; }
+  .pause .ico{ font-size:15pt; color:var(--accent-deep); font-family:"Comfortaa"; font-weight:700; }
+  .contact{ margin-top:8mm; border-top:3px solid var(--accent); padding-top:5mm; display:flex; justify-content:space-between; align-items:flex-end; }
+  .contact img{ width:38mm; }
+  .contact div{ text-align:right; font-size:10pt; line-height:1.7; color:var(--ink); }
+</style>
+</head>
+<body>
+
+<!-- CAPA -->
+<div class="hero">
+  <img class="logo" src="logo.png" alt="Trilha Arquitetura Brasileira" style="width:48mm">
+  <div>
+    <svg class="trail" viewBox="0 0 600 200" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,150 C120,150 140,60 250,70 S380,160 470,110 S560,40 600,50" fill="none" stroke="#88AC67" stroke-width="4" stroke-linecap="round" stroke-dasharray="1 12"/>
+      <circle cx="250" cy="70" r="9" fill="#88AC67"/><circle cx="470" cy="110" r="9" fill="#88AC67"/><circle cx="600" cy="50" r="9" fill="#5f8443"/>
+    </svg>
+    <h1>O caminho do seu projeto</h1>
+    <p class="sub">Da primeira conversa à entrega do projeto completo: cada passo, o que acontece nele e como você participa.</p>
+  </div>
+  <p class="small muted">Trilha Arquitetura Brasileira · Guia para clientes</p>
+</div>
+
+<!-- MAPA -->
+<section class="page">
+  <div class="kicker">O caminho</div>
+  <h2 class="big">Cinco passos até o seu projeto</h2>
+  <p class="intro">Arquitetura não nasce pronta: nasce de um caminho percorrido junto. Cada passo termina com a sua aprovação, e só então seguimos para o próximo.</p>
+  <svg class="map" viewBox="0 0 600 820" aria-label="Mapa das etapas do projeto">
+    <defs>
+      <marker id="ar" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#5f8443"/>
+      </marker>
+    </defs>
+    <g fill="none" stroke="#88AC67" stroke-width="5" stroke-linecap="round">
+      <path d="M140,98 C140,160 460,120 460,180" marker-end="url(#ar)"/>
+      <path d="M460,240 C460,300 140,270 140,330" marker-end="url(#ar)"/>
+      <path d="M140,390 C140,450 460,420 460,480" marker-end="url(#ar)"/>
+      <path d="M460,540 C460,600 140,570 140,630" marker-end="url(#ar)"/>
+      <path d="M140,690 C140,750 460,720 460,752" stroke-dasharray="2 12" marker-end="url(#ar)"/>
+    </g>
+    <!-- portões -->
+    <g font-family="Comfortaa" font-size="11" font-weight="700" fill="#5f8443" text-anchor="middle">
+      <rect x="236" y="268" width="128" height="22" rx="11" fill="#fff" stroke="#88AC67"/><text x="300" y="283">✓ sua aprovação</text>
+      <rect x="236" y="418" width="128" height="22" rx="11" fill="#fff" stroke="#88AC67"/><text x="300" y="433">✓ sua aprovação</text>
+      <rect x="236" y="568" width="128" height="22" rx="11" fill="#fff" stroke="#88AC67"/><text x="300" y="583">✓ sua aprovação</text>
+    </g>
+    <!-- estações -->
+    <g font-family="Comfortaa" font-weight="700" font-size="20" fill="#fff" text-anchor="middle">
+      <circle cx="140" cy="70" r="28" fill="#88AC67"/><text x="140" y="77">1</text>
+      <circle cx="460" cy="210" r="28" fill="#88AC67"/><text x="460" y="217">2</text>
+      <circle cx="140" cy="360" r="28" fill="#88AC67"/><text x="140" y="367">3</text>
+      <circle cx="460" cy="510" r="28" fill="#88AC67"/><text x="460" y="517">4</text>
+      <circle cx="140" cy="660" r="28" fill="#5f8443"/><text x="140" y="667">5</text>
+      <circle cx="460" cy="780" r="22" fill="#fff" stroke="#88AC67" stroke-width="3" stroke-dasharray="4 5"/>
+    </g>
+    <!-- textos -->
+    <g font-family="Work Sans" font-size="13" fill="oklch(36% 0.012 145)">
+      <text x="186" y="64" font-family="Comfortaa" font-weight="700" font-size="19" fill="oklch(20% 0.01 145)">Briefing</text>
+      <text x="186" y="86">Conhecemos você, seus desejos e o terreno.</text>
+
+      <text x="414" y="204" text-anchor="end" font-family="Comfortaa" font-weight="700" font-size="19" fill="oklch(20% 0.01 145)">Estudo Preliminar</text>
+      <text x="414" y="226" text-anchor="end">Nasce a ideia do seu projeto.</text>
+
+      <text x="186" y="354" font-family="Comfortaa" font-weight="700" font-size="19" fill="oklch(20% 0.01 145)">Anteprojeto</text>
+      <text x="186" y="376">O projeto ganha precisão técnica.</text>
+
+      <text x="414" y="504" text-anchor="end" font-family="Comfortaa" font-weight="700" font-size="19" fill="oklch(20% 0.01 145)">Projeto Executivo</text>
+      <text x="414" y="526" text-anchor="end">Todos os detalhes para construir.</text>
+
+      <text x="186" y="654" font-family="Comfortaa" font-weight="700" font-size="19" fill="oklch(20% 0.01 145)">Entrega</text>
+      <text x="186" y="676">Seu projeto completo, pronto para a obra.</text>
+
+      <text x="424" y="776" text-anchor="end" font-family="Comfortaa" font-weight="700" font-size="16" fill="oklch(20% 0.01 145)">Obra</text>
+      <text x="424" y="795" text-anchor="end" font-size="12">acompanhamento opcional</text>
+    </g>
+    <!-- projeto legal -->
+    <g>
+      <path d="M168,352 C260,300 330,300 400,318" fill="none" stroke="#88AC67" stroke-width="2.5" stroke-dasharray="5 6"/>
+      <rect x="400" y="298" width="186" height="46" rx="12" fill="#fff" stroke="#88AC67" stroke-width="2" stroke-dasharray="5 5"/>
+      <text x="493" y="317" text-anchor="middle" font-family="Comfortaa" font-weight="700" font-size="13" fill="oklch(20% 0.01 145)">Projeto Legal</text>
+      <text x="493" y="334" text-anchor="middle" font-family="Work Sans" font-size="11" fill="oklch(36% 0.012 145)">aprovação, em paralelo</text>
+    </g>
+  </svg>
+</section>
+
+<!-- ETAPAS -->
+<section class="page">
+  <div class="kicker">Passo a passo</div>
+  <h2 class="big">O que acontece em cada passo</h2>
+
+  <div class="step">
+    <div class="step-head"><div class="step-num">1</div><div><h3>Briefing</h3><div class="tag-line">Conhecer para projetar</div></div></div>
+    <div class="cols">
+      <div><h5>O que acontece</h5><p>Conversamos sobre as suas ideias, a sua rotina e o que você espera da casa. Visitamos o terreno e montamos o programa de necessidades: os ambientes e as áreas do projeto.</p></div>
+      <div><h5>O que precisamos de você</h5><ul><li>Responder ao questionário de briefing com calma</li><li>Levantamento topográfico do terreno</li><li>Documentos do imóvel e pessoais</li></ul></div>
+    </div>
+    <div class="end"><b>Como termina:</b> com o contrato assinado e o topográfico em mãos, o projeto começa oficialmente.</div>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><div class="step-num">2</div><div><h3>Estudo Preliminar</h3><div class="tag-line">A concepção · até 40 dias úteis para a primeira apresentação</div></div></div>
+    <div class="cols">
+      <div><h5>O que acontece</h5><p>Estudamos o terreno, o sol, os ventos, as vistas e a legislação. Testamos caminhos até chegar à proposta que melhor responde a tudo isso.</p></div>
+      <div><h5>O que você recebe</h5><ul><li>Apresentação do projeto em reunião</li><li>Imagens fotorrealistas</li><li>Plantas e cortes</li><li>Modelo 3D para navegar no celular (BIMx)</li></ul></div>
+      <div><h5>Sua participação</h5><p>Você analisa a proposta e reúne os seus pedidos de ajuste numa lista. As rodadas de ajuste incluídas estão descritas no seu contrato.</p></div>
+      <div><h5>Por que é importante</h5><p>É o momento de maior liberdade: tudo pode ser repensado. Depois da aprovação, o projeto passa a ser desenvolvido sobre esta base.</p></div>
+    </div>
+    <div class="end"><b>Como termina:</b> você aprova a proposta e assina o Termo de Encerramento de Etapa.</div>
+  </div>
+</section>
+
+<section class="page">
+  <div class="step">
+    <div class="step-head"><div class="step-num">3</div><div><h3>Anteprojeto</h3><div class="tag-line">Apertar os parafusos</div></div></div>
+    <div class="cols">
+      <div><h5>O que acontece</h5><p>Ajustamos medidas e soluções técnicas, lançamos a estrutura e os pontos de instalações e trabalhamos junto com os engenheiros para que todos os projetos conversem entre si.</p></div>
+      <div><h5>Em três momentos</h5><ul><li><b>Ajustes:</b> o projeto fica preciso</li><li><b>Compatibilização:</b> arquitetura e engenharias sem conflitos</li><li><b>Definições:</b> acabamentos, revestimentos, louças, metais e iluminação escolhidos com você</li></ul></div>
+      <div><h5>O que precisamos de você</h5><ul><li>Contratar os projetos de engenharia (o estrutural é indispensável); indicamos profissionais de confiança</li><li>Participar das escolhas de acabamentos</li></ul></div>
+      <div><h5>O que você recebe</h5><ul><li>Plantas, cortes e fachadas técnicos</li><li>Mapeamentos de pisos, instalações, forro e iluminação</li><li>Modelo 3D atualizado</li></ul></div>
+    </div>
+    <div class="end"><b>Como termina:</b> com o projeto compatibilizado e definido, você aprova e assina o Termo de Encerramento de Etapa.</div>
+  </div>
+
+  <div class="step" style="border-style:dashed; border-color:var(--accent)">
+    <div class="step-head"><div class="step-num alt">+</div><div><h3>Projeto Legal</h3><div class="tag-line">Em paralelo ao Anteprojeto</div></div></div>
+    <div class="cols">
+      <div><h5>O que acontece</h5><p>Preparamos e protocolamos o projeto para aprovação no condomínio, quando houver, e na prefeitura. Acompanhamos o processo até a aprovação.</p></div>
+      <div><h5>O que precisamos de você</h5><ul><li>Documentos do imóvel e pessoais pedidos pelos órgãos</li><li>Pagamento das taxas de aprovação</li></ul></div>
+    </div>
+    <div class="end"><b>Como termina:</b> com o projeto aprovado. O tempo de análise é definido pelo condomínio e pela prefeitura.</div>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><div class="step-num">4</div><div><h3>Projeto Executivo</h3><div class="tag-line">Os detalhes para construir · 40 a 60 dias úteis</div></div></div>
+    <div class="cols">
+      <div><h5>O que acontece</h5><p>Desenvolvemos todos os desenhos e documentos que a obra precisa: plantas, cortes, fachadas, ampliações de cozinha e banheiros, escadas, esquadrias, bancadas, detalhes e listas de especificações.</p></div>
+      <div><h5>Por que não recebe mudanças</h5><p>Nesta etapa o projeto já está aprovado e definido. Mudanças agora refazem detalhes já desenhados; por isso as decisões acontecem até o Anteprojeto.</p></div>
+    </div>
+    <div class="end"><b>Como termina:</b> em reunião, abrimos as pranchas e explicamos o projeto. Você assina o Termo de Encerramento de Projeto.</div>
+  </div>
+</section>
+
+<section class="page">
+  <div class="step">
+    <div class="step-head"><div class="step-num" style="background:var(--accent-deep)">5</div><div><h3>Entrega</h3><div class="tag-line">O projeto nas suas mãos</div></div></div>
+    <div class="cols">
+      <div><h5>O que você recebe</h5><ul><li>Todas as pranchas e documentos em PDF</li><li>Conjunto impresso e organizado</li><li>Guia de Projeto: um caderno que ajuda a ler o projeto na obra</li><li>Modelo 3D final e imagens atualizadas</li></ul></div>
+      <div><h5>E depois?</h5><p>Se quiser, cuidamos também da obra: <b>administração</b> (planejamos e gerenciamos tudo, do orçamento ao fim da obra) ou <b>fiscalização</b> (visitas programadas para garantir que a obra siga o projeto). São serviços contratados à parte.</p></div>
+    </div>
+  </div>
+
+  <div class="kicker" style="margin-top:6mm">O tempo do projeto</div>
+  <h2 class="big">Como os prazos funcionam</h2>
+  <p>Os prazos são contados em <b>dias úteis de trabalho da Trilha</b>. Referência de uma residência, sem as esperas:</p>
+  <div class="timeline">
+    <div class="tl-row">
+      <div style="flex:40; background:#88AC67">Estudo Preliminar<br>até 40</div>
+      <div style="flex:65; background:#6f9450">Anteprojeto<br>60 a 70 + engenheiros</div>
+      <div style="flex:50; background:#5f8443">Executivo<br>40 a 60</div>
+    </div>
+    <div class="tl-legal"><div style="flex:40; visibility:hidden"></div><div style="flex:65">Projeto Legal · 20 até o protocolo + análise dos órgãos</div><div style="flex:50; visibility:hidden"></div></div>
+  </div>
+  <h3>O relógio pausa enquanto aguardamos</h3>
+  <div class="pause">
+    <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5f8443" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/></svg></div><span class="small">a sua análise e as suas decisões</span></div>
+    <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5f8443" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/></svg></div><span class="small">os projetos dos engenheiros</span></div>
+    <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5f8443" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/></svg></div><span class="small">a aprovação do condomínio</span></div>
+    <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5f8443" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/></svg></div><span class="small">a aprovação da prefeitura</span></div>
+  </div>
+  <p class="small">Quanto mais rápidas as respostas, mais rápido o projeto anda. Um projeto que fica muito tempo sem retorno pode ser pausado e retomado em nova data combinada.</p>
+</section>
+
+<section class="page">
+  <div class="kicker">Juntos no caminho</div>
+  <h2 class="big">O que faz o projeto fluir</h2>
+  <div class="grid2">
+    <div class="card"><h4>Reúna seus pedidos</h4><span class="small">Uma lista única de ajustes, enviada de uma vez, é analisada com mais cuidado e respondida mais rápido do que pedidos soltos.</span></div>
+    <div class="card"><h4>Decida no momento certo</h4><span class="small">Cada passo tem o seu tempo de decisão. Mudanças depois de uma aprovação refazem trabalho e podem gerar custo adicional.</span></div>
+    <div class="card"><h4>Engenheiros de confiança</h4><span class="small">O projeto estrutural é indispensável. Indicamos profissionais e coordenamos todos eles para você.</span></div>
+    <div class="card"><h4>Estamos por perto</h4><span class="small">Atendemos você e os profissionais envolvidos em horário comercial, de segunda a sexta, das 8h às 18h.</span></div>
+    <div class="card"><h4>Pedidos fora de hora</h4><span class="small">Quando algo precisa acontecer antes do momento previsto, conversamos sobre os riscos e registramos a decisão juntos.</span></div>
+    <div class="card"><h4>Na obra, o projeto</h4><span class="small">A obra começa com o projeto completo. Qualquer mudança durante a obra deve passar por nós antes.</span></div>
+  </div>
+
+  <div class="contact">
+    <img src="logo.png" alt="Trilha Arquitetura Brasileira">
+    <div>trilha@trilhaarq.com.br<br>www.trilhaarq.com.br<br>@trilhaarq</div>
+  </div>
+</section>
+
+</body>
+</html>

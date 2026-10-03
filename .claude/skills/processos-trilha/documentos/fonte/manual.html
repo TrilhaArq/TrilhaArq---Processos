@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Manual do Processo de Projeto — Trilha</title>
+<link rel="stylesheet" href="fonts/local.css">
+<link rel="stylesheet" href="trilha-doc.css">
+<style>
+  .rule{ border-left:3px solid var(--accent); background:var(--accent-tint); padding:2mm 3.5mm; margin:2mm 0 3.5mm; border-radius:0 8px 8px 0; break-inside:avoid; }
+  .rule b{ font-family:"Comfortaa"; }
+  .steps{ counter-reset:s; list-style:none; padding:0; }
+  .steps li{ counter-increment:s; position:relative; padding-left:8mm; margin-bottom:1.6mm; }
+  .steps li::before{ content:counter(s); position:absolute; left:0; top:.2mm; width:5mm; height:5mm; border-radius:50%; background:var(--accent); color:#fff; font-family:"Comfortaa"; font-weight:700; font-size:7.4pt; display:flex; align-items:center; justify-content:center; }
+  dl{ margin:0; }
+  dl div{ display:grid; grid-template-columns:38mm 1fr; gap:3mm; padding:1.4mm 0; border-bottom:1px solid var(--border); break-inside:avoid; }
+  dt{ font-family:"Comfortaa"; font-weight:700; color:var(--ink); font-size:8.8pt; }
+  dd{ margin:0; }
+  .meta-etapa{ display:flex; gap:3mm; margin:0 0 4mm; flex-wrap:wrap; }
+  .meta-etapa span{ border:1px solid var(--border); border-radius:99px; padding:.6mm 3mm; font-size:8pt; }
+  .meta-etapa span b{ font-family:"Comfortaa"; color:var(--accent-deep); }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <img class="logo" src="logo.png" alt="Trilha Arquitetura Brasileira">
+  <div class="band">
+    <h1>Manual do Processo de Projeto</h1>
+    <p class="sub">Como a Trilha desenvolve um projeto de arquitetura, da abertura à entrega do projeto executivo.</p>
+  </div>
+  <div class="meta">
+    <b>Para a equipe de projeto: arquitetos, colaboradores e estagiários</b><br>
+    Versão 1 · 28 de setembro de 2026<br>
+    Modelo descrito: projeto do zero (residencial)<br>
+    Leitura obrigatória antes do primeiro projeto
+  </div>
+</div>
+
+<section class="chap">
+  <h2>Sumário</h2>
+  <div class="toc">
+    <div><span>01</span>Sobre este manual</div>
+    <div><span>02</span>A Trilha</div>
+    <div><span>03</span>Funções</div>
+    <div><span>04</span>Vocabulário</div>
+    <div><span>05</span>O fluxo de projeto</div>
+    <div><span>06</span>Abertura do projeto</div>
+    <div><span>07</span>Estudo Preliminar</div>
+    <div><span>08</span>Anteprojeto</div>
+    <div><span>09</span>Projeto Legal</div>
+    <div><span>10</span>Projeto Executivo</div>
+    <div><span>11</span>Complementares e compatibilização</div>
+    <div><span>12</span>Pranchas, desenhos e arquivos</div>
+    <div><span>13</span>Revisão interna</div>
+    <div><span>14</span>Encerramento e entrega</div>
+    <div><span>15</span>Seções em construção</div>
+  </div>
+
+  <h2 style="margin-top:12mm"><span class="num">01</span>Sobre este manual</h2>
+  <p class="lead">Este manual descreve como o trabalho de projeto acontece na Trilha. Ele é a regra: em caso de dúvida, vale o que está escrito aqui.</p>
+  <ul>
+    <li>Descreve etapas, sequência de trabalho, entregáveis, padrões de pranchas e arquivos, e responsabilidades.</li>
+    <li>Não trata de assuntos comerciais, financeiros ou contratuais. Essas questões são da direção.</li>
+    <li>Ler inteiro antes do primeiro projeto. Consultar sempre que iniciar uma etapa nova.</li>
+    <li>Quando uma situação não estiver prevista, a decisão é da direção.</li>
+  </ul>
+</section>
+
+<section class="chap">
+  <h2><span class="num">02</span>A Trilha</h2>
+  <p class="lead">Escritório de arquitetura de Juiz de Fora (MG), fundado em novembro de 2020.</p>
+  <h3>O nome</h3>
+  <p><b>Trilha</b> remete a um caminho percorrido com determinação, atenção e curiosidade. <b>Arquitetura</b> não nasce pronta: nasce do percurso e continua na vivência do espaço. <b>Brasileira</b> é a inspiração: o clima tropical, a paisagem, a cultura e a tradição da arquitetura moderna brasileira.</p>
+  <div class="grid2">
+    <div class="card"><h4>Missão</h4><span class="small">Oferecer soluções arquitetônicas únicas, através de desenhos inventivos e racionais, amparados no saber técnico e construtivo, de expressão estética essencialista, contemporânea e atemporal.</span></div>
+    <div class="card"><h4>Visão</h4><span class="small">Ser reconhecida nacionalmente pelo exercício de uma arquitetura conceitual e de excelência, distante dos modismos, que enfatiza a qualidade espacial e a eficiência técnico-construtiva.</span></div>
+  </div>
+  <h3>Valores</h3>
+  <p>Honestidade · respeito · qualidade · sustentabilidade · dedicação · pé no chão · "menos é mais".</p>
+  <h3>Linguagem de projeto</h3>
+  <ul>
+    <li>Arquitetura essencialista. A estrutura é frequentemente aparente: pilares e vigas fazem parte da estética.</li>
+    <li>Implantação em harmonia com o terreno, com a menor intervenção possível na topografia.</li>
+    <li>Aproveitamento das condicionantes: insolação, ventilação, chuva e visuais.</li>
+    <li>Soluções técnicas e construtivas resolvidas no projeto, para que a obra aconteça sem surpresas.</li>
+  </ul>
+  <h3>Ferramentas</h3>
+  <table>
+    <tr><th style="width:40mm">Ferramenta</th><th>Uso</th></tr>
+    <tr><td><b>ArchiCAD (BIM)</b></td><td>Todo o projeto, do Estudo Preliminar ao Executivo, em um único modelo que evolui</td></tr>
+    <tr><td><b>Lumion</b></td><td>Imagens fotorrealistas</td></tr>
+    <tr><td><b>BIMx</b></td><td>Modelo navegável enviado ao cliente</td></tr>
+    <tr><td><b>Pasta padrão e template</b></td><td>Base de todo projeto novo (capítulo 06)</td></tr>
+  </table>
+</section>
+
+<section class="chap">
+  <h2><span class="num">03</span>Funções</h2>
+  <p class="lead">Cada função tem responsabilidades definidas. A comunicação com o cliente e com os projetistas complementares é feita pela direção.</p>
+  <table>
+    <tr><th style="width:42mm">Função</th><th>Responsabilidades</th></tr>
+    <tr><td><b>Direção geral</b><br><span class="small muted">Luan Carvalho</span></td><td>Decisão final sobre o projeto. Concepção. Estrutura, lançamento de pontos, cobertura e pluvial. Compatibilização com os complementares. Contato com o cliente e com os complementares. Revisão final.</td></tr>
+    <tr><td><b>Direção de projetos</b><br><span class="small muted">Elisa Christo</span></td><td>Responsável técnica pelos projetos. Emissão da RRT. Coordenação e desenvolvimento dos projetos.</td></tr>
+    <tr><td><b>Equipe de projeto</b></td><td>Desenhos e partes do projeto definidos pela direção. As tarefas são entregues com orientação e passam por revisão.</td></tr>
+  </table>
+  <h3>Divisão de trabalho por etapa</h3>
+  <table>
+    <tr><th style="width:36mm">Etapa</th><th>Direção geral</th><th>Direção de projetos e equipe</th></tr>
+    <tr><td>Estudo Preliminar</td><td>Concepção. Condução da apresentação</td><td>Topográfico, criação do arquivo, modelagem do terreno, estudo solar, finalização do modelo 3D e das imagens</td></tr>
+    <tr><td>Anteprojeto</td><td>Revisão geral, estrutura, lançamento de pontos, compatibilização</td><td>Desenvolvimento das pranchas, acabamentos e revestimentos</td></tr>
+    <tr><td>Projeto Executivo</td><td>Revisão</td><td>Desenvolvimento das séries 100 a 1000</td></tr>
+  </table>
+  <div class="rule"><b>Regra.</b> Nenhum membro da equipe envia arquivo, responde ou combina algo com o cliente ou com projetistas complementares sem orientação da direção.</div>
+</section>
+
+<section class="chap">
+  <h2><span class="num">04</span>Vocabulário</h2>
+  <p class="lead">Os termos abaixo têm significado fixo na Trilha. Use-os sempre com este sentido.</p>
+  <dl>
+    <div><dt>Etapa</dt><dd>Grande divisão do projeto: Briefing, Estudo Preliminar, Anteprojeto, Projeto Legal, Projeto Executivo.</dd></div>
+    <div><dt>Fase</dt><dd>Subdivisão de uma etapa. O Anteprojeto tem 3 fases; o Executivo, 2.</dd></div>
+    <div><dt>Portão</dt><dd>Condição para encerrar uma etapa e abrir a seguinte.</dd></div>
+    <div><dt>Termo de Encerramento de Etapa</dt><dd>Documento assinado pelo cliente que encerra o Estudo Preliminar e o Anteprojeto.</dd></div>
+    <div><dt>Termo de Encerramento de Projeto</dt><dd>Documento assinado pelo cliente na entrega do Executivo. Encerra o projeto.</dd></div>
+    <div><dt>Marco zero</dt><dd>Liberação do início do projeto pela direção, depois de cumpridas as condições de entrada.</dd></div>
+    <div><dt>Antecipação</dt><dd>Início de algo fora do momento previsto, a pedido do cliente. Só acontece com autorização da direção e termo de ciência assinado pelo cliente.</dd></div>
+    <div><dt>Programa de necessidades</dt><dd>Lista de ambientes do projeto, com quantidades e áreas aproximadas.</dd></div>
+    <div><dt>Plano de Projeto</dt><dd>Lista preliminar das pranchas e documentos a produzir em cada etapa.</dd></div>
+    <div><dt>Prancha</dt><dd>Folha do projeto, identificada por um número (ID) de série e posição.</dd></div>
+    <div><dt>Desenho</dt><dd>Conteúdo gráfico com nome próprio (planta baixa, corte AA, amp01 - cozinha - elevação 01). Uma prancha pode ter vários desenhos; um desenho pode ocupar mais de uma prancha.</dd></div>
+    <div><dt>Série</dt><dd>Grupo de pranchas de mesma natureza: 100, 200… 1000.</dd></div>
+    <div><dt>Ampliação (amp)</dt><dd>Detalhamento de um ambiente (cozinha, banheiro, escada…). Número fixo por ambiente.</dd></div>
+    <div><dt>Revisão (R00, R01…)</dt><dd>Versão do conjunto de desenhos. Todo projeto começa em R00.</dd></div>
+    <div><dt>Complementares</dt><dd>Projetos de engenharia contratados pelo cliente: estrutural, hidrossanitário, elétrico, SPDA, climatização e outros.</dd></div>
+    <div><dt>Lançamento</dt><dd>Primeira definição, feita pela Trilha, de estrutura ou de pontos, que serve de base para os complementares.</dd></div>
+    <div><dt>Compatibilização</dt><dd>Sobreposição e ajuste do projeto de arquitetura com os complementares, até não haver conflitos.</dd></div>
+    <div><dt>Interferência</dt><dd>Conflito encontrado na compatibilização (ex.: viga cruzando uma tubulação).</dd></div>
+    <div><dt>Aceite</dt><dd>Aprovação do cliente sobre um ponto do projeto.</dd></div>
+    <div><dt>Rodada de ajuste</dt><dd>Conjunto único de pedidos do cliente, respondido de uma vez pela Trilha.</dd></div>
+    <div><dt>Aguardando</dt><dd>Projeto ou item parado à espera de terceiros (cliente, engenheiro, condomínio, prefeitura).</dd></div>
+    <div><dt>Suspenso</dt><dd>Projeto parado por falta de retorno do cliente além do prazo. Sai da lista de prioridades até ser reativado pela direção.</dd></div>
+    <div><dt>Guia de Projeto</dt><dd>Documento A4 entregue com o Executivo, que orienta a leitura do projeto na obra.</dd></div>
+  </dl>
+</section>
+
+<section class="chap">
+  <h2><span class="num">05</span>O fluxo de projeto</h2>
+  <p class="lead">Todo projeto do zero segue o mesmo caminho. Uma etapa só começa quando a anterior passa pelo seu portão.</p>
+  <div class="flow">
+    <div class="st pre"><b>Briefing</b><small>informações e programa de necessidades</small></div><div class="ar">›</div>
+    <div class="st pre"><b>Abertura</b><small>marco zero, pasta e arquivo</small></div>
+  </div>
+  <div class="flow">
+    <div class="st main"><b>Estudo Preliminar</b><small>concepção e apresentação</small><span class="gate">■ termo de etapa</span></div><div class="ar">›</div>
+    <div class="st main"><b>Anteprojeto</b><small>revisão · compatibilização · definições</small><span class="gate">■ termo de etapa</span></div><div class="ar">›</div>
+    <div class="st main"><b>Projeto Executivo</b><small>desenhos base · detalhamento</small><span class="gate">■ termo de projeto</span></div><div class="ar">›</div>
+    <div class="st pre"><b>Entrega</b><small>Guia de Projeto</small></div>
+  </div>
+  <div class="parallel"><b>Projeto Legal</b> — em paralelo ao Anteprojeto · fecha com a aprovação</div>
+
+  <h3>Condições de passagem</h3>
+  <table>
+    <tr><th style="width:44mm">Para…</th><th>É preciso</th></tr>
+    <tr><td>Iniciar o Estudo Preliminar</td><td>Marco zero liberado pela direção</td></tr>
+    <tr><td>Iniciar o Anteprojeto</td><td>Termo de Encerramento do Estudo Preliminar assinado</td></tr>
+    <tr><td>Iniciar o Projeto Legal</td><td>Documentos do cliente, fase 1 do Anteprojeto concluída e lançamento estrutural aprovado pelo engenheiro</td></tr>
+    <tr><td>Encerrar o Anteprojeto</td><td>Projeto estrutural contratado, desenvolvido e compatibilizado</td></tr>
+    <tr><td>Iniciar o Executivo</td><td>Termo de Encerramento do Anteprojeto assinado <b>e</b> Projeto Legal aprovado</td></tr>
+  </table>
+  <div class="rule"><b>Regra.</b> Nenhuma etapa é iniciada fora de ordem. Antecipações só acontecem com autorização da direção.</div>
+
+  <h3>Modelos de projeto</h3>
+  <table>
+    <tr><th>Modelo</th><th>Etapas</th></tr>
+    <tr><td><b>Projeto do zero</b> (residência, restaurante, pousada, chalé, institucional)</td><td>Estudo Preliminar → Anteprojeto → Projeto Legal (paralelo) → Executivo</td></tr>
+    <tr><td><b>Reforma</b></td><td>Estudo Preliminar → Executivo. Projeto Legal e complementares quando necessários</td></tr>
+    <tr><td><b>Interiores e marcenaria</b></td><td>Estudo Preliminar → Executivo</td></tr>
+  </table>
+  <p class="small muted">Este manual descreve o projeto do zero. Reforma e interiores seguem a mesma lógica, com lista de entregáveis própria (capítulo 15).</p>
+</section>
+
+<section class="chap">
+  <h2><span class="num">06</span>Abertura do projeto</h2>
+  <p class="lead">O projeto chega à equipe com o briefing, o programa de necessidades e o Plano de Projeto. A abertura prepara a base de trabalho.</p>
+  <h3>O que a equipe recebe</h3>
+  <ul>
+    <li>Formulário de briefing respondido pelo cliente.</li>
+    <li>Programa de necessidades com ambientes e áreas.</li>
+    <li>Plano de Projeto (lista preliminar de pranchas por etapa).</li>
+    <li>Levantamento topográfico planialtimétrico.</li>
+    <li>Levantamento fotográfico da visita ao terreno ou imóvel.</li>
+  </ul>
+  <h3>Procedimento</h3>
+  <ol class="steps">
+    <li>Aguardar a liberação do marco zero pela direção.</li>
+    <li>Duplicar a pasta padrão e renomear com o código do projeto (sem acentos).</li>
+    <li>Criar o arquivo do projeto a partir do template ArchiCAD.</li>
+    <li>Preencher a aba de informações: dados do cliente e do terreno.</li>
+    <li>Fazer a análise de legislação do terreno no arquivo.</li>
+    <li>Importar o topográfico e modelar o terreno.</li>
+  </ol>
+</section>
+
+<section class="chap">
+  <h2><span class="num">07</span>Estudo Preliminar (EP)</h2>
+  <p class="lead">Etapa de concepção. Estudar o terreno e a demanda e chegar à proposta que a Trilha apresenta ao cliente.</p>
+  <div class="meta-etapa"><span><b>Entrada</b> marco zero</span><span><b>Saída</b> Termo de Encerramento de Etapa</span><span><b>Código dos desenhos</b> AP (Apresentação)</span></div>
+  <h3>Sequência de trabalho</h3>
+  <ol class="steps">
+    <li><b>Estudos:</b> terreno, insolação (estudo solar), ventilação, chuva, visuais, legislação e demandas do cliente.</li>
+    <li><b>Concepção:</b> testar opções até a direção decidir a proposta que será levada ao cliente.</li>
+    <li><b>Modelo 3D</b> no ArchiCAD com as soluções definidas, incluindo estrutura preliminar e terraplenagem.</li>
+    <li><b>Esquemas técnicos:</b> estrutura, terraplenagem, ventilação, insolação, visuais.</li>
+    <li><b>Imagens</b> no Lumion (vegetação, decoração, cerca de 15 imagens numa residência).</li>
+    <li><b>Plantas do EP</b> cotadas, em pranchas próprias A3, escala 1/100.</li>
+    <li><b>Apresentação</b> montada no roteiro padrão (abaixo).</li>
+    <li><b>Revisão interna</b> e reunião de apresentação ao cliente.</li>
+    <li>Envio do PDF, das imagens e do link BIMx.</li>
+  </ol>
+  <h3>Roteiro padrão da apresentação (PDF widescreen)</h3>
+  <table>
+    <tr><th style="width:8mm">#</th><th>Conteúdo</th></tr>
+    <tr><td>1</td><td>Capa</td></tr>
+    <tr><td>2</td><td>Imagem impactante</td></tr>
+    <tr><td>3</td><td>Análise do terreno</td></tr>
+    <tr><td>4</td><td>Estudos esquemáticos de concepção, que justificam as diretrizes</td></tr>
+    <tr><td>5</td><td>Algumas imagens</td></tr>
+    <tr><td>6</td><td>Desenhos técnicos: plantas e cortes</td></tr>
+    <tr><td>7</td><td>Mais imagens</td></tr>
+    <tr><td>8</td><td>Esquemas e diagramas: estrutura, terraplenagem, ventilação, insolação, visuais</td></tr>
+    <tr><td>9</td><td>Imagens finais</td></tr>
+  </table>
+  <p class="small">Lógica: o cliente descobre o projeto durante a apresentação. As imagens seguem de fora para dentro.</p>
+  <h3>Ajustes e encerramento</h3>
+  <ul>
+    <li>Os pedidos do cliente são reunidos em uma <b>rodada de ajuste</b>: uma lista única, respondida de uma vez. Pedidos fora da lista aguardam a rodada seguinte.</li>
+    <li>O número de rodadas é definido pela direção para cada projeto.</li>
+    <li>Com a proposta aprovada, o cliente assina o Termo de Encerramento de Etapa. Depois disso, a etapa não é reaberta sem autorização da direção.</li>
+  </ul>
+  <p><b>Entregáveis:</b> apresentação em PDF widescreen · imagens avulsas · plantas do EP (A3, 1/100) · link BIMx atualizado.</p>
+</section>
+
+<section class="chap">
+  <h2><span class="num">08</span>Anteprojeto (AP)</h2>
+  <p class="lead">Etapa de "apertar os parafusos": tornar o projeto preciso, compatível com as engenharias e com todas as definições tomadas.</p>
+  <div class="meta-etapa"><span><b>Entrada</b> Termo de Encerramento do EP</span><span><b>Saída</b> Termo de Encerramento de Etapa</span><span><b>Séries</b> 100, 200, 300, 400</span></div>
+
+  <h3>Fase 1 · Revisão e lançamentos</h3>
+  <ol class="steps">
+    <li>Revisão geral do EP aprovado: medidas de parede, áreas, cobertura, calhas, tubos de queda, contrapiso, forro detalhado.</li>
+    <li>Lançamento estrutural (pilares, vigas, lajes), sempre antes das demais disciplinas.</li>
+    <li>Lançamento de pontos: elétrica, hidráulica, rede, climatização, forro e iluminação.</li>
+    <li>Primeiras pranchas das séries 100, 200 e 300, enviadas ao cliente.</li>
+    <li>Exportação para as engenharias (DWG e formato BIM).</li>
+  </ol>
+  <h3>Fase 2 · Compatibilização</h3>
+  <ol class="steps">
+    <li>Ciclos com o calculista e com as demais disciplinas (capítulo 11).</li>
+    <li>Importação e sobreposição de cada complementar no modelo.</li>
+    <li>Registro das interferências e ajustes até não haver conflitos.</li>
+    <li>Aceite da direção, que libera as engenharias para os projetos executivos delas.</li>
+  </ol>
+  <h3>Fase 3 · Definições</h3>
+  <ol class="steps">
+    <li>Definição, com o cliente, de acabamentos, revestimentos, forro final, iluminação final, louças e metais, bancadas e esquadrias.</li>
+    <li>Quando o cliente não responde a uma indicação, a Trilha segue a própria especificação.</li>
+    <li>Montagem da série 400.</li>
+    <li>Revisão interna e reunião final com o cliente.</li>
+    <li>Assinatura do Termo de Encerramento de Etapa.</li>
+  </ol>
+  <div class="rule"><b>Regras.</b> O Anteprojeto só começa com o termo do EP assinado. Só encerra com o projeto estrutural contratado, desenvolvido e compatibilizado. Os aceites do cliente ao longo da etapa são comunicados à direção.</div>
+</section>
+
+<section class="chap">
+  <h2><span class="num">09</span>Projeto Legal (PL)</h2>
+  <p class="lead">Projeto de aprovação do condomínio (quando houver) e da prefeitura. Corre em paralelo ao Anteprojeto.</p>
+  <div class="meta-etapa"><span><b>Entrada</b> documentos do cliente + fase 1 do AP + lançamento estrutural aprovado</span><span><b>Saída</b> aprovação</span></div>
+  <ol class="steps">
+    <li>Revisar e organizar os documentos do cliente e do imóvel.</li>
+    <li>Desenvolver as pranchas de aprovação conforme as exigências do órgão.</li>
+    <li>Aprovar no condomínio, quando houver.</li>
+    <li>Protocolar na prefeitura.</li>
+    <li>Acompanhar o processo e atender às exigências até a aprovação.</li>
+    <li>Arquivar os documentos de aprovação emitidos pelos órgãos.</li>
+  </ol>
+  <div class="rule"><b>Regra.</b> Toda alteração pedida depois do protocolo é comunicada à direção antes de ser feita.</div>
+</section>
+
+<section class="chap">
+  <h2><span class="num">10</span>Projeto Executivo (PE)</h2>
+  <p class="lead">Etapa interna de detalhamento. Produz o conjunto de documentos que orienta a obra.</p>
+  <div class="meta-etapa"><span><b>Entrada</b> termo do AP + Projeto Legal aprovado</span><span><b>Saída</b> Termo de Encerramento de Projeto</span><span><b>Séries</b> 100 a 1000</span></div>
+  <h3>Fase 1 · Desenhos base</h3>
+  <p>Evolução das séries 100, 200 e 300: implantação, plantas, cobertura, cortes e fachadas, com as marcações de ampliações, detalhes e mapeamentos.</p>
+  <h3>Fase 2 · Mapeamentos e detalhamento</h3>
+  <p>Evolução da série 400 e criação das séries 500 a 1000: ampliações, esquadrias, marmoraria, detalhes construtivos, marcenaria (quando contratada) e documentos.</p>
+  <div class="rule"><b>Regras.</b> Não há alterações do cliente nem nova compatibilização nesta etapa. Ajustes finos internos fazem parte do trabalho. Qualquer pedido de alteração do cliente é encaminhado à direção.</div>
+  <h3>Encerramento</h3>
+  <ol class="steps">
+    <li>Revisão interna completa das pranchas.</li>
+    <li>Reunião final: a Trilha abre as pranchas e explica o projeto ao cliente.</li>
+    <li>Assinatura do Termo de Encerramento de Projeto.</li>
+    <li>Entrega (capítulo 14).</li>
+  </ol>
+</section>
+
+<section class="chap">
+  <h2><span class="num">11</span>Complementares e compatibilização</h2>
+  <p class="lead">Os complementares são contratados pelo cliente. A Trilha gerencia e compatibiliza. O estrutural vem sempre primeiro.</p>
+  <p>Disciplinas usuais: estrutural (fundação, concreto e/ou metálica), hidrossanitário, elétrico (iluminação de apoio, rede e automação), SPDA e climatização. Eventuais: paisagismo e luminotécnico.</p>
+  <div class="grid2">
+    <div class="card"><h4>Estrutural</h4><ol class="steps small">
+      <li>A Trilha lança pilares, vigas e lajes.</li>
+      <li>Reunião com o calculista.</li>
+      <li>Envio do projeto.</li>
+      <li>O calculista faz o lançamento preliminar e testa.</li>
+      <li>Nova reunião.</li>
+      <li>Ok da Trilha; o calculista envia os arquivos.</li>
+      <li>Importação e sobreposição no ArchiCAD.</li>
+      <li>Ajustes até o projeto fechar.</li></ol></div>
+    <div class="card"><h4>Demais disciplinas</h4><ol class="steps small">
+      <li>Reunião inicial: apresentação do projeto e das especificações.</li>
+      <li>A disciplina lança e envia o arquivo.</li>
+      <li>Importação, sobreposição e revisão pela Trilha.</li>
+      <li>Retorno das interferências à disciplina.</li>
+      <li>Nova rodada (em geral, 2 por disciplina).</li>
+      <li>Aceite da direção.</li></ol></div>
+  </div>
+  <h3>Interferências</h3>
+  <p>Cada interferência é anotada com disciplina, local, descrição e rodada, e enviada à disciplina responsável. Fica marcada como resolvida quando o arquivo corrigido é importado e conferido.</p>
+  <h3>Esperas</h3>
+  <p>Os prazos dos complementares e dos órgãos são definidos por eles. O prazo informado por cada um é anotado para saber quando retomar o trabalho.</p>
+</section>
+
+<section class="chap">
+  <h2><span class="num">12</span>Pranchas, desenhos e arquivos</h2>
+  <p class="lead">O projeto é um único modelo BIM que evolui. O que muda de etapa para etapa é o nível de informação e a representação.</p>
+  <h3>Numeração das pranchas</h3>
+  <ul>
+    <li>O ID da prancha é formado pela <b>série</b> e pela <b>posição</b> na lista (101, 102…). Inserir, mover ou remover uma prancha renumera as seguintes.</li>
+    <li>Cada série tem até 99 IDs e <b>nunca se repete</b>. Mais pavimentos ou unidades ocupam mais números da mesma série.</li>
+    <li>Desenhos têm nome próprio, sem número de prancha. Ampliações: <code>amp01 - cozinha - planta baixa</code>, <code>amp01 - cozinha - elevação 01</code>. O número do amp é fixo por ambiente.</li>
+    <li>Na série 400, cada mapeamento ocupa uma prancha por pavimento, na ordem da tabela. O mapeamento de cobertura é a última prancha da série.</li>
+    <li>Projetos com mais de uma edificação usam as mesmas séries: planta geral e, em seguida, a unidade-modelo ou uma prancha por unidade diferente.</li>
+  </ul>
+  <table>
+    <tr><th style="width:12mm">Série</th><th>Conteúdo</th><th style="width:12mm">Etapa</th></tr>
+    <tr><td><b>100</b></td><td>101 implantação (com quadro de informações gerais e de áreas); plantas por pavimento; última: planta de cobertura</td><td>AP</td></tr>
+    <tr><td><b>200</b></td><td>Cortes (mínimo 4, em 2 pranchas), com quadro de esquadrias e legenda de hachuras</td><td>AP</td></tr>
+    <tr><td><b>300</b></td><td>Elevações (mínimo 4), com quadro de esquadrias e legenda de hachuras</td><td>AP</td></tr>
+    <tr><td><b>400</b></td><td>401 topografia e terraplenagem (planta, cortes, 3D, corte e aterro em m³) · piso e acabamento · hidrossanitário · elétrica · forro e iluminação · mapeamento de cobertura (quando houver)</td><td>AP</td></tr>
+    <tr><td><b>500</b></td><td>Ampliações: cozinha, serviço/lavanderia, cada banheiro, gourmet, escada, piscina</td><td>PE</td></tr>
+    <tr><td><b>600</b></td><td>601 alumínio e vidro · 602 madeira · 603 guarda-corpo e corrimão — cadernos A4, uma esquadria por folha</td><td>PE</td></tr>
+    <tr><td><b>700</b></td><td>701 planta de marmoraria (por pavimento) · bancadas, uma por ambiente de área molhada</td><td>PE</td></tr>
+    <tr><td><b>800</b></td><td>Detalhamentos construtivos — caderno A3</td><td>PE</td></tr>
+    <tr><td><b>900</b></td><td>Marcenaria (só quando contratada): 901 mapa de marcenaria · uma prancha por peça</td><td>PE</td></tr>
+    <tr><td><b>1000</b></td><td>Documentos A4: 1001 terraplenagem · 1002 revestimentos · 1003 louças e metais · 1004 equipamentos · 1005 tomadas e interruptores · 1006 iluminação</td><td>PE</td></tr>
+  </table>
+  <h3>Formatos</h3>
+  <table>
+    <tr><th>Material</th><th>Formato</th></tr>
+    <tr><td>Séries 100 a 300</td><td>A1 estendido, escala 1/50</td></tr>
+    <tr><td>Plantas do Estudo Preliminar</td><td>A3, escala 1/100</td></tr>
+    <tr><td>Cadernos de esquadrias (600)</td><td>A4, uma esquadria por folha</td></tr>
+    <tr><td>Caderno de detalhes (800)</td><td>A3, um detalhe por folha</td></tr>
+    <tr><td>Documentos (1000) e Guia de Projeto</td><td>A4</td></tr>
+    <tr><td>Apresentação do EP</td><td>PDF widescreen</td></tr>
+  </table>
+  <h3>Revisões e nomes de arquivo</h3>
+  <ul>
+    <li>Todo projeto começa em <b>R00</b>. Uma revisão considerável passa para R01, R02…</li>
+    <li>Toda prancha do Anteprojeto e do Executivo traz, em campo próprio, o nome do arquivo de origem e a revisão.</li>
+    <li>Nome do PDF exportado: <code>NNN_TR_CODIGO_DISCIPLINA_ETAPA - TITULO DA PRANCHA.pdf</code>. Exemplo: <code>201_TR_CODIGO_ARQ_PE - CORTES AA E BB.pdf</code>.</li>
+    <li>O código do projeto é definido pela direção e não leva acentos.</li>
+  </ul>
+</section>
+
+<section class="chap">
+  <h2><span class="num">13</span>Revisão interna</h2>
+  <p class="lead">Nada sai para o cliente ou para os complementares sem revisão interna.</p>
+  <ul>
+    <li>A revisão acontece antes de toda entrega e antes de todo encerramento de etapa.</li>
+    <li>Participam a direção e quem desenvolveu o material.</li>
+    <li>A revisão final é da direção.</li>
+    <li>Os pontos encontrados são corrigidos e conferidos antes do envio.</li>
+  </ul>
+  <h2 style="margin-top:10mm"><span class="num">14</span>Encerramento e entrega</h2>
+  <p class="lead">Com o Termo de Encerramento de Projeto assinado, o projeto é entregue em formato digital e físico.</p>
+  <ul>
+    <li><b>Entrega digital:</b> PDFs de todas as pranchas e documentos, por e-mail.</li>
+    <li><b>Entrega física:</b> conjunto impresso, organizado e conferido.</li>
+    <li><b>BIMx</b> atualizado.</li>
+    <li><b>Imagens</b> atualizadas, quando a direção definir.</li>
+  </ul>
+  <h3>Guia de Projeto (PDF A4)</h3>
+  <ol class="steps">
+    <li>Capa padrão Trilha.</li>
+    <li>Informações gerais do projeto.</li>
+    <li>Lista-guia das pranchas do Executivo, com os desenhos e as informações de cada uma.</li>
+    <li>Documentos da série 1000.</li>
+    <li>Plantas, cortes e elevações no padrão do Estudo Preliminar.</li>
+    <li>Perspectivas esquemáticas.</li>
+    <li>Imagens atualizadas.</li>
+  </ol>
+</section>
+
+<section class="chap">
+  <h2><span class="num">15</span>Seções em construção</h2>
+  <p class="lead">As partes abaixo serão incluídas nas próximas versões do manual.</p>
+  <table>
+    <tr><th>Seção</th><th>Conteúdo previsto</th></tr>
+    <tr><td>Pasta padrão</td><td>Estrutura de pastas e o que vai em cada uma</td></tr>
+    <tr><td>Template ArchiCAD</td><td>Abas, camadas, layouts, carimbo e configurações de representação por etapa</td></tr>
+    <tr><td>Checklists por série e desenho</td><td>O que cada prancha deve conter para ser considerada pronta</td></tr>
+    <tr><td>Padrões técnicos</td><td>Alturas de pontos, medidas usuais, especificações recorrentes</td></tr>
+    <tr><td>Visita ao terreno</td><td>Checklist de análise do terreno</td></tr>
+    <tr><td>Reforma</td><td>Levantamento, etapas e entregáveis próprios</td></tr>
+    <tr><td>Interiores e marcenaria</td><td>Etapas e entregáveis próprios</td></tr>
+  </table>
+</section>
+
+</body>
+</html>
