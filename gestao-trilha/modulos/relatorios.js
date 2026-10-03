@@ -5,7 +5,11 @@
   var T = window.Trilha, $ = T.$, esc = T.esc, ymd = T.ymd, fmtH = T.fmtH;
   var S = { fech: {}, sel: null, running: false };
 
+  var S_ABA = "horas";
   var html =
+    '<div class="segmented" id="r-abas"><button class="seg-pill is-selected" data-rab="horas">Horas e fechamentos</button><button class="seg-pill" data-rab="custos">Horas e custos por projeto</button></div>' +
+    '<div id="r-custos" class="view-sub" hidden>' + (T.horasCustos ? T.horasCustos.html : "") + "</div>" +
+    '<div id="r-horas" class="view-sub">' +
     '<div class="notes" id="r-notes"></div>' +
     '<div class="card grid-form">' +
       '<div class="field col-4"><label for="r-periodo">Período</label><select id="r-periodo"><option value="semana">Esta semana</option><option value="mes" selected>Este mês</option><option value="mesant">Mês anterior</option><option value="ano">Este ano</option><option value="custom">Personalizado</option></select></div>' +
@@ -23,7 +27,7 @@
         '<input type="month" id="f-mes" class="btn btn-small" aria-label="Mês do fechamento">' +
         '<button class="btn btn-small" id="btn-fech-csv">Exportar (CSV)</button></div></div>' +
       '<div id="f-status" class="hint" style="margin-bottom:10px"></div><div id="r-fech"></div>' +
-    "</div>";
+    "</div></div>";
   function sec(t, meta, id) { return '<div><div class="section-head"><h2 class="section-title">' + t + "</h2>" + (meta ? '<span class="section-meta">' + meta + "</span>" : "") + '</div><div id="' + id + '"></div></div>'; }
 
   function L0() { return T.tempo ? T.tempo.lancAtivos() : []; }
@@ -61,6 +65,9 @@
   var BAR = { t: "", bar: 1 };
   function H() { return { t: "Horas", r: 1, f: function (r) { return fmtH(r.min); } }; }
   function render() {
+    T.each("#r-abas [data-rab]", function (b) { b.classList.toggle("is-selected", b.dataset.rab === S_ABA); });
+    $("r-horas").hidden = S_ABA !== "horas"; $("r-custos").hidden = S_ABA !== "custos";
+    if (S_ABA === "custos") { if (T.horasCustos) T.horasCustos.render(); return; }
     var sel = $("r-pessoa"), cur = sel.value;
     sel.innerHTML = '<option value="">Todas</option>' + T.state.pessoas.map(function (p) { return '<option value="' + esc(p.id) + '">' + esc(p.nome) + "</option>"; }).join("");
     sel.value = cur;
@@ -184,6 +191,8 @@
   }
 
   function init() {
+    if (T.horasCustos) T.horasCustos.init();
+    $("r-abas").addEventListener("click", function (e) { var b = e.target.closest("[data-rab]"); if (!b) return; S_ABA = b.dataset.rab; render(); });
     ["r-periodo", "r-de", "r-ate", "r-pessoa"].forEach(function (id) {
       $(id).addEventListener("change", function () { var c = $("r-periodo").value === "custom"; $("r-de-wrap").hidden = !c; $("r-ate-wrap").hidden = !c; render(); });
     });
@@ -221,12 +230,13 @@
   }
 
   // Leitura para outros módulos (Financeiro): fechamentos gravados e cálculo do mês.
-  T.relatorios = { fechamentos: function () { return S.fech; }, calcFechamento: calcFechamento };
+  T.relatorios = { fechamentos: function () { return S.fech; }, calcFechamento: calcFechamento,
+    abrirCustos: function () { S_ABA = "custos"; T.go("admin", "relatorios"); } };
 
   T.register({
     id: "relatorios", label: "Relatórios", area: "admin", html: html, init: init, render: render,
     icon: '<path d="M4 20h16"/><path d="M7 16V10"/><path d="M12 16V5"/><path d="M17 16v-3"/>',
-    desc: function () { return "Horas, custos e fechamentos"; },
+    desc: function () { return "Horas, fechamentos e custos por projeto"; },
     connect: function (db) {
       db.collection("fechamentos").onSnapshot(function (s) { var m = {}; T.snapList(s).forEach(function (f) { m[f.id] = f; }); S.fech = m; T.loaded("fech", s); T.scheduleRender(); }, T.onErr);
     },

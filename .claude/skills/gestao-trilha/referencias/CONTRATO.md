@@ -18,13 +18,15 @@ modulos/<id>.js     um arquivo por módulo
 
 **Cópia de teste:** https://claude.ai/artifact/V9bUhPfLyowX83XUz5Zeaw — mesmos arquivos, `<title>` "Gestão Trilha Teste",
 capacidades só `db` e `downloads` (sem Google Agenda) e banco próprio com dados fictícios (`fin_config/geral.teste = true`
-mostra o aviso na capa). Módulos novos são testados lá antes de ir para o link oficial. Ao levar uma mudança ao oficial, publicar os
-mesmos arquivos nos dois links (na cópia de teste só muda o `<title>`). A antiga cópia de teste do Gestor de Projetos
+mostra o aviso na capa). **Decisão do Luan (29/09/2026):** a cópia de teste fica parada e
+desatualizada; ajustes do dia a dia vão direto ao oficial. Quando houver um **grande ajuste** (módulo novo ou mudança
+estrutural), atualizar a cópia de teste primeiro com todos os arquivos do oficial (só muda o `<title>`), testar lá e
+depois levar ao oficial. Não excluir a cópia: o banco dela guarda os dados fictícios de teste. A antiga cópia de teste do Gestor de Projetos
 (https://claude.ai/artifact/MCRcCpLbCTKURD3qUb6Wmx, com projetos de exemplo) ficou superada pelo oficial e não é mais atualizada.
 
 Publicar sempre com `url` = link acima, `file_path` = `index.html`, `root` = esta pasta e `files` listando
 **todos** os arquivos (estilo.css, nucleo.js, logo.png e cada `modulos/*.js`). Não mudar `capabilities` sem
-necessidade (hoje: `db`, `downloads`, `mcp` Google Calendar com `create_event`/`update_event`); para declarar
+necessidade (hoje: `db`, `downloads`, `mcp` Google Calendar com `create_event`/`update_event`, `assets` e `sample`); para declarar
 uma nova capacidade, repetir as existentes.
 
 **Um chat por vez** publicando neste artefato. Antes de começar, ler a versão publicada (Artifact `read`) ou o
@@ -60,12 +62,16 @@ Dentro de um app do escritório, a barra do topo tem **só "← Início"**: não
 Na área da pessoa continuam as abas Tempo, Tarefas e Projetos (Meu trabalho).
 
 Adicionar um módulo = criar o arquivo + uma linha `<script src="modulos/<id>.js">` no `index.html` antes de
-`Trilha.start()`. Ao ficar pronto, remover o botão "Em breve" correspondente (`FUTUROS` em `nucleo.js`).
+`Trilha.start()`. Ao ficar pronto, o botão "Em breve" com o mesmo id (`FUTUROS` em `nucleo.js`) some sozinho; use o
+id previsto (`obras`, `comercial`). A ordem dos botões do Escritório está em `ORDEM_CAPA` (`nucleo.js`): gestor,
+obras, comercial, financeiro, relatorios, config, cadastros; módulo fora da lista vai para o fim.
 
 Um módulo **não** mexe no HTML nem no estado de outro módulo. Para ler dados de outro módulo, use o objeto que
 ele expõe (ex.: `Trilha.tempo.lancAtivos()`, `Trilha.tempo.custoLanc(l)`, `Trilha.tempo.lancar(l)`,
 `Trilha.relatorios.fechamentos()`, `Trilha.relatorios.calcFechamento(pid, mes)`, `Trilha.gestor.*`,
-`Trilha.cadastros.contato(id)`, `Trilha.tarefas.criar(pid, item)`).
+`Trilha.cadastros.contato(id)`, `Trilha.cadastros.editarProjeto(pid)`, `Trilha.tarefas.criar(pid, item)`,
+`Trilha.gestor.criar(dados)` (cria projeto + processo, usado pelo "Virar projeto" do Comercial), `Trilha.comercial.*` (oportunidades, cálculo do simulador), `Trilha.comercialDocs.*` (proposta PDF, contrato .docx, IA), `Trilha.gestor.corpoItem(pid, item)` + `Trilha.gestor.ligarCorpo(elemento)` para mostrar e editar desenhos e
+checklists de um item fora do Gestor, como faz a área da pessoa).
 
 ## 3. O que o núcleo oferece (`window.Trilha`, abreviado `T`)
 
@@ -73,6 +79,8 @@ ele expõe (ex.: `Trilha.tempo.lancAtivos()`, `Trilha.tempo.custoLanc(l)`, `Tril
   `T.state.view` (`home` | `pessoa` | `admin`), `T.state.sub` (módulo aberto).
 - Dados comuns: `T.pessoa(id)`, `T.pessoasAtivas()`, `T.projeto(id)`, `T.cfg()` (config com padrões),
   `T.etapaNome`, `T.areaNome`, `T.topicoNome`, `T.tipoNome`, `T.custoHoraTotal(pid)`, `T.rateioHora()`,
+  `T.DEFAULT_CONFIG.pesosEtapas` (pesos do % concluído; `T.gestor.pct(pid)` e `T.gestor.pctMarc(pid)`),
+  `T.padroes()`, `T.padraoRotulo(p)`, `T.padraoOpts()` (faixas de R$/m² dos padrões de obra, editáveis em Configurações),
   `T.saveConfig(patch)`.
 - Banco e capacidades: `T.db`, `T.downloads`, `T.mcp` (podem ser `null`: esconder o recurso).
 - Navegação e desenho: `T.go(view, sub, pid)`, `T.render()`, `T.scheduleRender()`.
@@ -93,8 +101,11 @@ ele expõe (ex.: `Trilha.tempo.lancAtivos()`, `Trilha.tempo.custoLanc(l)`, `Tril
   campos a `projetos` (ex.: `perfil`, usado na precificação), mas nunca renomear ou apagar os existentes.
 - Coleções de módulos em uso: `lancamentos`, `atividades`, `timers` (Tempo); `tarefas` (Tarefas);
   `fin_config`, `fin_contratos`, `fin_mov`, `fin_recorrentes` (Financeiro);
-  `fechamentos` (Relatórios); `gp`, `gp_config` (Gestor de Projetos); `contatos`, `obras` (Cadastros). Um módulo novo usa coleções com o próprio prefixo/nome e as documenta aqui.
+  `fechamentos` (Relatórios); `gp`, `gp_config` (Gestor de Projetos); `contatos`, `obras` (Cadastros). `com_oport` (uma oportunidade por documento), `com_config/geral` (percentuais, horas, mensagens) e `com_config/modelos` (modelos de proposta e de contrato, textos exemplares) (Gestor Comercial). `aprimoramentos/<AAAA-MM>` com `itens[]` (caixa "Dúvidas e aprimoramentos" da capa; módulo `aprimoramentos`, área `capa`: não vira botão, desenha-se em `#home-extra` do `index.html`). Arquivos (páginas fixas, logos, contratos em base64) ficam no armazenamento de arquivos do artefato (capacidade `assets`); o banco guarda só o id. Um módulo novo usa coleções com o próprio prefixo/nome e as documenta aqui.
 - Toda gravação feita pelo Claude no chat (ArtifactData) usa `if_version` do documento lido.
+- **Documentos do banco chegam somente-leitura** (`d.data()` é congelado no app real): nunca alterar o objeto
+  recebido; copiar com `T.clone` antes de ajustar formatos antigos. Nos testes, o banco simulado deve congelar os
+  dados (`Object.freeze` em profundidade) — foi esse erro que deixou o Gestor vazio em 01/10/2026.
 - Datas: ISO (`toISOString`) para instantes; `AAAA-MM-DD` para dias; `AAAA-MM` para meses. Valores em reais
   como número (sem formatação). Mês = do dia 1º ao último; semana = segunda a domingo.
 
@@ -131,8 +142,9 @@ ele expõe (ex.: `Trilha.tempo.lancAtivos()`, `Trilha.tempo.custoLanc(l)`, `Tril
 | Gestor de Projetos | `modulos/gestor.js` | admin | em uso (oficial desde 29/09/2026) |
 | Cadastros | `modulos/cadastros.js` | admin | em uso (único lugar para excluir projetos, pessoas e contatos) |
 | Financeiro | `modulos/financeiro.js` | admin | em uso (v1 no app oficial desde set/2026) |
-| Horas e custos (antigo "Projetos") | `modulos/projetos.js` | admin | em uso |
+| Horas e custos (antigo "Projetos") | `modulos/projetos.js` | aba de Relatórios | em uso — não se registra como módulo: expõe `T.horasCustos {html, init, render}` e Relatórios o mostra na aba "Horas e custos por projeto" |
 | Relatórios | `modulos/relatorios.js` | admin | em uso |
 | Configurações | `modulos/config.js` | admin | em uso |
-| Gestor Comercial (oportunidades, briefing) | — | admin | aprovado, para depois (ver REGRAS.md) |
+| Gestor Comercial (oportunidades, briefing, simulador) | `modulos/comercial.js` | admin | em uso (oficial desde 02/10/2026; pendências de configuração em `PENDENCIAS-CONTA-ORIGEM.md`); expõe `T.comercial` |
+| Documentos do Comercial (proposta PDF, contrato .docx, IA) | `modulos/comercial-docs.js` | — | não se registra; expõe `T.comercialDocs`, carregado antes de `comercial.js` |
 | Gestor de obras (orçamento de obras) | — | admin | "Em breve" na capa — portar o app de orçamento (skill orcamento-obra-trilha), itens agrupados por obra |

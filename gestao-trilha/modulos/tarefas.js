@@ -18,7 +18,15 @@
   function remLabel(r) { var v = remVal(r); for (var i = 0; i < REM_OPTS.length; i++) if (REM_OPTS[i][0] === v) return REM_OPTS[i][1]; return ""; }
   function durLabel(m) { for (var i = 0; i < DUR_OPTS.length; i++) if (DUR_OPTS[i][0] === m) return DUR_OPTS[i][1]; return m ? m + " min" : "1h"; }
 
-  var html =
+  // Caixa "Fale com o Claude": a pessoa dita ou escreve solto; o Claude (nível rápido) organiza em tarefas/compromissos;
+  // nada é gravado antes de "Criar". Sem IA nesta visualização, a caixa não aparece.
+  var htmlIA = '<div class="card gp-box com-chat tia-box" id="tia-box" hidden><div class="com-chat-h"><b>✨ Fale com o Claude</b>' +
+      '<span class="hint">Dite ou escreva do seu jeito: compromissos, tarefas e demandas. O Claude organiza em fichas; nada é salvo antes de você clicar em Criar.</span></div>' +
+    '<div class="com-chat-in"><textarea class="ctl" id="tia-txt" rows="3" placeholder="Ex.: reunião com o Bruno na obra quinta às 10h, lembrete meia hora antes; revisar o executivo da Paula até sexta, é prioridade"></textarea>' +
+      '<span class="hint apr-dica">Dica: no computador, use o microfone com <kbd aria-label="tecla Windows"><svg class="apr-win" viewBox="0 0 16 16" aria-hidden="true"><path d="M0 0h7.5v7.5H0zM8.5 0H16v7.5H8.5zM0 8.5h7.5V16H0zM8.5 8.5H16V16H8.5z"/></svg> Win</kbd> + <kbd>H</kbd> · no celular, o microfone do teclado.</span>' +
+      '<span></span><button type="button" class="btn btn-small btn-primary" id="tia-ok">Organizar</button></div>' +
+    '<div id="tia-out"></div></div>';
+  var html = htmlIA +
     '<div class="form-actions" style="justify-content:space-between"><div class="section-meta" id="task-meta"></div><button class="btn btn-primary" id="btn-new-task">+ Nova tarefa</button></div>' +
     '<div class="panel" id="task-panel" hidden><h3 class="panel-title" id="task-panel-title">Nova tarefa</h3>' +
       '<form id="task-form" class="grid-form" autocomplete="off">' +
@@ -160,8 +168,13 @@
       try { await save(pid, itens); $("task-panel").hidden = true; T.toast("Tarefa salva"); syncAgenda(pid, t); } catch (err) { T.showError(err); }
     });
     var view = $("view-tarefas");
+    if (window.claude && window.claude.use) $("tia-box").hidden = false;
+    view.addEventListener("change", function (e) { if (e.target.dataset.tia != null) IA.sel[e.target.dataset.tia] = e.target.checked; });
     view.addEventListener("click", async function (e) {
       var pid = T.state.pessoaId, el;
+      if (e.target.id === "tia-ok") { organizar(e.target); return; }
+      if (e.target.id === "tia-criar") { criarIA(e.target); return; }
+      if (e.target.id === "tia-desc") { IA.itens = null; renderIA(); return; }
       if ((el = e.target.closest("[data-open]"))) { S.open[el.dataset.open] = !S.open[el.dataset.open]; S.confirmId = null; render(); return; }
       if ((el = e.target.closest("[data-edit-field]"))) { S.inline = { id: el.dataset.id, field: el.dataset.editField }; render(); return; }
       if ((el = e.target.closest("[data-task-edit]"))) { openTask(T.byId(tarefas(pid), el.dataset.taskEdit)); return; }
@@ -194,6 +207,74 @@
     view.addEventListener("focusout", function (e) {
       if (e.target.dataset && e.target.dataset.inline) setTimeout(function () { if (S.inline && !document.querySelector("[data-inline]:focus")) { S.inline = null; render(); } }, 150);
     });
+  }
+
+  // ---------- Fale com o Claude ----------
+  var GRUPOS = { compromisso: "Compromisso", prioridade: "Prioridade", demanda: "Demanda", tarefa: "Tarefa" };
+  var DIAS = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
+  var IA = { rodando: false, itens: null, sel: {}, erro: "" };
+  function promptIA(txt) {
+    var hoje = new Date(), p = T.pessoa(T.state.pessoaId), proj = T.state.projetos.filter(function (x) { return x.status !== "concluido"; }).map(function (x) { return x.id + " = " + (x.codigo || "") + " " + x.nome + (x.cliente ? " (" + x.cliente + ")" : ""); });
+    return "Você organiza a agenda de " + (p ? p.nome : "uma pessoa") + ", do escritório Trilha Arquitetura Brasileira. Hoje é " + DIAS[hoje.getDay()] + ", " + ymd(hoje) + " (fuso America/Sao_Paulo).\n" +
+      "Transforme o texto abaixo (muitas vezes ditado, solto ou confuso) em itens de agenda. Devolva SÓ um JSON: {\"itens\": [{" +
+      "\"grupo\": \"compromisso\" (tem dia e hora: reunião, visita, ligação marcada) | \"prioridade\" (urgente/importante) | \"demanda\" (pedido de alguém, de cliente ou obra) | \"tarefa\" (o resto), " +
+      "\"titulo\": curto e direto, começando com verbo quando couber (até 70 caracteres), " +
+      "\"descricao\": detalhes úteis do texto, resumidos e claros, ou \"\", " +
+      "\"checklist\": lista de passos se o texto trouxer etapas, senão [], " +
+      "\"data\": \"AAAA-MM-DD\" ou null (resolva \"amanhã\", \"quinta\", \"dia 15\" a partir de hoje; dia da semana = o próximo), " +
+      "\"hora\": \"HH:MM\" ou null (só compromisso), \"duracaoMin\": minutos (só compromisso; padrão 60), " +
+      "\"lembreteMin\": minutos antes ou null (só se pedido; -1 = sem lembrete), " +
+      "\"repeticao\": null | \"WEEKLY\" | \"BIWEEKLY\" | \"MONTHLY\" (só se pedido), " +
+      "\"projetoId\": id do projeto citado (lista abaixo) ou null}]}.\n" +
+      "Não invente datas, horários nem fatos. Um item por assunto. Português do Brasil.\n" +
+      (proj.length ? "Projetos (id = código nome):\n" + proj.join("\n") + "\n" : "") +
+      "Texto:\n" + txt;
+  }
+  function limpar(x) {
+    var g = GRUPOS[x && x.grupo] ? x.grupo : "tarefa", data = /^\d{4}-\d{2}-\d{2}$/.test(x && x.data || "") ? x.data : null, hora = /^\d{1,2}:\d{2}$/.test(x && x.hora || "") ? ("0" + x.hora).slice(-5) : null;
+    if (g === "compromisso" && !data) g = "tarefa";
+    return { grupo: g, titulo: String(x && x.titulo || "").trim().slice(0, 120), descricao: String(x && x.descricao || "").trim(),
+      checklist: Array.isArray(x && x.checklist) ? x.checklist.map(function (c) { return String(c).trim(); }).filter(Boolean) : [],
+      data: data, hora: g === "compromisso" ? hora : null, duracaoMin: g === "compromisso" ? (+x.duracaoMin > 0 ? Math.round(+x.duracaoMin) : 60) : null,
+      lembreteMin: g === "compromisso" && x.lembreteMin != null && !isNaN(+x.lembreteMin) ? Math.round(+x.lembreteMin) : null,
+      repeticao: g === "compromisso" && REC_RRULE[x.repeticao] ? x.repeticao : null, projetoId: x && x.projetoId && T.projeto(x.projetoId) ? x.projetoId : null };
+  }
+  function renderIA() {
+    var out = $("tia-out"); if (!out) return;
+    if (IA.rodando) { out.innerHTML = '<p class="hint">Organizando…</p>'; return; }
+    if (IA.erro) { out.innerHTML = '<p class="hint warn">' + esc(IA.erro) + "</p>"; return; }
+    if (!IA.itens) { out.innerHTML = ""; return; }
+    if (!IA.itens.length) { out.innerHTML = '<p class="hint">Não encontrei nenhuma tarefa no texto. Tente descrever de outro jeito.</p>'; return; }
+    out.innerHTML = '<div class="tia-lista">' + IA.itens.map(function (x, k) {
+      var pj = x.projetoId ? T.projeto(x.projetoId) : null, quando = [x.data ? T.fmtYmd(x.data) : "sem data", x.hora, x.duracaoMin ? durLabel(x.duracaoMin) : "", x.lembreteMin != null ? remLabel(x.lembreteMin) : "", x.repeticao ? (REC_OPTS.filter(function (r) { return r[0] === x.repeticao; })[0] || [])[1] : ""].filter(Boolean).join(" · ");
+      return '<label class="tia-item"><input type="checkbox" data-tia="' + k + '"' + (IA.sel[k] !== false ? " checked" : "") + '><span class="tia-c"><span class="tia-l1"><span class="subgroup-dot ' + x.grupo + '"></span><b>' + esc(x.titulo) + '</b><span class="hint">' + esc(GRUPOS[x.grupo]) + (pj ? " · " + esc(pj.codigo || pj.nome) : "") + "</span></span>" +
+        '<span class="hint">' + esc(quando) + "</span>" + (x.descricao ? '<span class="tia-d">' + esc(x.descricao) + "</span>" : "") + (x.checklist.length ? '<span class="tia-d">☐ ' + x.checklist.map(esc).join(" · ☐ ") + "</span>" : "") + "</span></label>";
+    }).join("") + '</div><div class="form-actions"><button type="button" class="btn btn-small btn-primary" id="tia-criar">Criar selecionadas</button><button type="button" class="btn btn-small" id="tia-desc">Descartar</button><span class="hint">Detalhes podem ser ajustados depois, abrindo a tarefa.</span></div>';
+  }
+  async function organizar(btn) {
+    var txt = $("tia-txt").value.trim(); if (!txt) { T.toast("Escreva ou dite o que precisa registrar."); return; }
+    var sample = window.claude && window.claude.use ? await window.claude.use("sample") : null;
+    if (!sample) { T.toast("O Claude não está disponível nesta visualização."); return; }
+    IA.rodando = true; IA.erro = ""; IA.itens = null; IA.sel = {}; btn.disabled = true; renderIA();
+    try {
+      var r = await sample.json(promptIA(txt), { modelTier: "quick" });
+      IA.itens = (r && Array.isArray(r.itens) ? r.itens : []).map(limpar).filter(function (x) { return x.titulo; });
+    } catch (err) {
+      IA.erro = err && err.code === "not_granted" ? "Sem autorização para usar o Claude nesta visualização." : err && err.code === "rate_limited" ? "Muitos pedidos seguidos. Espere um pouco e tente de novo." : "Não foi possível organizar agora. Tente de novo.";
+    } finally { IA.rodando = false; btn.disabled = false; renderIA(); }
+  }
+  async function criarIA(btn) {
+    var pid = T.state.pessoaId, lista = IA.itens.filter(function (x, k) { return IA.sel[k] !== false; }); if (!lista.length) { T.toast("Marque ao menos uma."); return; }
+    var ok = await T.saveWith(btn, async function () {
+      for (var i = 0; i < lista.length; i++) {
+        var x = lista[i];
+        var it = { title: x.titulo, description: x.descricao, subdivision: x.grupo, checklist: x.checklist.map(function (c) { return { text: c, done: false }; }),
+          dueDate: x.data, dueTime: x.hora, durationMinutes: x.grupo === "compromisso" ? x.duracaoMin : null, reminderMinutes: x.lembreteMin, recurrence: x.repeticao };
+        if (x.projetoId) it.projetoId = x.projetoId;
+        await T.tarefas.criar(pid, it);
+      }
+    });
+    if (ok) { $("tia-txt").value = ""; IA.itens = null; renderIA(); T.toast(lista.length === 1 ? "Tarefa criada" : lista.length + " tarefas criadas"); }
   }
 
   // Usado pelo Gestor de Projetos: a tarefa de projeto mora na agenda da pessoa responsável, com projetoId.

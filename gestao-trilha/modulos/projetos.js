@@ -1,5 +1,5 @@
-/* Módulo Projetos — cadastro de projetos (dado comum do núcleo: projetos/<id>) e painel de horas/custos.
- * O futuro Gestor de Projetos vai ampliar este módulo. */
+/* Horas e custos — painel de horas, custos e perfil por projeto (dado comum do núcleo: projetos/<id>).
+ * Aparece como a aba "Horas e custos" de Relatórios (T.horasCustos); não se registra como módulo. */
 (function () {
   "use strict";
   var T = window.Trilha, $ = T.$, esc = T.esc;
@@ -23,7 +23,7 @@
 
   var html =
     "<div>" +
-      '<div class="section-head"><h2 class="section-title">Projetos</h2><div class="form-actions">' +
+      '<div class="section-head"><h2 class="section-title">Horas e custos por projeto</h2><div class="form-actions">' +
         '<div class="segmented" id="proj-filter"><button class="seg-pill is-selected" data-f="ativo">Ativos</button><button class="seg-pill" data-f="pausado">Pausados</button><button class="seg-pill" data-f="concluido">Concluídos</button></div>' +
         '<button class="btn btn-small btn-primary" id="btn-new-proj">+ Novo projeto</button></div></div>' +
       '<div class="panel" id="proj-panel" hidden style="margin-bottom:14px"><h3 class="panel-title" id="proj-panel-title">Novo projeto</h3>' +
@@ -110,7 +110,8 @@
       Array.prototype.forEach.call(this.children, function (c) { c.classList.toggle("is-selected", c === b); });
       render();
     });
-    $("btn-new-proj").addEventListener("click", function () { openProj(null); });
+    // Projeto novo nasce sempre no Gestor de Projetos (assistente de criação).
+    $("btn-new-proj").addEventListener("click", function () { if (T.gestor) T.gestor.novo(); else openProj(null); });
     $("p-cancel").addEventListener("click", function () { $("proj-panel").hidden = true; });
     $("projects").addEventListener("click", function (e) { var b = e.target.closest("[data-editp]"); if (b) openProj(T.projeto(b.dataset.editp)); });
     $("proj-form").addEventListener("submit", async function (e) {
@@ -129,9 +130,6 @@
     });
   }
 
-  T.register({
-    id: "projetos", label: "Horas e custos", area: "admin", html: html, init: init, render: render,
-    icon: '<path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/>',
-    desc: function () { return "Cadastro, perfil e horas por projeto"; }
-  });
+  // Não é mais um app da capa: é a aba "Horas e custos" dentro de Relatórios (relatorios.js monta e desenha).
+  T.horasCustos = { html: html, init: init, render: render };
 })();

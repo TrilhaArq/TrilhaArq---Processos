@@ -6,7 +6,7 @@
   var T = window.Trilha, $ = T.$, esc = T.esc;
   var TIPOS = [["cliente", "Cliente", "Clientes"], ["fornecedor", "Fornecedor", "Fornecedores"], ["maodeobra", "Mão de obra", "Mão de obra"], ["parceiro", "Parceiro", "Parceiros"]];
   var OBRA_SIT = [["planejamento", "Planejamento"], ["andamento", "Em andamento"], ["pausada", "Pausada"], ["concluida", "Concluída"]];
-  var S = { contatos: [], obras: [], sec: "contatos", filtro: "todos", busca: "", edit: null, editObra: null };
+  var S = { contatos: [], obras: [], sec: "contatos", filtro: "todos", busca: "", edit: null, editObra: null, editProj: null };
 
   function tipoNome(k) { var t = TIPOS.filter(function (x) { return x[0] === k; })[0]; return t ? t[1] : k; }
   function contato(id) { return T.byId(S.contatos, id); }
@@ -56,13 +56,41 @@
       (c.id ? '<button type="button" class="link danger" data-del="' + esc(c.id) + '">Excluir contato</button>' : "") +
       '</div><p class="hint col-12">CPF, CNPJ e endereço são dados pessoais: quando houver colaboradores, ficam visíveis só para os sócios.</p></form>';
   }
+  // Dados de cadastro do projeto (nome, código, clientes, endereço, contratos): só se alteram aqui.
+  function formProjeto(p) {
+    var ct = p.contrato || {}, g = T.gestor && T.gestor.gp(p.id), mc = g && g.marc && g.marc.ativo ? g.marc : null, mct = mc && mc.contrato || {};
+    var cls = contatos("cliente");
+    function f(id, l, v, col, extra) { return '<div class="field ' + (col || "col-4") + '"><label for="pj-' + id + '">' + l + '</label><input id="pj-' + id + '" value="' + esc(v == null ? "" : v) + '"' + (extra || "") + "></div>"; }
+    return '<form class="panel grid-form" id="proj-form-cad" data-pid="' + esc(p.id) + '" style="margin-bottom:16px" autocomplete="off"><h3 class="panel-title col-12">Editar projeto</h3>' +
+      f("nome", "Nome do projeto", p.nome, "col-8", " required") + f("cod", "Código", p.codigo) +
+      '<div class="field col-12"><span class="label">Clientes</span><div class="gp-multi">' + (cls.length ? cls.map(function (c) { return '<label class="gp-check"><input type="checkbox" data-pjcli="' + esc(c.id) + '"' + ((p.clienteIds || []).indexOf(c.id) >= 0 ? " checked" : "") + "> " + esc(c.nome) + "</label>"; }).join("") : '<span class="hint">Nenhum cliente cadastrado.</span>') + "</div></div>" +
+      f("end", "Endereço da obra", p.endereco, "col-12") +
+      f("cnum", "Nº do contrato", ct.numero) + f("cdata", "Data do contrato", ct.data, "col-4", ' type="date"') + f("ccid", "Cidade (para os termos)", ct.cidade) +
+      (mc ? f("mnum", "Nº do contrato da marcenaria", mct.numero) + f("mdata", "Data do contrato da marcenaria", mct.data, "col-4", ' type="date"') + f("mval", "Valor da marcenaria (R$)", mc.valor, "col-4", ' type="number" min="0" step="0.01"') : "") +
+      '<div class="col-12 form-actions"><button class="btn btn-primary" id="pj-save">Salvar projeto</button><button type="button" class="btn" data-cancel="1">Cancelar</button></div>' +
+      '<p class="hint col-12">No Gestor de Projetos, esses dados aparecem em Informações só para consulta.</p></form>';
+  }
+  async function salvarProjeto() {
+    var f = $("proj-form-cad"), pid = f.dataset.pid, ids = [];
+    T.each("[data-pjcli]", function (i) { if (i.checked) ids.push(i.dataset.pjcli); }, f);
+    var nomes = ids.map(function (id) { var c = contato(id); return c ? c.nome : ""; }).filter(Boolean);
+    var body = { nome: $("pj-nome").value.trim(), codigo: $("pj-cod").value.trim(), clienteIds: ids, cliente: nomes.join(" e "), endereco: $("pj-end").value.trim(), contrato: { numero: $("pj-cnum").value.trim(), data: $("pj-cdata").value || null, cidade: $("pj-ccid").value.trim() } };
+    if (!body.nome) return;
+    var marc = $("pj-mnum") ? { numero: $("pj-mnum").value.trim(), data: $("pj-mdata").value || null, valor: T.numOrNull($("pj-mval").value) } : null;
+    var ok = await T.saveWith($("pj-save"), async function () {
+      await T.db.doc("projetos/" + pid).update(body);
+      if (marc && T.gestor) await T.gestor.salvar(pid, function (x) { x.marc.contrato = { numero: marc.numero, data: marc.data }; x.marc.valor = marc.valor; });
+    });
+    if (ok) setTimeout(function () { S.editProj = null; render(); }, 500);
+  }
   function secProjetos() {
     var list = T.state.projetos.slice().sort(function (a, b) { return (a.codigo || a.nome).localeCompare(b.codigo || b.nome); });
-    var head = '<div class="section-head"><div class="section-meta">Cada projeto tem um ou mais clientes. O processo fica no Gestor de Projetos. Excluir um projeto só por aqui.</div><button class="btn btn-small btn-primary" data-novo="projeto">+ Novo projeto</button></div>';
-    return head + (list.length ? '<div class="table-wrap as-list"><table><thead><tr><th>Código</th><th>Projeto</th><th>Clientes</th><th>Etapa</th><th>Situação</th><th></th></tr></thead><tbody>' + list.map(function (p) {
+    var head = '<div class="section-head"><div class="section-meta">Cada projeto tem um ou mais clientes. Nome, clientes e contratos se alteram aqui; o processo fica no Gestor de Projetos. Excluir um projeto só por aqui.</div><button class="btn btn-small btn-primary" data-novo="projeto">+ Novo projeto</button></div>';
+    var ep = S.editProj && T.projeto(S.editProj);
+    return head + (ep ? formProjeto(ep) : "") + (list.length ? '<div class="table-wrap as-list"><table><thead><tr><th>Código</th><th>Projeto</th><th>Clientes</th><th>Etapa</th><th>Situação</th><th></th></tr></thead><tbody>' + list.map(function (p) {
       var cl = (p.clienteIds || []).map(function (id) { var c = contato(id); return c ? c.nome : null; }).filter(Boolean).join(", ") || p.cliente || "";
       var g = T.gestor && T.gestor.gp(p.id), s = g ? T.gestor.situacao(p.id) : null;
-      return '<tr class="cad-row" data-proj="' + esc(p.id) + '"><td class="num" data-l="Código"><b>' + esc(p.codigo || "—") + '</b></td><td class="name">' + esc(p.nome) + '</td><td data-l="Clientes">' + esc(cl) + '</td><td data-l="Etapa">' + (g ? T.gestor.etapaNome(p.id) : '<span class="hint">fora do Gestor</span>') + '</td><td data-l="Situação">' + (s ? '<span class="gp-sit ' + s.k + '">' + esc(s.txt) + "</span>" : "") + '</td><td class="acts">' + (g ? "" : '<button class="btn btn-small" data-levar="' + esc(p.id) + '">Levar ao Gestor</button>') + '<button class="link danger" data-pdel="' + esc(p.id) + '">Excluir</button></td></tr>';
+      return '<tr class="cad-row" data-proj="' + esc(p.id) + '"><td class="num" data-l="Código"><b>' + esc(p.codigo || "—") + '</b></td><td class="name">' + esc(p.nome) + '</td><td data-l="Clientes">' + esc(cl) + '</td><td data-l="Etapa">' + (g ? T.gestor.etapaNome(p.id) : '<span class="hint">fora do Gestor</span>') + '</td><td data-l="Situação">' + (s ? '<span class="gp-sit ' + s.k + '">' + esc(s.txt) + "</span>" : "") + '</td><td class="acts"><button class="btn btn-small" data-pedit="' + esc(p.id) + '">Editar</button>' + (g ? "" : '<button class="btn btn-small" data-levar="' + esc(p.id) + '">Levar ao Gestor</button>') + '<button class="link danger" data-pdel="' + esc(p.id) + '">Excluir</button></td></tr>';
     }).join("") + "</tbody></table></div>" : '<div class="empty">Nenhum projeto cadastrado.</div>');
   }
   function secObras() {
@@ -130,6 +158,7 @@
     v.addEventListener("click", async function (e) {
       var t = e.target, b;
       if ((b = t.closest("[data-levar]"))) { T.gestor.novo(T.projeto(b.dataset.levar)); return; }
+      if ((b = t.closest("[data-pedit]"))) { S.editProj = b.dataset.pedit; render(); window.scrollTo(0, 0); return; }
       if ((b = t.closest("[data-pdel]"))) {
         var pj = T.projeto(b.dataset.pdel);
         if (!(await T.confirmar({ titulo: "Excluir o projeto?", texto: "<b>" + esc(pj.nome) + "</b> sai de Cadastros, do Gestor de Projetos e de Horas e custos. As horas já lançadas continuam no Tempo, como “projeto removido”. Não dá para desfazer.", ok: "Excluir projeto", perigo: true }))) return;
@@ -147,12 +176,12 @@
         try { await T.db.doc("obras/" + b.dataset.odel).delete(); S.editObra = null; render(); T.toast("Obra excluída"); } catch (err) { T.showError(err); }
         return;
       }
-      if ((b = t.closest("[data-sec]"))) { S.sec = b.dataset.sec; S.edit = S.editObra = null; render(); return; }
+      if ((b = t.closest("[data-sec]"))) { S.sec = b.dataset.sec; S.edit = S.editObra = S.editProj = null; render(); return; }
       if ((b = t.closest("[data-cf]"))) { S.filtro = b.dataset.cf; render(); return; }
       if ((b = t.closest("[data-novo]"))) { var k = b.dataset.novo; if (k === "projeto") { T.gestor.novo(); return; } if (k === "obra") S.editObra = "novo"; else S.edit = "novo"; render(); return; }
-      if (t.closest("[data-cancel]")) { S.edit = S.editObra = null; render(); return; }
+      if (t.closest("[data-cancel]")) { S.edit = S.editObra = S.editProj = null; render(); return; }
       if ((b = t.closest("[data-ed]"))) { S.edit = b.dataset.ed; render(); window.scrollTo(0, 0); return; }
-      if ((b = t.closest("[data-proj]"))) { T.gestor.gp(b.dataset.proj) ? T.gestor.abrir(b.dataset.proj) : T.go("admin", "projetos"); return; }
+      if ((b = t.closest("[data-proj]"))) { T.gestor.gp(b.dataset.proj) ? T.gestor.abrir(b.dataset.proj) : T.relatorios.abrirCustos(); return; }
       if ((b = t.closest("[data-obra]"))) { S.editObra = b.dataset.obra; render(); return; }
       if ((b = t.closest("[data-del]"))) {
         var ct = contato(b.dataset.del);
@@ -163,10 +192,11 @@
     });
     v.addEventListener("change", function (e) { if (e.target.dataset.ctipo === "cliente") $("ct-proj-wrap").hidden = !e.target.checked; });
     v.addEventListener("input", function (e) { if (e.target.id === "cad-busca") { S.busca = e.target.value; var pos = e.target.selectionStart; render(); var i = $("cad-busca"); i.focus(); try { i.setSelectionRange(pos, pos); } catch (x) {} } });
-    v.addEventListener("submit", function (e) { e.preventDefault(); if (e.target.id === "cad-form") salvarContato(); if (e.target.id === "obra-form") salvarObra(); });
+    v.addEventListener("submit", function (e) { e.preventDefault(); if (e.target.id === "cad-form") salvarContato(); if (e.target.id === "obra-form") salvarObra(); if (e.target.id === "proj-form-cad") salvarProjeto(); });
   }
 
-  T.cadastros = { contato: contato, contatos: contatos, criarContato: criarContato };
+  T.cadastros = { contato: contato, contatos: contatos, criarContato: criarContato,
+    editarProjeto: function (pid) { S.sec = "projetos"; S.edit = S.editObra = null; S.editProj = pid; T.go("admin", "cadastros"); window.scrollTo(0, 0); } };
   T.register({
     id: "cadastros", label: "Cadastros", area: "admin", html: html, init: init, render: render,
     icon: '<path d="M4 4h12l4 4v12H4z"/><circle cx="11" cy="11" r="2.5"/><path d="M7 17c.8-1.8 2.2-2.7 4-2.7s3.2.9 4 2.7"/>',

@@ -14,14 +14,24 @@ Um único Artifact, organizado em **módulos**, com um único banco de dados com
 - **Regras de negócio dos módulos atuais:** `referencias/REGRAS.md`
 - **Processo de projeto da Trilha (base do Gestor):** `manual-trilha/` no repositório (MAPEAMENTO.md,
   processo-trilha.json, AJUSTES-TESTE.md com as decisões do Luan, TERMOS.md com os textos dos termos)
+- **Gestor Comercial:** fases 1, 2 e 3 no app oficial desde 02/10/2026 (inclui serviços menores, "Peça ao Claude",
+  versões, relatórios, vários contratantes, Levantamento e "Registrar rodada" no Gestor); configurações que só a conta de
+  origem faz no roteiro de `PENDENCIAS-CONTA-ORIGEM.md` (Passos 2 a 4). Código em `modulos/comercial.js` e `comercial-docs.js`; plano em
+  `gestao-trilha/COMERCIAL-PLANO.md`; regras em `REGRAS.md`; referências e modelos em `gestao-trilha/referencias-comercial/`.
+- **Pendências para a conta de origem:** `gestao-trilha/PENDENCIAS-CONTA-ORIGEM.md` — **ler sempre antes de mexer no
+  app**. O desenvolvimento pode ser feito por uma conta convidada (sem acesso ao banco pelo chat e que só envia imagens e
+  scripts); o que só a conta de origem (Luan e Elisa) pode configurar fica listado ali. Ao trabalhar pela conta de
+  origem: executar os itens abertos, pedindo autorização ao Luan quando o item pedir, e marcar cada um como feito.
+  Ao trabalhar pela conta convidada: acrescentar ali tudo o que precisar ser feito/configurado na conta de origem.
 
 ## Princípios que não se reabrem sem pedido explícito
 
 1. Tudo fica **num único app, no mesmo link**, para que os módulos compartilhem dados (pessoas, projetos,
    custos). Um módulo novo nasce como `modulos/<id>.js` deste app, não como outro Artifact.
 2. **Capa** = hub: notificações no topo (só as do Gestor de Projetos, via `notes()`), botões das pessoas (área
-   "pessoa": Tempo, Tarefas, Projetos) e botões do Escritório (área "admin": Gestor de Projetos, Cadastros,
-   Financeiro, Horas e custos, Relatórios, Configurações). Cada app do escritório abre sozinho, só com "← Início".
+   "pessoa": Tempo, Tarefas, Projetos) e botões do Escritório nesta ordem: Gestor de Projetos, Gestor de obras
+   (em breve), Gestor Comercial, Financeiro, Relatórios (com a aba Horas e custos), Configurações,
+   Cadastros. Cada app do escritório abre sozinho, só com "← Início".
 3. **Banco:** limite de 5.000 documentos por Artifact → registros numerosos agrupados em um documento por
    pessoa/mês ou por mês/obra, com `itens[]`. Gravações pelo chat usam `if_version`.
 4. **Identidade visual Trilha:** verde-sálvia #88AC67, neutros oklch esverdeados, Comfortaa + Work Sans,
@@ -31,6 +41,13 @@ Um único Artifact, organizado em **módulos**, com um único banco de dados com
 7. **Celular e computador:** seguir as regras de layout do `CONTRATO.md` §5 e conferir com imagem em 390 px e
    1280 px antes de publicar. Excluir, suspender e arquivar sempre com `T.confirmar`.
 8. **Nada é rígido:** listas, prazos, modelos e textos são padrões editáveis pelo usuário.
+9. **Uso eficiente do Claude** (pedido do Luan, 01/10/2026): garantir funcionamento, precisão e qualidade
+   sempre pelo caminho que gasta menos uso do Claude.
+   - **No desenvolvimento:** ler só os arquivos e trechos necessários; registrar decisões nos documentos para não
+     redescobrir; agrupar mudanças e publicar uma vez por rodada, depois de testar na cópia de teste.
+   - **No app:** IA só quando o usuário pede (um clique, nunca ao abrir a tela); cálculos, regras e montagem de
+     PDFs em código, não pela IA; enviar à IA só o contexto necessário; usar o nível "rápido" para tarefas
+     pequenas.
 
 ## Fluxo de trabalho em cada pedido
 
@@ -40,11 +57,12 @@ Um único Artifact, organizado em **módulos**, com um único banco de dados com
 2. **Alterar só o necessário**, no arquivo do módulo envolvido. Núcleo e `estilo.css` só mudam quando algo é
    comum a vários módulos.
 3. **Testar** antes de publicar: `node --check` em cada `.js` e a página aberta no Playwright com um banco simulado
-   (mock de `window.claude.use('db')` com os dados reais lidos por ArtifactData), servida por `page.route` (não
+   (mock de `window.claude.use('db')` com os dados reais lidos por ArtifactData, **com os documentos congelados**, como no app real), servida por `page.route` (não
    `file://`, que bloqueia o PDF do logo), em 390 px e 1280 px, sem erros no console.
 4. **Publicar** no mesmo link: `url` = link acima, `file_path` = `index.html`, `root` = pasta do app, `files`
    com todos os arquivos. Não alterar `capabilities` sem necessidade (hoje: `db`, `downloads` e `mcp` com
-   Google Calendar `create_event`/`update_event`); ao declarar uma nova, repetir as existentes.
+   Google Calendar `create_event`/`update_event`; com o Gestor Comercial entram `assets` e `sample`); ao declarar
+   uma nova, repetir as existentes.
 5. **Atualizar a documentação:** `REGRAS.md` (regras de negócio) e, se mudou a arquitetura, `CONTRATO.md`.
    Se houver acesso ao repositório, commit e push.
 6. **Um chat por vez** publicando no app, para um não sobrescrever o trabalho do outro.
@@ -66,3 +84,34 @@ Um único Artifact, organizado em **módulos**, com um único banco de dados com
 - Responder em português do Brasil, com linguagem de arquiteto/gestor (não de programador).
 - Quando o usuário pedir "só responder" ou "não processar ainda", responder sem alterar o app.
 - Explicar custos e riscos de forma direta; recomendar em vez de listar opções sem posição.
+- **Quando a pessoa disser que é a Elisa (Lili):** só anotar as sugestões dela, sem alterar o app nem os dados, e
+  pedir que o Luan confirme e analise antes de qualquer processamento. As sugestões ficam em `REGRAS.md`, seção
+  "Sugestões da Elisa (aguardando análise do Luan)", até o Luan aprovar, ajustar ou recusar cada uma.
+
+## Dúvidas e aprimoramentos (caixa na capa) — regra fixa (Luan, 02/10/2026)
+
+- Na capa, abaixo dos botões do Escritório, a caixa "Dúvidas e aprimoramentos · Registre aqui" grava cada registro em
+  `aprimoramentos/<AAAA-MM>` (`itens[]`: `id`, `texto`, `app`, `pessoaId`, `criadoEm`, `status`, `resposta`,
+  `atualizadoEm`). O app **só recebe**: não responde, não usa IA, não altera nada.
+- **Nenhum chat processa esses registros por conta própria.** Só quando o **Luan** pedir no chat:
+  1. **Analisar:** ler `aprimoramentos` (ArtifactData `list`), responder cada item no chat e gravar a resposta no
+     registro (`status: "respondido"`, `resposta`, `atualizadoEm`, com `if_version`).
+  2. **Processar:** só os itens que o Luan **autorizar** explicitamente; marcar `status: "aprovado"` ao começar e
+     `"feito"` ao publicar (ou `"recusado"`, com o motivo em `resposta`).
+- Pedidos registrados pela Elisa seguem a mesma regra: dependem da análise e da autorização do Luan.
+
+## Contas e onde cada coisa acontece (decidido em 01/10/2026)
+
+- **Uso do app:** sempre na conta do escritório (dona do link oficial e do banco de dados).
+- **Desenvolvimento e ajustes:** podem ser feitos numa segunda conta de confiança do Luan, com o app e as
+  conversas compartilhados com ela. O código e as regras chegam por este repositório. Antes de publicar no link
+  oficial, confirmar que essa conta tem permissão de edição; senão, testar numa cópia e publicar a partir da
+  conta do escritório.
+
+## Tarefas futuras
+
+- **Guia em PDF de todo o app Gestão Trilha** (todos os apps internos: Tempo, Tarefas, Projetos, Gestor de
+  Projetos, Comercial, Financeiro, Cadastros, Relatórios, Configurações…), explicando como cada um funciona e como
+  se ligam. **Referência de formato e tom:** a página visual do Gestor Comercial
+  (https://claude.ai/artifact/84BSJdugmhStKNBKKfCNND; cópia em `gestao-trilha/apresentacoes/gestor-comercial.html`),
+  que o Luan aprovou: processo em etapas, telas simuladas, exemplos, ligações entre apps e linguagem de gestor.
