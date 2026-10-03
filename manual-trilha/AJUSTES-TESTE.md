@@ -390,3 +390,24 @@ Dúvidas para o Luan:
 - Primeiro: **Casa Motta (RES-CASAMOTTA)**, dados da proposta, do contrato e do briefing. Hoje: **Anteprojeto, fase 2
   (compatibilização)**; Abertura, Estudo Preliminar e Projeto Legal concluídos. Marcenaria contratada no AP e com o EP
   da marcenaria quase no fim: o Luan manda depois a proposta e o contrato da marcenaria para ativá-la.
+
+## 26. Especificações (pedido do Luan, 03/10 — proposta, não processado)
+
+- Nova aba **Especificação** no projeto, com listas: Revestimentos, Louças e metais, Iluminação, Eletrodomésticos;
+  outras por projeto (espelhos, interruptores…).
+- Listas grandes: **não ficam no documento do projeto**. Proposta:
+  - **Biblioteca de itens** da Trilha (um documento por item): fabricante, linha/modelo, código, acabamento,
+    dimensões, fornecedor, link/foto, observação. Itens padrão, como os ambientes padrão.
+  - **Especificação do projeto** num documento próprio por lista (`esp/<projeto>_<lista>`): cada linha aponta para
+    o item da biblioteca e guarda uma cópia dos dados do momento (para o projeto não mudar se a biblioteca mudar),
+    mais ambiente, local, quantidade, situação (proposto / aprovado pelo cliente / substituído) e observação.
+  - Importar a lista já existente da Casa Motta.
+
+## 27. Registros de acontecimentos (pedido do Luan, 03/10 — proposta, não processado)
+
+- Caixa de texto (e voz) para registrar acontecimentos relevantes do projeto: pedido de alteração do cliente,
+  revisão solicitada, decisão, aceite, reclamação, retorno atrasado… Não é diário do dia a dia.
+- Fica na área da pessoa (registro rápido, escolhendo o projeto) e aparece no Histórico do projeto.
+- Guardados fora do documento do projeto (`diario/<projeto>_<ano>`).
+- Relatório em PDF para o cliente: pedidos de alteração e revisões (por ambiente, ex.: cozinha 6 versões), tempo
+  aguardando o cliente, reuniões, horas por etapa, linha do tempo. Marcar o que é candidato a aditivo (cláusula 9.1).
